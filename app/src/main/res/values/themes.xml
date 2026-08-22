@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FixITCity" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorSecondary">@color/secondary_blue</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:statusBarColor">@color/primary_green</item>
+    </style>
+
+    <style name="Theme.FixITCity.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="CardViewStyle" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="android:layout_margin">@dimen/padding_small</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.FixITCity.Button</item>
+    </style>
+
+    <style name="ShapeAppearance.FixITCity.Button" parent="">
+        <item name="cornerSize">8dp</item>
+    </style>
+    <style name="ShapeAppearance.FixITCity.Circle" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

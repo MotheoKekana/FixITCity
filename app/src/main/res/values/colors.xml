@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="secondary_blue">#003366</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="text_primary">#003366</color>
+    <color name="text_secondary">#666666</color>
+    <color name="status_in_progress">#FFA500</color>
+    <color name="status_completed">#008744</color>
+    <color name="status_unverified">#E32636</color>
+    <color name="divider">#DDDDDD</color>
+
+    <color name="primary_green">#2E7D32</color>   <!-- dark green -->
+    <color name="gold">#FFC107</color>            <!-- gold accent -->
+    <color name="background_light">#F5F5F5</color> <!-- existing -->
+
+    <!-- Severity badge colours -->
+    <color name="severity_high_bg">#FFEBEE</color>      <!-- light red -->
+    <color name="severity_high_text">#D32F2F</color>    <!-- dark red -->
+    <color name="severity_medium_bg">#FFF9C4</color>    <!-- light yellow -->
+    <color name="severity_medium_text">#F57F17</color>  <!-- dark orange -->
+    <color name="severity_low_bg">#E8F5E9</color>       <!-- light green -->
+    <color name="severity_low_text">#2E7D32</color>     <!-- dark green -->
+</resources>

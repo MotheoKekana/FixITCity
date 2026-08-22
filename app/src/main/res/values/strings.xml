@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FixITCity</string>
+    <string name="tagline">Report. Rank. Repair.</string>
+    <string name="loading">Loading...</string>
+    <string name="version_1_0">version 1.0</string>
+
+    <string name="login_title">Sign in to report and track municipal issues.</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="continue_as_guest">Continue as Guest</string>
+    <string name="dont_have_account">Don\'t have an account? Register</string>
+
+    <string name="register_title">Create an account to report and track civic issues.</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone_number">Phone Number (Optional)</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="agree_terms">I agree to the Terms of Service and Privacy Policy.</string>
+    <string name="register">REGISTER</string>
+    <string name="already_have_account">Already have an account? Sign In</string>
+
+    <string name="guest_welcome">Welcome to FixITCity</string>
+    <string name="guest_subtitle">Empowering citizens to build a better community. Report issues, track progress, and stay informed about your local environment.</string>
+    <string name="get_started">Get Started</string>
+    <string name="sign_in_caps">Sign In</string>
+
+    <string name="report_issues">Report Issues</string>
+    <string name="report_issues_desc">Easily log potholes, broken lights, and other concerns directly to authorities.</string>
+    <string name="track_progress">Track Progress</string>
+    <string name="track_progress_desc">Follow real-time updates on your submitted reports from review to resolution.</string>
+    <string name="community_impact">Community Impact</string>
+    <string name="community_impact_desc">See how your contributions improve the city and foster a safer environment.</string>
+
+    <string name="notifications">Notifications</string>
+    <string name="nearby_reports_title">Recent Reports Near You</string>
+    <string name="within_radius">Within 5km radius</string>
+    <string name="select_category">Select Category</string>
+    <string name="category_step">Step 1 of 4. What type of issue are you reporting?</string>
+    <string name="search_categories">Search categories (e.g., \'water\', \'street\')</string>
+    <string name="confirm_location">Confirm Location</string>
+    <string name="next_step">Next Step</string>
+    <string name="help_guide_title">Help &amp; Guide</string>
+    <string name="search_help">Search help topics...</string>
+    <string name="faq">Frequently Asked Questions</string>
+    <string name="tips_reporting">Tips for Effective Reporting</string>
+    <string name="need_more_help">Need More Help?</string>
+
+    <string name="take_photo_title">Take Photo of the Fault</string>
+    <string name="photo_step">STEP 2 OF 4</string>
+    <string name="photo_evidence">Photo Evidence</string>
+    <string name="tap_to_take_photo">Tap to take photo</string>
+    <string name="gallery">Gallery</string>
+    <string name="retake">Retake</string>
+    <string name="onboarding_title_1">Report Infrastructure Faults</string>
+    <string name="onboarding_desc_1">Take a photo and automatically tag the GPS location of potholes, burst pipes, broken streetlights, and other municipal issues.</string>
+    <string name="track_report_title">Track Your Report</string>
+    <string name="track_report_subtitle">Enter your reference number below to check the current status of your submitted report.</string>
+    <string name="reference_number">Reference Number</string>
+    <string name="track">TRACK</string>
+    <string name="recent_history">Recent History</string>
+    <string name="view_all_archive">View All Archive</string>
+
+    <string name="report_summary_title">Add Description (Optional)</string>
+    <string name="provide_details">Provide more details</string>
+    <string name="ready_to_submit">Ready to Submit?</string>
+    <string name="report_status_title">Report Status: #%1$s</string>
+    <string name="track_progress_result">Track the progress of your reported infrastructure issue.</string>
+    <string name="share_status">Share Status</string>
+    <string name="status_history">Status History</string>
+    <string name="notify_me">Notify Me</string>
+
+    <string name="guest_access">Guest Access</string>
+    <string name="guest_access_desc">You can report issues quickly without an account, but some community features will be restricted.</string>
+    <string name="sign_in_or_create">Sign In or Create Account</string>
+    <string name="category_label">CATEGORY</string>
+    <string name="photo_label">PHOTO</string>
+    <string name="location_label">LOCATION</string>
+    <string name="confirm_location_title">Confirm Location</string>
+    <string name="submit_report">Submit</string>
+    <string name="adjust_pin">Adjust Pin</string>
+    <string name="photo_tips">Photo Tips\n</string>
+</resources>
