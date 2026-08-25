@@ -21,4 +21,10 @@
     <color name="severity_medium_text">#F57F17</color>  <!-- dark orange -->
     <color name="severity_low_bg">#E8F5E9</color>       <!-- light green -->
     <color name="severity_low_text">#2E7D32</color>     <!-- dark green -->
+
+    <!-- Cohen colors -->
+    <color name="grey_overlay">#808080</color>
+    <color name="background_main_light_blue">#DDEFFA</color>    <!-- Faint blue used as background-->
+    <color name="faint_yellow">#FFF3D6</color>    <!-- Used on onboard Improve your community page-->
+    
 </resources>
