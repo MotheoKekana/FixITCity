@@ -2,7 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Camera feature (optional) -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <!-- Permissions for camera and gallery -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />   <!-- only needed for Android 9 and below -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".FixITCityApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,9 +25,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FixITCity">
 
-        <!-- Launcher activity – choose one of your screens -->
+        <!-- Launcher activity – starts at Category screen -->
         <activity
-            android:name=".HelpGuideActivity"
+            android:name=".ReportFaultCategoryActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,14 +35,25 @@
             </intent-filter>
         </activity>
 
-        <!-- Your other activities (just declare them if needed) -->
-        <activity android:name=".ReportFaultCategoryActivity" />
+        <!-- Report flow activities -->
         <activity android:name=".ReportFaultGPSActivity" />
         <activity android:name=".ReportFaultPhotoActivity" />
         <activity android:name=".ReportFaultSummaryActivity" />
         <activity android:name=".ReportSuccessActivity" />
 
+        <!-- Help & Guide (no longer launcher) -->
+        <activity android:name=".HelpGuideActivity" />
 
+        <!-- FileProvider for camera photos -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.fixitcity.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

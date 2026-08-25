@@ -8,8 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
 import java.util.List;
 
 public class FaultCategoryAdapter extends BaseAdapter {
@@ -59,23 +57,8 @@ public class FaultCategoryAdapter extends BaseAdapter {
         holder.title.setText(category.getTitle());
         holder.description.setText(category.getDescription());
 
-        int severity = category.getSeverity();
-        holder.severity.setText("⚠ Severity " + severity);
-
-        // Color code severity badge
-        int bgColor, textColor;
-        if (severity >= 8) {
-            bgColor = ContextCompat.getColor(context, R.color.severity_high_bg);
-            textColor = ContextCompat.getColor(context, R.color.severity_high_text);
-        } else if (severity >= 5) {
-            bgColor = ContextCompat.getColor(context, R.color.severity_medium_bg);
-            textColor = ContextCompat.getColor(context, R.color.severity_medium_text);
-        } else {
-            bgColor = ContextCompat.getColor(context, R.color.severity_low_bg);
-            textColor = ContextCompat.getColor(context, R.color.severity_low_text);
-        }
-        holder.severity.setBackgroundColor(bgColor);
-        holder.severity.setTextColor(textColor);
+        // Hide the severity badge (user should not see it)
+        holder.severity.setVisibility(View.GONE);
 
         return convertView;
     }

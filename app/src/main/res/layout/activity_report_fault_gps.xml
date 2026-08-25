@@ -13,7 +13,9 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
+            android:id="@+id/back_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_revert"
@@ -21,6 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary_green" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,6 +35,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Progress -->
@@ -63,12 +67,14 @@
             app:trackColor="#E1F5FE"
             app:indicatorColor="@color/primary_green"
             app:trackCornerRadius="4dp" />
+
     </LinearLayout>
 
-    <!-- Content -->
+    <!-- Main Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintTop_toBottomOf="@id/progress_container">
 
@@ -87,6 +93,26 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Address Search Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:boxStrokeColor="@color/primary_green"
+                app:startIconDrawable="@android:drawable/ic_menu_search"
+                app:startIconTint="@color/primary_green">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_address_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search for address or enter manually"
+                    android:inputType="textPostalAddress"
+                    android:imeOptions="actionSearch" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Map Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,17 +124,19 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Map -->
+                    <!-- Map placeholder -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="220dp"
                         android:background="@color/divider">
+
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_map_placeholder"
+                            android:src="@android:drawable/ic_menu_mapmode"
                             tools:src="@android:drawable/ic_menu_mapmode" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -117,13 +145,14 @@
                             android:background="@drawable/bg_pill_white"
                             android:paddingHorizontal="14dp"
                             android:paddingVertical="6dp"
-                            android:text="📡 GPS locked"
+                            android:text="📡 GPS enabled"
                             android:textColor="@color/primary_green"
                             android:textStyle="bold"
                             android:elevation="2dp" />
+
                     </RelativeLayout>
 
-                    <!-- Details -->
+                    <!-- Address details -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -137,47 +166,9 @@
                             android:textColor="@color/primary_green"
                             android:textSize="22sp"
                             android:textStyle="bold"
-                            tools:text="123 Main Street, Gqeberha" />
+                            tools:text=""
+                            android:hint="123 Main Street, Gqeberha"/>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:gravity="center_vertical">
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@android:drawable/ic_menu_compass"
-                                app:tint="@color/text_secondary" />
-                            <TextView
-                                android:id="@+id/tv_latitude"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:textColor="@color/text_secondary"
-                                tools:text="Latitude: -33.9608" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical">
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@android:drawable/ic_menu_compass"
-                                app:tint="@color/text_secondary" />
-                            <TextView
-                                android:id="@+id/tv_longitude"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:textColor="@color/text_secondary"
-                                tools:text="Longitude: 25.6022" />
-                        </LinearLayout>
-
-                        <!-- Adjust Pin – gold tonal -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_adjust_pin"
                             style="@style/Widget.Material3.Button.TonalButton"
@@ -188,6 +179,7 @@
                             android:backgroundTint="#FFC107"
                             android:textColor="@color/primary_green"
                             app:iconGravity="textStart" />
+
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -195,13 +187,13 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom -->
+    <!-- Next Step Button -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_next"
@@ -212,6 +204,134 @@
             app:cornerRadius="8dp"
             app:icon="@android:drawable/ic_media_next"
             app:iconGravity="textEnd" />
+
     </LinearLayout>
+
+    <!-- Bottom Navigation (highlighting "Report" tab) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Home (unselected) -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navReport"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_home"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Report (selected – highlighted with yellow pill) -->
+        <LinearLayout
+            android:id="@+id/navReport"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navTrack"
+            app:layout_constraintStart_toEndOf="@+id/navHome">
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_pill_white"
+                android:backgroundTint="#FFD600" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="-28dp"
+                android:src="@drawable/ic_report_24"
+                app:tint="#111827"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_report"
+                android:textColor="#111827"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Track (unselected) -->
+        <LinearLayout
+            android:id="@+id/navTrack"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navSettings"
+            app:layout_constraintStart_toEndOf="@+id/navReport">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_track_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_track"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Settings (unselected) -->
+        <LinearLayout
+            android:id="@+id/navSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/navTrack">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_settings"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,41 @@
 package com.example.fixitcity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class ReportFaultGPSActivity extends AppCompatActivity {
 
-    private TextView tvAddress, tvLat, tvLng;
+    private static final int LOCATION_PERMISSION_REQUEST = 1;
+    private TextView tvAddress;
+    private TextInputEditText etAddressSearch;
     private ReportData reportData;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,44 +43,183 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report_fault_gps);
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
-
         tvAddress = findViewById(R.id.tv_location_address);
-        tvLat = findViewById(R.id.tv_latitude);
-        tvLng = findViewById(R.id.tv_longitude);
+        etAddressSearch = findViewById(R.id.et_address_search);
 
-        // Simulate getting GPS location
-        fetchLocation();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Check permission and get location
+        if (checkLocationPermission()) {
+            getCurrentLocation();
+        } else {
+            requestLocationPermission();
+        }
+
+        // Address search with validation
+        etAddressSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                String query = etAddressSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    validateAndSetAddress(query);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        // Adjust Pin – open map picker
         findViewById(R.id.btn_adjust_pin).setOnClickListener(v -> {
-            // Open map picker or adjust pin – implement later
-            Toast.makeText(this, "Adjust pin clicked", Toast.LENGTH_SHORT).show();
+            String address = tvAddress.getText().toString();
+            openMapPicker(address);
         });
 
         findViewById(R.id.btn_next).setOnClickListener(v -> {
-            if (reportData.getLocationAddress() == null) {
+            if (reportData.getLocationAddress() == null || reportData.getLocationAddress().isEmpty()) {
                 Toast.makeText(this, "Please confirm your location", Toast.LENGTH_SHORT).show();
             } else {
-                startActivity(ReportFaultPhotoActivity.class);
+                startNextActivity(ReportFaultPhotoActivity.class);
             }
         });
+
+        // Bottom nav and back button
+        findViewById(R.id.navHome).setOnClickListener(v -> finish());
+        findViewById(R.id.navReport).setOnClickListener(v -> {});
+        findViewById(R.id.navTrack).setOnClickListener(v ->
+                Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.navSettings).setOnClickListener(v ->
+                Toast.makeText(this, "Settings screen coming soon", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.back_button).setOnClickListener(v -> finish());
     }
 
-    private void fetchLocation() {
-        // Dummy location – replace with actual GPS / API
-        String address = "123 Main Street, Gqeberha";
-        double lat = -33.9608;
-        double lng = 25.6022;
-
-        reportData.setLocationAddress(address);
-        reportData.setLatitude(lat);
-        reportData.setLongitude(lng);
-
-        tvAddress.setText(address);
-        tvLat.setText("Latitude: " + lat);
-        tvLng.setText("Longitude: " + lng);
+    private boolean checkLocationPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void startActivity(Class<?> cls) {
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                LOCATION_PERMISSION_REQUEST);
+    }
+
+    private void getCurrentLocation() {
+        if (!checkLocationPermission()) return;
+
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setNumUpdates(1);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (locationResult == null) return;
+                android.location.Location location = locationResult.getLastLocation();
+                if (location != null) {
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    reverseGeocode(lat, lng);
+                } else {
+                    Toast.makeText(ReportFaultGPSActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
+                }
+                fusedLocationClient.removeLocationUpdates(this);
+            }
+        };
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    private void reverseGeocode(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                String address = addresses.get(0).getAddressLine(0);
+                tvAddress.setText(address);
+                reportData.setLocationAddress(address);
+                // Optionally store lat/lng in ReportData if needed later
+            } else {
+                tvAddress.setText("Unknown location");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            tvAddress.setText("Reverse geocoding failed");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation();
+            } else {
+                Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void validateAndSetAddress(String query) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(query, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String fullAddress = address.getAddressLine(0);
+                tvAddress.setText(fullAddress);
+                reportData.setLocationAddress(fullAddress);
+                Toast.makeText(this, "Address validated", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Address not found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Geocoding service failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openMapPicker(String address) {
+        if (address == null || address.isEmpty()) {
+            Toast.makeText(this, "Please enter an address first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String encodedAddress = Uri.encode(address);
+        Uri geoUri = Uri.parse("geo:0,0?q=" + encodedAddress);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, geoUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+            return;
+        }
+
+        String webUri = "https://www.google.com/maps/search/?api=1&query=" + encodedAddress;
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUri));
+        try {
+            startActivity(webIntent);
+        } catch (Exception e) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirm Location")
+                    .setMessage("Location: " + address + "\n\nNo map app found. Continue?")
+                    .setPositiveButton("Continue", (dialog, which) -> {
+                        reportData.setLocationAddress(address);
+                        tvAddress.setText(address);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
+    }
+
+    private void startNextActivity(Class<?> cls) {
         startActivity(new Intent(this, cls));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (fusedLocationClient != null && locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
     }
 }

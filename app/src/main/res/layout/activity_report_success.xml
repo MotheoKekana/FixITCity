@@ -14,17 +14,17 @@
         android:fillViewport="true"
         android:padding="24dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation">
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="24dp">
@@ -45,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:text="Report Submitted!"
-                    android:textColor="@color/secondary_blue"
+                    android:textColor="@color/primary_green"
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
@@ -55,10 +55,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="Thank you for helping keep FixITCity safe and functional."
+                    android:text="Thank you for helping keep your city safe."
                     android:textColor="@color/text_secondary" />
 
-                <!-- Report Details -->
+                <!-- Report Details Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:textColor="@color/secondary_blue"
+                                android:textColor="@color/primary_green"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 tools:text="FIX-2024-001" />
@@ -149,17 +149,18 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
+                                android:background="#FFF3E0"
                                 android:paddingHorizontal="8dp"
                                 android:paddingVertical="2dp"
                                 android:text="Pending"
-                                android:textColor="#F57F17" />
+                                android:textColor="#E65100"
+                                android:textStyle="bold" />
 
                         </RelativeLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
-
 
                 <!-- Copy & Share -->
                 <LinearLayout
@@ -174,8 +175,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
+                        android:backgroundTint="#FFC107"
                         android:text="Copy Ref"
-                        app:icon="@android:drawable/ic_menu_edit" />
+                        android:textColor="@color/primary_green"
+                        app:icon="@android:drawable/ic_menu_edit"
+                        app:iconTint="@color/primary_green" />
 
                     <com.google.android.material.button.MaterialButton
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -183,11 +187,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
+                        android:backgroundTint="#FFC107"
                         android:text="Share"
-                        app:icon="@android:drawable/ic_menu_share" />
+                        android:textColor="@color/primary_green"
+                        app:icon="@android:drawable/ic_menu_share"
+                        app:iconTint="@color/primary_green" />
 
                 </LinearLayout>
-
 
                 <!-- Go To Dashboard -->
                 <com.google.android.material.button.MaterialButton
@@ -199,7 +205,6 @@
                     android:text="Go to Dashboard"
                     app:cornerRadius="8dp" />
 
-
                 <!-- Report Another Fault -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_report_another"
@@ -208,10 +213,9 @@
                     android:layout_height="60dp"
                     android:layout_marginTop="12dp"
                     android:text="Report Another Fault"
-                    android:textColor="@color/secondary_blue"
+                    android:textColor="@color/primary_green"
                     app:cornerRadius="8dp"
-                    app:strokeColor="@color/divider" />
-
+                    app:strokeColor="@color/primary_green" />
 
                 <!-- Track Report -->
                 <com.google.android.material.button.MaterialButton
@@ -221,9 +225,9 @@
                     android:layout_height="60dp"
                     android:layout_marginTop="12dp"
                     android:text="Track This Report"
-                    android:textColor="@color/secondary_blue"
+                    android:textColor="@color/primary_green"
                     app:cornerRadius="8dp"
-                    app:strokeColor="@color/divider" />
+                    app:strokeColor="@color/primary_green" />
 
             </LinearLayout>
 
@@ -231,19 +235,131 @@
 
     </ScrollView>
 
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <!-- Bottom Navigation (custom, highlighting "Report") -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
         android:background="@color/white"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Home (unselected) -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navReport"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_home"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Report (selected – highlighted with yellow pill) -->
+        <LinearLayout
+            android:id="@+id/navReport"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navTrack"
+            app:layout_constraintStart_toEndOf="@+id/navHome">
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_pill_white"
+                android:backgroundTint="#FFD600" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="-28dp"
+                android:src="@drawable/ic_report_24"
+                app:tint="#111827"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_report"
+                android:textColor="#111827"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Track (unselected) -->
+        <LinearLayout
+            android:id="@+id/navTrack"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/navSettings"
+            app:layout_constraintStart_toEndOf="@+id/navReport">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_track_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_track"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Settings (unselected) -->
+        <LinearLayout
+            android:id="@+id/navSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/navTrack">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings_24"
+                app:tint="#6B7280"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/nav_settings"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

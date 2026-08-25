@@ -2,10 +2,15 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +19,8 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
     private ListView listView;
     private FaultCategoryAdapter adapter;
-    private List<FaultCategory> categoryList = new ArrayList<>();
+    private List<FaultCategory> fullCategoryList = new ArrayList<>();
+    private List<FaultCategory> filteredList = new ArrayList<>();
     private ReportData reportData;
 
     @Override
@@ -22,49 +28,148 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_fault_category);
 
-        // Get or create shared data
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
         listView = findViewById(R.id.list_categories);
-        adapter = new FaultCategoryAdapter(this, categoryList);
+        adapter = new FaultCategoryAdapter(this, filteredList);
         listView.setAdapter(adapter);
 
-        // Load categories from API (dummy for now)
-        loadCategoriesFromApi();
+        loadCategories();
+
+        // Search filter
+        TextInputEditText etSearch = findViewById(R.id.et_search);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterCategories(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            FaultCategory selected = categoryList.get(position);
-            reportData.setCategory(selected.getTitle());
-            reportData.setCategoryDescription(selected.getDescription());
-            // Navigate to next step
-            startActivity(ReportFaultGPSActivity.class);
+            FaultCategory selected = filteredList.get(position);
+            if (selected.getId() == 99) { // "Other"
+                showOtherCategoryDialog();
+            } else {
+                reportData.setCategory(selected.getTitle());
+                reportData.setCategoryDescription(selected.getDescription());
+                startNextActivity(ReportFaultGPSActivity.class);
+            }
         });
 
         findViewById(R.id.btn_next).setOnClickListener(v -> {
-            // If nothing selected, show a message
             if (reportData.getCategory() == null) {
-                Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(this, "Please select a category", android.widget.Toast.LENGTH_SHORT).show();
             } else {
-                startActivity(ReportFaultGPSActivity.class);
+                startNextActivity(ReportFaultGPSActivity.class);
             }
         });
+
+        // Bottom nav and back button
+        findViewById(R.id.navHome).setOnClickListener(v -> finish());
+        findViewById(R.id.navReport).setOnClickListener(v -> {});
+        findViewById(R.id.navTrack).setOnClickListener(v ->
+                android.widget.Toast.makeText(this, "Track screen coming soon", android.widget.Toast.LENGTH_SHORT).show());
+        findViewById(R.id.navSettings).setOnClickListener(v ->
+                android.widget.Toast.makeText(this, "Settings screen coming soon", android.widget.Toast.LENGTH_SHORT).show());
+        findViewById(R.id.back_button).setOnClickListener(v -> finish());
     }
 
-    private void loadCategoriesFromApi() {
-        // Simulate API call – replace with Retrofit/Volley
-        categoryList.add(new FaultCategory(1, "Burst Water Pipe",
-                "Major water leak affecting pressure, flooding streets, or...", 10,
-                android.R.drawable.ic_dialog_alert));
-        categoryList.add(new FaultCategory(2, "Power Outage",
-                "Complete loss of electricity in multiple zones", 8,
+    private void loadCategories() {
+        fullCategoryList.clear();
+        // Add all categories (same as before, with an "Other" at the end)
+        fullCategoryList.add(new FaultCategory(1, "Pothole",
+                "Road surface damage, often caused by weather and traffic", 6,
                 android.R.drawable.ic_menu_report_image));
-        categoryList.add(new FaultCategory(3, "Blocked Drain",
+        fullCategoryList.add(new FaultCategory(2, "Burst Water Pipe",
+                "Major water leak affecting pressure, flooding streets", 10,
+                android.R.drawable.ic_dialog_alert));
+        fullCategoryList.add(new FaultCategory(3, "Blocked Drain",
                 "Sewage backup causing foul smell and slow drainage", 4,
                 android.R.drawable.ic_menu_compass));
+        fullCategoryList.add(new FaultCategory(4, "Streetlight Outage",
+                "Non-functioning streetlight creating safety hazards", 5,
+                android.R.drawable.ic_menu_camera));
+        fullCategoryList.add(new FaultCategory(5, "Litter / Illegal Dumping",
+                "Unsanitary waste buildup requiring removal", 3,
+                android.R.drawable.ic_menu_delete));
+        fullCategoryList.add(new FaultCategory(6, "Overgrown Vegetation",
+                "Uncontrolled growth obstructing sidewalks or visibility", 2,
+                android.R.drawable.ic_menu_gallery));
+        fullCategoryList.add(new FaultCategory(7, "Sidewalk Damage",
+                "Cracked or uneven pavement posing tripping hazards", 4,
+                android.R.drawable.ic_menu_mapmode));
+        fullCategoryList.add(new FaultCategory(8, "Traffic Signal Malfunction",
+                "Faulty traffic lights causing congestion or danger", 7,
+                android.R.drawable.ic_menu_manage));
+        fullCategoryList.add(new FaultCategory(9, "Fallen Tree / Branch",
+                "Debris blocking roads or damaging property", 6,
+                android.R.drawable.ic_menu_myplaces));
+        fullCategoryList.add(new FaultCategory(10, "Animal Control Issue",
+                "Stray animals or wildlife causing disturbance or danger", 3,
+                android.R.drawable.ic_menu_compass));
+        fullCategoryList.add(new FaultCategory(11, "Road Marking Damage",
+                "Faded or missing road markings, stop lines, or crosswalks", 4,
+                android.R.drawable.ic_menu_manage));
+        fullCategoryList.add(new FaultCategory(12, "Broken Street Sign",
+                "Damaged or missing street name signs or traffic signs", 3,
+                android.R.drawable.ic_menu_compass));
+        fullCategoryList.add(new FaultCategory(13, "Graffiti Removal",
+                "Unwanted graffiti on public property", 2,
+                android.R.drawable.ic_menu_camera));
+        fullCategoryList.add(new FaultCategory(14, "Abandoned Vehicle",
+                "Vehicle parked on public road for extended period", 4,
+                android.R.drawable.ic_menu_report_image));
+        // "Other" with question mark icon
+        fullCategoryList.add(new FaultCategory(99, "Other",
+                "If your issue is not listed, select this option to describe it", 0,
+                android.R.drawable.ic_menu_help));
+
+        filterCategories("");
+    }
+
+    private void filterCategories(String query) {
+        filteredList.clear();
+        if (query.isEmpty()) {
+            filteredList.addAll(fullCategoryList);
+        } else {
+            String lowerQuery = query.toLowerCase();
+            for (FaultCategory cat : fullCategoryList) {
+                if (cat.getTitle().toLowerCase().contains(lowerQuery) ||
+                        cat.getDescription().toLowerCase().contains(lowerQuery)) {
+                    filteredList.add(cat);
+                }
+            }
+        }
         adapter.notifyDataSetChanged();
     }
 
-    private void startActivity(Class<?> cls) {
+    private void showOtherCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Describe the issue");
+        final EditText input = new EditText(this);
+        input.setHint("Enter fault description");
+        builder.setView(input);
+        builder.setPositiveButton("Continue", (dialog, which) -> {
+            String description = input.getText().toString().trim();
+            if (!description.isEmpty()) {
+                reportData.setCategory("Other");
+                reportData.setCategoryDescription(description);
+                startNextActivity(ReportFaultGPSActivity.class);
+            } else {
+                android.widget.Toast.makeText(this, "Please describe the issue", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private void startNextActivity(Class<?> cls) {
         startActivity(new Intent(this, cls));
     }
 }
