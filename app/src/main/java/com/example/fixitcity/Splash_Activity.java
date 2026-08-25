@@ -1,4 +1,4 @@
-package com.example.yearprojectcohen;
+package com.example.fixitcity;
 
 import android.os.Bundle;
 
