@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FixITCity Dashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c27ffd6537e1c48dc1ab0c1baf57e20e6fad887d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b5293fbdf79b4055469ca5ff6cb113c4c044a17")]
 [assembly: System.Reflection.AssemblyProductAttribute("FixITCity Dashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FixITCity Dashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

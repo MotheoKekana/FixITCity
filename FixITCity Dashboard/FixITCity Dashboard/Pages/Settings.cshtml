@@ -4,6 +4,289 @@
     ViewData["Title"] = "Settings";
     Layout = "_SidebarLayout";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Settings content goes here.</p>
+<div class="settings-container">
+    <div class="settings-header">
+        <h2>Settings</h2>
+        <p class="text-muted">Manage your account settings and preferences</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- ===== PROFILE SECTION ===== -->
+    <div class="settings-card">
+        <div class="card-header">
+            <h5><i class="fas fa-user"></i> Profile Information</h5>
+            <p class="text-muted">Update your personal information</p>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="UpdateProfile">
+                <div class="form-group">
+                    <label asp-for="Input.FullName">Full Name</label>
+                    <input asp-for="Input.FullName" class="form-control" placeholder="Enter your full name" />
+                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Input.Email">Email Address</label>
+                    <input asp-for="Input.Email" class="form-control" placeholder="Enter your email address" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Input.PhoneNumber">Phone Number</label>
+                    <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Enter your phone number" />
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== WEB PREFERENCES SECTION ===== -->
+    <div class="settings-card">
+        <div class="card-header">
+            <h5><i class="fas fa-globe"></i> Web Preferences</h5>
+            <p class="text-muted">Customize your dashboard experience</p>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="UpdatePreferences">
+                <div class="form-group">
+                    <label asp-for="Input.Theme">Theme</label>
+                    <select asp-for="Input.Theme" class="form-control">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="system">System Default</option>
+                    </select>
+                    <span asp-validation-for="Input.Theme" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Notifications</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input asp-for="Input.EmailNotifications" type="checkbox" />
+                            <span>Email notifications</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input asp-for="Input.PushNotifications" type="checkbox" />
+                            <span>Push notifications</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Preferences
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+    .settings-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .settings-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .settings-header h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 0.25rem;
+    }
+
+    .settings-header .text-muted {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .alert-success {
+        background: #e6f4ea;
+        color: #1e7e34;
+        border: 1px solid #c8e6c9;
+    }
+
+    .alert i {
+        font-size: 1.1rem;
+    }
+
+    .settings-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e8eaed;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .settings-card .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e8eaed;
+        background: #fafbfc;
+        text-align: center;
+    }
+
+    .settings-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 1rem;
+    }
+
+    .settings-card .card-header h5 i {
+        color: #2d9e6b;
+        margin-right: 0.5rem;
+    }
+
+    .settings-card .card-header p {
+        margin: 0.25rem 0 0;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .settings-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #1a1a2e;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-group .form-control {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1.5px solid #dadce0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #fafbfc;
+    }
+
+    .form-group .form-control:focus {
+        outline: none;
+        border-color: #2d9e6b;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(45, 158, 107, 0.1);
+    }
+
+    .form-group .form-control::placeholder {
+        color: #9aa0a6;
+    }
+
+    .form-group .text-danger {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #1a1a2e;
+        cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #2d9e6b;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #2d9e6b;
+        border: none;
+        padding: 0.6rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        color: white;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background: #238a5d;
+        box-shadow: 0 2px 8px rgba(45, 158, 107, 0.3);
+    }
+
+    .btn-primary i {
+        font-size: 0.9rem;
+    }
+
+    .settings-card .card-body form {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @@media (max-width: 480px) {
+        .settings-container {
+            padding: 0 0.5rem;
+        }
+
+        .settings-card .card-body {
+            padding: 1rem;
+        }
+
+        .settings-header h2 {
+            font-size: 1.4rem;
+        }
+
+        .settings-card .card-body form {
+            max-width: 100%;
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
