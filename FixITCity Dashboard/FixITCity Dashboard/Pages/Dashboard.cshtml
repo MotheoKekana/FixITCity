@@ -1,0 +1,66 @@
+﻿@page
+@model FixITCity_Dashboard.Pages.DashboardModel
+@{
+    
+    ViewData["Title"] = "Dashboard";
+
+}
+<h1>Welcome Back ...</h1>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Approved</h5>
+                <p class="card-text">Pending</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Approval</h5>
+                <p class="card-text">Insert Code</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Unresolved</h5>
+                <p class="card-text">Insert Code</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Emergencies</h5>
+                <p class="card-text">Insert Code</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="map" style="height:250px;"></div>
+
+@section Scripts {
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([-33.957, 25.602], 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add a marker
+        L.marker([-33.957, 25.602]).addTo(map)
+            .bindPopup("Most reports here")
+            .openPopup();
+    </script>
+}
+
+
