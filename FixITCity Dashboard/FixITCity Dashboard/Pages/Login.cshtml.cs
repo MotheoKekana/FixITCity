@@ -36,13 +36,16 @@ namespace FixITCity_Dashboard.Pages
 }
 
    
+  
     public class LoginInput
-    {
-        [Required(ErrorMessage = "Username is required")]
-        [Display(Name = "Username")]
-        public string Username { get; set; }
-    }
+{
+    [Required(ErrorMessage = "Username is required")]
+    [Display(Name = "Username")]
+    public string Username { get; set; }
 
+    [Display(Name = "Password")]
+    public string Password { get; set; } 
+}
 
 }
 

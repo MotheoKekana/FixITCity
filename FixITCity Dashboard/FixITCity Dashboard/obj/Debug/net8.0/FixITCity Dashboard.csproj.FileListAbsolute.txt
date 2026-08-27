@@ -31,3 +31,4 @@ C:\Users\ICT\Documents\GitHub\FixITCity-Web-Dashboard\FixITCity Dashboard\FixITC
 C:\Users\ICT\Documents\GitHub\FixITCity-Web-Dashboard\FixITCity Dashboard\FixITCity Dashboard\obj\Debug\net8.0\FixITCity Dashboard.pdb
 C:\Users\ICT\Documents\GitHub\FixITCity-Web-Dashboard\FixITCity Dashboard\FixITCity Dashboard\obj\Debug\net8.0\FixITCity Dashboard.genruntimeconfig.cache
 C:\Users\ICT\Documents\GitHub\FixITCity-Web-Dashboard\FixITCity Dashboard\FixITCity Dashboard\obj\Debug\net8.0\ref\FixITCity Dashboard.dll
+c:\Users\ICT\Documents\GitHub\FixITCity-Web-Dashboard\FixITCity Dashboard\FixITCity Dashboard\obj\Debug\net8.0\scopedcss\Pages\Shared\_SidebarLayout.cshtml.rz.scp.css
