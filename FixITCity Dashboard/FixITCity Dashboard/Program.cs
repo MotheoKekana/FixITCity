@@ -1,5 +1,8 @@
+using FixITCity_Dashboard.Services;
+using FixITCity_Dashboard.Services.Dashboard;  
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 // Add services to the container.
 builder.Services.AddRazorPages();
 

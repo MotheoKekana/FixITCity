@@ -1,7 +1,80 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\2026 NMU\\2nd Semester\\ITPV302\\Admin Dashboard\\FixITCity Dashboard\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\pages\\shared\\_sidebarlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\pages\\shared\\_sidebarlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\pages\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\pages\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\pages\\dashboard.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\pages\\dashboard.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\pages\\reports.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\pages\\reports.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\wwwroot\\js\\dashboard-map.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\wwwroot\\js\\dashboard-map.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\wwwroot\\js\\dashboard-charts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\wwwroot\\js\\dashboard-charts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\services\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\services\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\dashboardstatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\dashboardstatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboardviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboardviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\mapsummaryviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\mapsummaryviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\emergencysummaryviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\emergencysummaryviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\dashboardviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\dashboardviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\dashboardalertviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\dashboardalertviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\categorystatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\categorystatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|c:\\users\\mnday\\downloads\\itproject\\fixitcity dashboard\\fixitcity dashboard\\viewmodels\\dashboard\\activitystatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BE0D50C-FD83-43AB-8AC1-20F1D7B00AB9}|FixITCity Dashboard\\FixITCity Dashboard.csproj|solutionrelative:fixitcity dashboard\\viewmodels\\dashboard\\activitystatisticsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +82,241 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "dashboard-map.js",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\wwwroot\\js\\dashboard-map.js",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\wwwroot\\js\\dashboard-map.js",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\wwwroot\\js\\dashboard-map.js",
+              "RelativeToolTip": "FixITCity Dashboard\\wwwroot\\js\\dashboard-map.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-08-28T12:50:59.505Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "dashboard-charts.js",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\wwwroot\\js\\dashboard-charts.js",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\wwwroot\\js\\dashboard-charts.js",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\wwwroot\\js\\dashboard-charts.js",
+              "RelativeToolTip": "FixITCity Dashboard\\wwwroot\\js\\dashboard-charts.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-08-28T12:50:57.583Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IDashboardService.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Services\\IDashboardService.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Services\\IDashboardService.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Services\\IDashboardService.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\Services\\IDashboardService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:44:55.683Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "DashboardService.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Services\\DashboardService.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Services\\DashboardService.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Services\\DashboardService.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\Services\\DashboardService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:44:54.105Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Program.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Program.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Program.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:31.216Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IDashboardService.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\IDashboardService.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\IDashboardService.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\IDashboardService.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\IDashboardService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:25.606Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "DashboardViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\DashboardViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\DashboardViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\DashboardViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\DashboardViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:23.716Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "MapSummaryViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\MapSummaryViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\MapSummaryViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\MapSummaryViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\MapSummaryViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:22.041Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "EmergencySummaryViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\EmergencySummaryViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\EmergencySummaryViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\EmergencySummaryViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\EmergencySummaryViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:20.817Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "DashboardViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:16.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DashboardStatisticsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardStatisticsViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardStatisticsViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardStatisticsViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardStatisticsViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:15.054Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "DashboardAlertViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardAlertViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardAlertViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardAlertViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardAlertViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:13.708Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "CategoryStatisticsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\CategoryStatisticsViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\CategoryStatisticsViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\CategoryStatisticsViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\CategoryStatisticsViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:12.143Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "ActivityStatisticsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\ActivityStatisticsViewModel.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\ViewModels\\Dashboard\\ActivityStatisticsViewModel.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\ViewModels\\Dashboard\\ActivityStatisticsViewModel.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\ActivityStatisticsViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:11.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Dashboard.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Dashboard.cshtml.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Pages\\Dashboard.cshtml.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Dashboard.cshtml.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\Pages\\Dashboard.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:43:02.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_SideBarLayout.cshtml",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Shared\\_SideBarLayout.cshtml",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Pages\\Shared\\_SideBarLayout.cshtml",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Shared\\_SideBarLayout.cshtml",
+              "RelativeToolTip": "FixITCity Dashboard\\Pages\\Shared\\_SideBarLayout.cshtml",
+              "ViewState": "AgIAABgBAACAlpmZmZkewCoBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-28T12:37:13.982Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Dashboard.cshtml",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Dashboard.cshtml",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Pages\\Dashboard.cshtml",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Dashboard.cshtml",
+              "RelativeToolTip": "FixITCity Dashboard\\Pages\\Dashboard.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-28T12:36:54.719Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Reports.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Reports.cshtml.cs",
+              "RelativeDocumentMoniker": "FixITCity Dashboard\\Pages\\Reports.cshtml.cs",
+              "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Pages\\Reports.cshtml.cs",
+              "RelativeToolTip": "FixITCity Dashboard\\Pages\\Reports.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-28T12:23:58.302Z",
+              "EditorCaption": ""
             }
           ]
         }
