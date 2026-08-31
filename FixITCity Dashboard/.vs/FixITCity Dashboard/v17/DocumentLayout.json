@@ -94,8 +94,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\wwwroot\\js\\dashboard-map.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-08-28T12:50:59.505Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:50:59.505Z"
             },
             {
               "$type": "Document",
@@ -107,8 +106,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\wwwroot\\js\\dashboard-charts.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-08-28T12:50:57.583Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:50:57.583Z"
             },
             {
               "$type": "Document",
@@ -120,8 +118,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Services\\IDashboardService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:44:55.683Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:44:55.683Z"
             },
             {
               "$type": "Document",
@@ -133,8 +130,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Services\\DashboardService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:44:54.105Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:44:54.105Z"
             },
             {
               "$type": "Document",
@@ -144,7 +140,7 @@
               "RelativeDocumentMoniker": "FixITCity Dashboard\\Program.cs",
               "ToolTip": "C:\\Users\\mnday\\Downloads\\ITProject\\FixITCity Dashboard\\FixITCity Dashboard\\Program.cs",
               "RelativeToolTip": "FixITCity Dashboard\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAABCAAAAAAAAAA==",
+              "ViewState": "AgIAAAIAAADAMjMzMzMrwAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-28T12:43:31.216Z",
               "EditorCaption": ""
@@ -159,8 +155,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\IDashboardService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:25.606Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:25.606Z"
             },
             {
               "$type": "Document",
@@ -172,8 +167,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\DashboardViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:23.716Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:23.716Z"
             },
             {
               "$type": "Document",
@@ -185,8 +179,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\MapSummaryViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:22.041Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:22.041Z"
             },
             {
               "$type": "Document",
@@ -198,8 +191,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\EmergencySummaryViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:20.817Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:20.817Z"
             },
             {
               "$type": "Document",
@@ -211,8 +203,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:16.094Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:16.094Z"
             },
             {
               "$type": "Document",
@@ -224,8 +215,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardStatisticsViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:15.054Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:15.054Z"
             },
             {
               "$type": "Document",
@@ -237,8 +227,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\DashboardAlertViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:13.708Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:13.708Z"
             },
             {
               "$type": "Document",
@@ -250,8 +239,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\CategoryStatisticsViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:12.143Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:12.143Z"
             },
             {
               "$type": "Document",
@@ -263,8 +251,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\ViewModels\\Dashboard\\ActivityStatisticsViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:11.002Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:11.002Z"
             },
             {
               "$type": "Document",
@@ -276,8 +263,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Pages\\Dashboard.cshtml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:43:02.002Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:43:02.002Z"
             },
             {
               "$type": "Document",
@@ -289,8 +275,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Pages\\Shared\\_SideBarLayout.cshtml",
               "ViewState": "AgIAABgBAACAlpmZmZkewCoBAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-08-28T12:37:13.982Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:37:13.982Z"
             },
             {
               "$type": "Document",
@@ -302,8 +287,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Pages\\Dashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAALAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-08-28T12:36:54.719Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:36:54.719Z"
             },
             {
               "$type": "Document",
@@ -315,8 +299,7 @@
               "RelativeToolTip": "FixITCity Dashboard\\Pages\\Reports.cshtml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-28T12:23:58.302Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-28T12:23:58.302Z"
             }
           ]
         }
