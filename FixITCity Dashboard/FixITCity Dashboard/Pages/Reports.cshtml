@@ -1,4 +1,4 @@
-﻿@page
+﻿@page 
 @model ReportsModel
 @{
     ViewData["Title"] = "Reports";
@@ -117,7 +117,8 @@
                             <td>@report.ReportedDate.ToString("dd MMM yyyy")</td>
                             <td>@report.Location</td>
                             <td>
-                                <a href="#" class="btn-view" title="View Details">
+                                <!-- Updated link to Fault Detail -->
+                                <a asp-page="/FaultDetail" asp-route-id="@report.ReportID" class="btn-view" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>

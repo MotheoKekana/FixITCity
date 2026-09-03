@@ -9,6 +9,8 @@
     <title>@ViewData["Title"] - FixITCity</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         * {
             margin: 0;
@@ -295,6 +297,11 @@
             <li>
                 <a asp-page="/Dashboard" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Dashboard" ? "active" : "")">
                     <i></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a asp-page="/Reports" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Reports" ? "active" : "")">
+                    <i></i> Reports
                 </a>
             </li>
             <li>
