@@ -87,4 +87,6 @@
     <string name="submit_report">Submit</string>
     <string name="adjust_pin">Adjust Pin</string>
     <string name="photo_tips">Photo Tips\n</string>
+    <string name="nearby_issues">Nearby Reports</string>
+    <string name="recent_reports">Recent reports</string>
 </resources>
