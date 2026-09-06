@@ -3,6 +3,8 @@ package com.example.fixitcity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -10,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,8 +26,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ProximityCheckActivity extends AppCompatActivity {
 
@@ -41,44 +44,43 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private TextView tvStatus, tvReportsCount;
     private LinearProgressIndicator progressIndicator;
-    private MaterialButton btnContinue, btnNewIssue;
+    private MaterialButton btnNewIssue;
+    // No Continue button
 
     private boolean hasUpvoted = false;
     private int upvotedReportId = -1;
+    private ReportData reportData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proximity_check);
 
+        reportData = ((FixITCityApp) getApplication()).getReportData();
+
         initViews();
         setupBottomNavigation();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (checkLocationPermission()) {
-            getCurrentLocation();
+        // Use stored location if available, else GPS
+        if (reportData.getLatitude() != 0 && reportData.getLongitude() != 0) {
+            queryNearbyReports(reportData.getLatitude(), reportData.getLongitude());
+        } else if (reportData.getLocationAddress() != null) {
+            geocodeAddress(reportData.getLocationAddress());
         } else {
-            requestLocationPermission();
+            if (checkLocationPermission()) {
+                getCurrentLocation();
+            } else {
+                requestLocationPermission();
+            }
         }
 
-        // "New Issue" button – clears draft and goes to category selection
+        // New Issue – go to Photo (category & location are already set)
         btnNewIssue.setOnClickListener(v -> {
-            ((FixITCityApp) getApplication()).clearReportData();
-            startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+            // Do NOT clear data – keep category and location
+            startActivity(new Intent(this, ReportFaultPhotoActivity.class));
             finish();
-        });
-
-        // Continue button – only enabled after upvoting
-        btnContinue.setOnClickListener(v -> {
-            if (hasUpvoted) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Upvote Confirmed")
-                        .setMessage("You've upvoted this report. Your draft has been discarded.")
-                        .setPositiveButton("OK", (dialog, which) -> finish())
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
         });
     }
 
@@ -87,7 +89,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tv_status);
         tvReportsCount = findViewById(R.id.tv_reports_count);
         progressIndicator = findViewById(R.id.progress_indicator);
-        btnContinue = findViewById(R.id.btn_continue);
         btnNewIssue = findViewById(R.id.btn_new_issue);
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
@@ -97,13 +98,14 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
-        findViewById(R.id.navReport).setOnClickListener(v -> {
-            // Already in report flow – do nothing or restart
-        });
+        findViewById(R.id.navReport).setOnClickListener(v ->
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class))
+        );
         findViewById(R.id.navTrack).setOnClickListener(v ->
                 Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
         findViewById(R.id.navSettings).setOnClickListener(v ->
-                Toast.makeText(this, "Settings screen coming soon", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, ProfileSettingsActivity.class))
+        );
         findViewById(R.id.back_button).setOnClickListener(v -> finish());
     }
 
@@ -143,11 +145,31 @@ public class ProximityCheckActivity extends AppCompatActivity {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
+    private void geocodeAddress(String address) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(address, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address addr = addresses.get(0);
+                reportData.setLatitude(addr.getLatitude());
+                reportData.setLongitude(addr.getLongitude());
+                queryNearbyReports(addr.getLatitude(), addr.getLongitude());
+            } else {
+                tvStatus.setText("Could not locate address");
+                progressIndicator.setIndeterminate(false);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            tvStatus.setText("Geocoding error");
+            progressIndicator.setIndeterminate(false);
+        }
+    }
+
     private void queryNearbyReports(double lat, double lng) {
         tvStatus.setText("Searching for nearby reports...");
         progressIndicator.setIndeterminate(true);
 
-        // Replace with actual API call
+        // Simulate API call – replace with real network call
         simulateApiResponse();
     }
 
@@ -169,7 +191,8 @@ public class ProximityCheckActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         if (reportList.isEmpty()) {
-            btnNewIssue.performClick(); // suggest new report
+            // No reports – suggest new report
+            btnNewIssue.performClick();
         }
     }
 
@@ -185,16 +208,17 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
         hasUpvoted = true;
         upvotedReportId = report.getId();
-        btnContinue.setEnabled(true);
-        btnContinue.setText("✓ Upvoted – Continue");
+
+        // Discard draft (but keep category & location? They are already saved)
+        // We don't need to clear here because we are going to ThankYou
+        // If you want to clear draft, call clearReportData() – but be careful not to lose category/location
+        // For this flow, we just navigate to ThankYou
 
         Toast.makeText(this, "Upvoted: " + report.getTitle(), Toast.LENGTH_SHORT).show();
 
-        // Discard draft
-        ((FixITCityApp) getApplication()).clearReportData();
-
-        // Here you would call your API to update the vote count on the server
-        // and recalculate the priority score (votes = 20% weighting)
+        // Navigate to ThankYouActivity (upvote confirmation)
+        startActivity(new Intent(this, ThankYouActivity.class));
+        finish();
     }
 
     @Override

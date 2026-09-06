@@ -1,26 +1,38 @@
 package com.example.fixitcity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.example.fixitcity.R;
 
 public class Guest_Dashboard_Activity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_guest_dashboard);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.guest_dashboard), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        // Get Started button – starts the report flow
+//        Button btnGetStarted = findViewById(R.id.btnGetStarted);
+//        btnGetStarted.setOnClickListener(v ->
+//                startActivity(new Intent(this, ProximityCheckActivity.class))
+//        );
+
+        // Bottom navigation clicks
+        findViewById(R.id.navHome).setOnClickListener(v ->
+                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
+        );
+        findViewById(R.id.navReport).setOnClickListener(v ->
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class))
+        );
+
+        findViewById(R.id.navTrack).setOnClickListener(v ->
+                Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show()
+        );
+        findViewById(R.id.navSettings).setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileSettingsActivity.class))
+        );
     }
 }

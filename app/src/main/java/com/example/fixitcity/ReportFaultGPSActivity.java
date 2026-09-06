@@ -73,17 +73,26 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             openMapPicker(address);
         });
 
+        // Next button – goes to ProximityCheck
         findViewById(R.id.btn_next).setOnClickListener(v -> {
             if (reportData.getLocationAddress() == null || reportData.getLocationAddress().isEmpty()) {
                 Toast.makeText(this, "Please confirm your location", Toast.LENGTH_SHORT).show();
             } else {
-                startNextActivity(ReportFaultPhotoActivity.class);
+                // Ensure we have lat/lng – if not, geocode the address
+                if (reportData.getLatitude() == 0 && reportData.getLongitude() == 0) {
+                    geocodeAddressForLocation(reportData.getLocationAddress());
+                } else {
+                    startNextActivity(ProximityCheckActivity.class);
+                }
             }
         });
 
-        // Bottom nav and back button
+        // Bottom navigation
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
-        findViewById(R.id.navReport).setOnClickListener(v -> {});
+        findViewById(R.id.navReport).setOnClickListener(v -> {
+            startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+            finish();
+        });
         findViewById(R.id.navTrack).setOnClickListener(v ->
                 Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
         findViewById(R.id.navSettings).setOnClickListener(v ->
@@ -115,9 +124,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 if (locationResult == null) return;
                 android.location.Location location = locationResult.getLastLocation();
                 if (location != null) {
-                    double lat = location.getLatitude();
-                    double lng = location.getLongitude();
-                    reverseGeocode(lat, lng);
+                    reverseGeocode(location.getLatitude(), location.getLongitude());
                 } else {
                     Toast.makeText(ReportFaultGPSActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
                 }
@@ -133,10 +140,12 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             if (addresses != null && !addresses.isEmpty()) {
-                String address = addresses.get(0).getAddressLine(0);
-                tvAddress.setText(address);
-                reportData.setLocationAddress(address);
-                // Optionally store lat/lng in ReportData if needed later
+                Address address = addresses.get(0);
+                String fullAddress = address.getAddressLine(0);
+                tvAddress.setText(fullAddress);
+                reportData.setLocationAddress(fullAddress);
+                reportData.setLatitude(lat);
+                reportData.setLongitude(lng);
             } else {
                 tvAddress.setText("Unknown location");
             }
@@ -168,6 +177,8 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 String fullAddress = address.getAddressLine(0);
                 tvAddress.setText(fullAddress);
                 reportData.setLocationAddress(fullAddress);
+                reportData.setLatitude(address.getLatitude());
+                reportData.setLongitude(address.getLongitude());
                 Toast.makeText(this, "Address validated", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Address not found", Toast.LENGTH_SHORT).show();
@@ -175,6 +186,30 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Geocoding service failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void geocodeAddressForLocation(String address) {
+        if (address == null || address.isEmpty()) {
+            Toast.makeText(this, "Address is empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(address, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address addr = addresses.get(0);
+                reportData.setLatitude(addr.getLatitude());
+                reportData.setLongitude(addr.getLongitude());
+                startNextActivity(ProximityCheckActivity.class);
+            } else {
+                Toast.makeText(this, "Could not get coordinates, but continuing", Toast.LENGTH_SHORT).show();
+                startNextActivity(ProximityCheckActivity.class);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Geocoding error, but continuing", Toast.LENGTH_SHORT).show();
+            startNextActivity(ProximityCheckActivity.class);
         }
     }
 

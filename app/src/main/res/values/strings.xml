@@ -89,4 +89,24 @@
     <string name="photo_tips">Photo Tips\n</string>
     <string name="nearby_issues">Nearby Reports</string>
     <string name="recent_reports">Recent reports</string>
+
+    <string name="content_desc_app_logo">App Logo</string>
+    <string name="content_desc_notifications">Notifications</string>
+    <string name="content_desc_report_symbol">Report symbol</string>
+    <string name="content_desc_track_report_icon">Track report icon</string>
+    <string name="desc_community_engagement">Community engagement illustration</string>
+    <string name="desc_user_icon">User icon</string>
+    <string name="desc_available_shield">Available shield</string>
+    <string name="available_as_guest">Available as Guest</string>
+    <string name="desc_included">Included feature</string>
+    <string name="report_faults_with_photo_gps">Report faults with photo and GPS</string>
+
+    <string name="track_progress_via_reference">Track progress via reference number</string>
+    <string name="desc_required_lock">Locked – sign in required</string>
+    <string name="requires_account">Requires an account</string>
+    <string name="desc_restricted">Restricted – sign in to access</string>
+    <string name="view_complete_report_history">View complete report history</string>
+    <string name="receive_push_notifications">Receive push notifications</string>
+    <string name="view_nearby_reports_from_others">View nearby reports from others</string>
+
 </resources>

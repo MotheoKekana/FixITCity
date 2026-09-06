@@ -7,12 +7,12 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <!-- Permissions for camera and gallery -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />   <!-- only needed for Android 9 and below -->
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -20,15 +20,15 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/app_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FixITCity">
 
-        <!-- Launcher activity – starts at Category screen -->
+        <!-- Launcher: Guest Dashboard -->
         <activity
-            android:name=".ReportFaultCategoryActivity"
+            android:name=".Guest_Dashboard_Activity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,13 +36,17 @@
             </intent-filter>
         </activity>
 
-        <!-- Report flow activities -->
+        <!-- Report flow (in order) -->
+        <activity android:name=".ReportFaultCategoryActivity" />
         <activity android:name=".ReportFaultGPSActivity" />
+        <activity android:name=".ProximityCheckActivity" />
+        <activity android:name=".ThankYouActivity" />
         <activity android:name=".ReportFaultPhotoActivity" />
         <activity android:name=".ReportFaultSummaryActivity" />
         <activity android:name=".ReportSuccessActivity" />
+        <activity android:name=".ProfileSettingsActivity" />
 
-        <!-- Help & Guide (no longer launcher) -->
+        <!-- Help & Guide -->
         <activity android:name=".HelpGuideActivity" />
 
         <!-- FileProvider for camera photos -->

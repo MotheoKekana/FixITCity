@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,6 +23,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- Checkmark Icon -->
             <ImageView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
@@ -47,6 +49,7 @@
                 android:text="Thank you for helping keep FixITCity safe and functional."
                 android:textColor="@color/text_secondary" />
 
+            <!-- Details Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,6 +64,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Reference Number -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -72,13 +76,14 @@
                             android:textSize="12sp"
                             android:textStyle="bold" />
                         <TextView
+                            android:id="@+id/tv_reference_number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="FIX-2024-001"
                             android:textColor="@color/secondary_blue"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="FIX-2024-001" />
                     </RelativeLayout>
 
                     <View
@@ -87,6 +92,7 @@
                         android:layout_marginVertical="12dp"
                         android:background="@color/divider" />
 
+                    <!-- Priority Score -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -98,16 +104,18 @@
                             android:textSize="12sp"
                             android:textStyle="bold" />
                         <TextView
+                            android:id="@+id/tv_priority_score"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:background="@drawable/bg_badge_priority"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
-                            android:text="92/100"
-                            android:textColor="@color/white" />
+                            android:textColor="@color/white"
+                            tools:text="92/100" />
                     </RelativeLayout>
 
+                    <!-- Status -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -120,24 +128,28 @@
                             android:textSize="12sp"
                             android:textStyle="bold" />
                         <TextView
+                            android:id="@+id/tv_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:background="@drawable/bg_badge_status_received"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
-                            android:text="Received"
+                            android:text="Pending"
                             android:textColor="#D32F2F" />
                     </RelativeLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Copy & Share -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_copy_ref"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -146,6 +158,7 @@
                     android:text="Copy Ref"
                     app:icon="@android:drawable/ic_menu_edit" />
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_share"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -155,7 +168,9 @@
                     app:icon="@android:drawable/ic_menu_share" />
             </LinearLayout>
 
+            <!-- Go to Dashboard -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_go_dashboard"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="24dp"
@@ -163,7 +178,9 @@
                 android:backgroundTint="@color/primary_green"
                 app:cornerRadius="8dp" />
 
+            <!-- Report Another Fault -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_report_another"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -173,7 +190,9 @@
                 app:strokeColor="@color/divider"
                 app:cornerRadius="8dp" />
 
+            <!-- Track Report -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_track_report"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"

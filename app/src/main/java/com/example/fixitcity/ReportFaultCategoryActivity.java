@@ -52,13 +52,15 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
+            // FIX: use filteredList instead of categoryList
             FaultCategory selected = filteredList.get(position);
-            if (selected.getId() == 99) { // "Other"
+            if (selected.getId() == 99) {
                 showOtherCategoryDialog();
             } else {
                 reportData.setCategory(selected.getTitle());
                 reportData.setCategoryDescription(selected.getDescription());
-                startNextActivity(ReportFaultGPSActivity.class);
+                // Go to GPS (Step 2)
+                startActivity(new Intent(this, ReportFaultGPSActivity.class));
             }
         });
 
@@ -66,13 +68,17 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             if (reportData.getCategory() == null) {
                 android.widget.Toast.makeText(this, "Please select a category", android.widget.Toast.LENGTH_SHORT).show();
             } else {
-                startNextActivity(ReportFaultGPSActivity.class);
+                startActivity(new Intent(this, ReportFaultGPSActivity.class));
             }
         });
 
-        // Bottom nav and back button
-        findViewById(R.id.navHome).setOnClickListener(v -> finish());
-        findViewById(R.id.navReport).setOnClickListener(v -> {});
+        // Bottom navigation
+        findViewById(R.id.navHome).setOnClickListener(v -> finish()); // back to dashboard
+        findViewById(R.id.navReport).setOnClickListener(v -> {
+            // Already in category – optionally restart the flow
+            startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+            finish();
+        });
         findViewById(R.id.navTrack).setOnClickListener(v ->
                 android.widget.Toast.makeText(this, "Track screen coming soon", android.widget.Toast.LENGTH_SHORT).show());
         findViewById(R.id.navSettings).setOnClickListener(v ->
@@ -82,7 +88,8 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
     private void loadCategories() {
         fullCategoryList.clear();
-        // Add all categories (same as before, with an "Other" at the end)
+
+        // Add all categories
         fullCategoryList.add(new FaultCategory(1, "Pothole",
                 "Road surface damage, often caused by weather and traffic", 6,
                 android.R.drawable.ic_menu_report_image));
@@ -130,6 +137,10 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
                 "If your issue is not listed, select this option to describe it", 0,
                 android.R.drawable.ic_menu_help));
 
+        // DEBUG: log the number of categories
+        android.util.Log.d("CategoryActivity", "Total categories loaded: " + fullCategoryList.size());
+
+        // Populate the filtered list
         filterCategories("");
     }
 
@@ -160,16 +171,12 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             if (!description.isEmpty()) {
                 reportData.setCategory("Other");
                 reportData.setCategoryDescription(description);
-                startNextActivity(ReportFaultGPSActivity.class);
+                startActivity(new Intent(this, ReportFaultGPSActivity.class));
             } else {
                 android.widget.Toast.makeText(this, "Please describe the issue", android.widget.Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
-    }
-
-    private void startNextActivity(Class<?> cls) {
-        startActivity(new Intent(this, cls));
     }
 }

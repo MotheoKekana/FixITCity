@@ -43,7 +43,7 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         holder.tvVotes.setText("⬆ " + report.getVoteCount());
         holder.tvDistance.setText(String.format("%.0fm away", report.getDistance()));
 
-        // Optional: set icon based on category
+        // Icon mapping (optional)
         int iconRes = android.R.drawable.ic_dialog_alert;
         String cat = report.getCategory().toLowerCase();
         if (cat.contains("pothole")) iconRes = android.R.drawable.ic_menu_report_image;
@@ -52,9 +52,12 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         else if (cat.contains("light")) iconRes = android.R.drawable.ic_menu_camera;
         holder.ivIcon.setImageResource(iconRes);
 
+        // ✅ Set click listener on the whole item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(report, position);
+            } else {
+                android.util.Log.e("Adapter", "Listener is null!");
             }
         });
     }

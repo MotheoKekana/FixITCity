@@ -4,6 +4,8 @@ public class ReportData {
     private String category;
     private String categoryDescription;
     private String locationAddress;
+    private double latitude;
+    private double longitude;
     private int photoCount;
     private String additionalDetails;
 
@@ -15,6 +17,12 @@ public class ReportData {
 
     public String getLocationAddress() { return locationAddress; }
     public void setLocationAddress(String locationAddress) { this.locationAddress = locationAddress; }
+
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
 
     public int getPhotoCount() { return photoCount; }
     public void setPhotoCount(int photoCount) { this.photoCount = photoCount; }
