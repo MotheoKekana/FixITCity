@@ -1,154 +1,256 @@
 @page
 @model FixITCity_Dashboard.Pages.DashboardModel
+@using System.Linq
+@using System.Text.Json
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "_SidebarLayout";
+
+    var stats = Model.DashboardData.Statistics;
+    var categories = Model.DashboardData.Categories.ReportsByCategory;
+    var activity = Model.DashboardData.Activity.ReportsByDay;
+    var emergencies = Model.DashboardData.Emergencies;
+    var alerts = Model.DashboardData.Alerts;
+    var map = Model.DashboardData.Map;
+
+    var maxCategory = categories.Count > 0 ? Math.Max(1, categories.Values.Max()) : 1;
+    var maxActivity = activity.Count > 0 ? Math.Max(1, activity.Values.Max()) : 1;
+
+    var mapPointsJson = JsonSerializer.Serialize(map.MapPoints.Select(point => new
+    {
+        latitude = point.Latitude,
+        longitude = point.Longitude,
+        title = point.Title,
+        description = point.Description,
+        isEmergency = point.IsEmergency
+    }));
 }
 
-<!-- Leaflet CSS for Map -->
+<link rel="preconnect" href="https://unpkg.com" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
-<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-    <div>
-        <h2>Municipal Dashboard</h2>
-        <span class="text-muted"><i class="fa-solid fa-location-dot"></i> Port Elizabeth, Eastern Cape</span>
-    </div>
-    <div>
-        <!-- High-level Filters -->
-        <select class="form-select d-inline-block w-auto">
-            <option>Last 30 Days</option>
-            <option>Last 7 Days</option>
-            <option>Today</option>
-        </select>
-    </div>
+<div class="dashboard-shell">
+    <main class="dashboard-main">
+        <header class="dashboard-header" id="overview">
+            <div>
+                <p class="eyebrow">Operations overview</p>
+                <h1>Good day, Admin</h1>
+                <p class="header-copy">Monitor service reports, approvals and urgent issues across the city.</p>
+            </div>
+
+            <div class="header-actions">
+                <div class="last-updated">
+                    <span>Last updated</span>
+                    <strong>@DateTime.Now.ToString("dd MMM yyyy, HH:mm")</strong>
+                </div>
+                <button class="refresh-button" type="button" onclick="window.location.reload()">
+                    <span aria-hidden="true">↻</span>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        @if (alerts.Any())
+        {
+            <section class="alert-strip" aria-label="Dashboard alerts">
+                @foreach (var alert in alerts.Take(3))
+                {
+                    var alertType = (alert.Type ?? "info").ToLowerInvariant();
+                    var normalizedType = alertType == "danger" || alertType == "warning" ? alertType : "info";
+                    <div class="dashboard-alert dashboard-alert--@normalizedType">
+                        <span class="alert-indicator" aria-hidden="true"></span>
+                        <span>@alert.Message</span>
+                    </div>
+                }
+            </section>
+        }
+
+        <section class="stats-grid" aria-label="Report statistics">
+            <a class="stat-card stat-card-link" href="/Reports?status=Approved">
+                <div class="stat-card-top">
+                    <span class="stat-label">Approved reports</span>
+                    <span class="stat-icon stat-icon--success" aria-hidden="true">✓</span>
+                </div>
+                <strong class="stat-value">@stats.ApprovedCount.ToString("N0")</strong>
+                <p>Reports accepted for municipal action</p>
+            </a>
+
+            <a class="stat-card stat-card-link" href="/Reports?status=PendingApproval">
+                <div class="stat-card-top">
+                    <span class="stat-label">Pending approval</span>
+                    <span class="stat-icon stat-icon--pending" aria-hidden="true">⌛</span>
+                </div>
+                <strong class="stat-value">@stats.PendingApprovalCount.ToString("N0")</strong>
+                <p>Reports waiting to be reviewed</p>
+            </a>
+
+            <a class="stat-card stat-card-link" href="/Reports?status=Unresolved">
+                <div class="stat-card-top">
+                    <span class="stat-label">Unresolved</span>
+                    <span class="stat-icon stat-icon--neutral" aria-hidden="true">○</span>
+                </div>
+                <strong class="stat-value">@stats.UnresolvedCount.ToString("N0")</strong>
+                <p>Open issues still requiring action</p>
+            </a>
+
+            <a class="stat-card stat-card--emergency stat-card-link" href="/Reports?priority=Emergency">
+                <div class="stat-card-top">
+                    <span class="stat-label">Emergency reports</span>
+                    <span class="stat-icon stat-icon--danger" aria-hidden="true">!</span>
+                </div>
+                <strong class="stat-value">@stats.EmergencyCount.ToString("N0")</strong>
+                <p>Urgent reports requiring attention</p>
+            </a>
+        </section>
+
+        <section class="dashboard-grid dashboard-grid--wide">
+            <article class="panel map-panel" id="map-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Live overview</p>
+                        <h2>Reported issues map</h2>
+                    </div>
+                    <div class="map-legend" aria-label="Map legend">
+                        <span><i class="legend-dot legend-dot--standard"></i>Standard</span>
+                        <span><i class="legend-dot legend-dot--emergency"></i>Emergency</span>
+                    </div>
+                </div>
+
+                <div
+                    id="issuesMap"
+                    class="issues-map"
+                    data-center-lat="@map.CenterLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                    data-center-lng="@map.CenterLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                    data-points="@mapPointsJson">
+                    <div class="map-fallback">
+                        <strong>Issue map</strong>
+                        <span>Map data will appear here when the map service is available.</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel emergency-panel" id="emergency-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker panel-kicker--danger">Priority queue</p>
+                        <h2>Emergency summary</h2>
+                    </div>
+                    <span class="emergency-total">@emergencies.TotalEmergencies</span>
+                </div>
+
+                @if (emergencies.EmergenciesByCategory.Any())
+                {
+                    <div class="emergency-list">
+                        @foreach (var item in emergencies.EmergenciesByCategory.OrderByDescending(x => x.Value))
+                        {
+                            var emergencyPercent = emergencies.TotalEmergencies > 0
+                                ? Math.Min(100, (int)Math.Round(item.Value * 100.0 / emergencies.TotalEmergencies))
+                                : 0;
+
+                            <div class="emergency-row">
+                                <div class="emergency-row-copy">
+                                    <span>@item.Key</span>
+                                    <strong>@item.Value</strong>
+                                </div>
+                                <div class="progress-track" aria-hidden="true">
+                                    <span class="progress-fill progress-fill--danger" style="width: @emergencyPercent%"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state compact">
+                        <span class="empty-icon">✓</span>
+                        <strong>No emergency reports</strong>
+                        <p>There are no emergency items in the current dataset.</p>
+                    </div>
+                }
+
+                <a class="panel-action panel-action--danger" href="/Reports?priority=Emergency">View emergency reports</a>
+            </article>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Dashboard analytics">
+            <article class="panel" id="categories-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Report mix</p>
+                        <h2>Reports by category</h2>
+                    </div>
+                    <span class="panel-meta">@categories.Values.Sum().ToString("N0") total</span>
+                </div>
+
+                @if (categories.Any())
+                {
+                    <div class="category-list">
+                        @foreach (var item in categories.OrderByDescending(x => x.Value))
+                        {
+                            var width = Math.Max(4, (int)Math.Round(item.Value * 100.0 / maxCategory));
+                            <div class="category-row">
+                                <div class="category-copy">
+                                    <span>@item.Key</span>
+                                    <strong>@item.Value</strong>
+                                </div>
+                                <div class="progress-track" aria-label="@item.Key: @item.Value reports">
+                                    <span class="progress-fill" style="width: @width%"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <strong>No category data yet</strong>
+                        <p>Category statistics will appear once reports are available.</p>
+                    </div>
+                }
+            </article>
+
+            <article class="panel" id="activity-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Recent volume</p>
+                        <h2>Reporting activity</h2>
+                    </div>
+                    <span class="panel-meta">Last @activity.Count day@(activity.Count == 1 ? "" : "s")</span>
+                </div>
+
+                @if (activity.Any())
+                {
+                    <div class="activity-chart" role="img" aria-label="Reports by day bar chart">
+                        @foreach (var item in activity)
+                        {
+                            var height = Math.Max(8, (int)Math.Round(item.Value * 100.0 / maxActivity));
+                            <div class="activity-column">
+                                <span class="activity-value">@item.Value</span>
+                                <div class="activity-bar-shell">
+                                    <span class="activity-bar" style="height: @height%"></span>
+                                </div>
+                                <span class="activity-label">@item.Key</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <strong>No activity data yet</strong>
+                        <p>Daily report volume will appear here as reports are submitted.</p>
+                    </div>
+                }
+            </article>
+        </section>
+
+        <footer class="dashboard-footer">
+            <span>FixITCity Municipal Operations Dashboard</span>
+            <span>Data shown reflects the current reporting system.</span>
+        </footer>
+    </main>
 </div>
 
-@if (Model.DashboardData.Alerts.Any())
-{
-    <div class="row mb-3">
-        <div class="col-12">
-            @foreach (var alert in Model.DashboardData.Alerts)
-            {
-                <div class="alert alert-@alert.Type py-2 px-3 mb-2" role="alert">
-                    <i class="fa-solid fa-circle-exclamation me-2"></i> @alert.Message
-                </div>
-            }
-        </div>
-    </div>
-}
-
-<div class="row mb-4">
-    <div class="col-md-3">
-        <a href="/Reports?status=Approved" class="text-decoration-none">
-            <div class="card text-white mb-3" style="background-color: #009688;">
-                <div class="card-body text-center shadow-sm">
-                    <h1 class="display-5">@Model.DashboardData.Statistics.ApprovedCount</h1>
-                    <p class="card-text text-uppercase fw-bold">Approved Reports</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/Reports?status=PendingApproval" class="text-decoration-none">
-            <div class="card text-dark bg-light mb-3 border border-warning shadow-sm">
-                <div class="card-body text-center">
-                    <h1 class="display-5 text-warning">@Model.DashboardData.Statistics.PendingApprovalCount</h1>
-                    <p class="card-text text-uppercase fw-bold">Pending Approval</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/Reports?status=Unresolved" class="text-decoration-none">
-            <div class="card text-dark bg-light mb-3 border border-secondary shadow-sm">
-                <div class="card-body text-center">
-                    <h1 class="display-5 text-secondary">@Model.DashboardData.Statistics.UnresolvedCount</h1>
-                    <p class="card-text text-uppercase fw-bold">Unresolved Reports</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/Reports?priority=Emergency" class="text-decoration-none">
-            <div class="card text-white bg-danger mb-3 shadow-sm">
-                <div class="card-body text-center">
-                    <h1 class="display-5">@Model.DashboardData.Statistics.EmergencyCount</h1>
-                    <p class="card-text text-uppercase fw-bold">Emergencies</p>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-bold">
-                Report Heatmap - Geographic Density
-            </div>
-            <div class="card-body p-0">
-                <div id="dashboard-map" style="height: 400px; width: 100%;"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">Reports by Category</div>
-            <div class="card-body">
-                <canvas id="categoryChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">Report Activity Trend</div>
-            <div class="card-body">
-                <canvas id="activityChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100 border border-danger">
-            <div class="card-header bg-danger text-white fw-bold">Emergency Overview</div>
-            <div class="card-body">
-                <h3 class="text-danger mb-3">@Model.DashboardData.Emergencies.TotalEmergencies Emergency Reports</h3>
-                <ul class="list-group list-group-flush mb-3">
-                    @foreach (var emp in Model.DashboardData.Emergencies.EmergenciesByCategory)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            @emp.Key-related emergencies
-                            <span class="badge bg-danger rounded-pill">@emp.Value</span>
-                        </li>
-                    }
-                </ul>
-                <a href="/Reports?priority=Emergency" class="btn btn-outline-danger w-100 mt-auto">View Emergency Reports</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <!-- Leaflet JS for Map -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script>
-        // Data for Map
-        var mapCenter = [@Model.DashboardData.Map.CenterLatitude, @Model.DashboardData.Map.CenterLongitude];
-        var mapPoints = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.Map.MapPoints));
-
-        // Data for Category Chart
-        var categoryLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.Categories.ReportsByCategory.Keys));
-        var categoryData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.Categories.ReportsByCategory.Values));
-
-        // Data for Activity Chart
-        var activityLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.Activity.ReportsByDay.Keys));
-        var activityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.Activity.ReportsByDay.Values));
-    </script>
-
-    <script src="~/js/dashboard-map.js"></script>
-    <script src="~/js/dashboard-charts.js"></script>
-}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="~/js/dashboard.js" asp-append-version="true"></script>
