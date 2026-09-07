@@ -31,7 +31,7 @@ namespace FixITCity_Dashboard.Pages
         HttpContext.Session.SetString("Username", Input.Username);
 
         // Redirect to the home page or dashboard
-        return RedirectToPage("/Index");
+        return RedirectToPage("/Dashboard");
     }
 }
 
