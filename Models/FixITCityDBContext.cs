@@ -19,6 +19,8 @@ public partial class FixITCityDbContext : DbContext
 
     public virtual DbSet<CitizenProfile> CitizenProfiles { get; set; }
 
+    public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
+
     public virtual DbSet<DuplicateReport> DuplicateReports { get; set; }
 
     public virtual DbSet<EssentialService> EssentialServices { get; set; }
@@ -105,6 +107,35 @@ public partial class FixITCityDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.CitizenProfiles)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__CitizenPr__user___778AC167");
+        });
+
+                modelBuilder.Entity<DeviceToken>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PK__DeviceTo__TokenId");
+
+            entity.Property(e => e.TokenId).HasColumnName("token_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.DeviceToken)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("device_token");
+            entity.Property(e => e.DeviceName)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("device_name");
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .HasDefaultValue(true);
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.LastUsedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("last_used_at");
+
+            entity.HasOne(d => d.User).WithMany(p => p.DeviceTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__DeviceTok__user");
         });
 
         modelBuilder.Entity<DuplicateReport>(entity =>

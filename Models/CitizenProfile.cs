@@ -23,6 +23,10 @@ public partial class CitizenProfile
 
     public decimal? Longitude { get; set; }
 
+    public string NotificationPreference { get; set; }  // notification_preference
+    
+    public DateTime? UpdatedAt { get; set; }            // updated_at
+
     public virtual ICollection<FaultReport> FaultReports { get; set; } = new List<FaultReport>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
