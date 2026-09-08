@@ -1,91 +1,251 @@
-﻿@page 
-@model ReportsModel
+﻿@page
+@model FixITCity_Dashboard.Pages.ReportsModel
+
 @{
     ViewData["Title"] = "Reports";
     Layout = "_SidebarLayout";
 }
 
 <div class="reports-container">
-    <!-- Header -->
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
     <div class="reports-header">
+
         <div>
             <h1>Reports Management</h1>
-           
         </div>
+
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <a href="#" class="btn btn-primary" onclick="exportCSV()">
-                <i class="fas fa-file-csv"></i> Export CSV
+
+            <a href="#"
+               class="btn btn-primary"
+               onclick="exportCSV(); return false;">
+
+                <i class="fas fa-file-csv"></i>
+                Export CSV
+
             </a>
-            <a href="#" class="btn btn-primary" onclick="exportPDF()">
-                <i class="fas fa-file-pdf"></i> Export PDF
+
+            <a href="#"
+               class="btn btn-primary"
+               onclick="exportPDF(); return false;">
+
+                <i class="fas fa-file-pdf"></i>
+                Export PDF
+
             </a>
+
         </div>
+
     </div>
 
-    <!-- Stats Summary - Full Width -->
+
+    <!-- ===================================================== -->
+    <!-- STATISTICS -->
+    <!-- ===================================================== -->
+
     <div class="stats-summary">
+
         <div class="stat-item">
-            <span class="stat-number">@Model.TotalReports</span>
-            <span class="stat-label">Total Reports</span>
+
+            <span class="stat-number">
+                @Model.TotalReports
+            </span>
+
+            <span class="stat-label">
+                Total Reports
+            </span>
+
         </div>
+
+
         <div class="stat-item stat-open">
-            <span class="stat-number">@Model.TotalOpen</span>
-            <span class="stat-label">Open</span>
+
+            <span class="stat-number">
+                @Model.TotalOpen
+            </span>
+
+            <span class="stat-label">
+                Open
+            </span>
+
         </div>
+
+
         <div class="stat-item stat-assigned">
-            <span class="stat-number">@Model.TotalAssigned</span>
-            <span class="stat-label">Assigned</span>
+
+            <span class="stat-number">
+                @Model.TotalAssigned
+            </span>
+
+            <span class="stat-label">
+                Assigned
+            </span>
+
         </div>
+
+
         <div class="stat-item stat-closed">
-            <span class="stat-number">@Model.TotalClosed</span>
-            <span class="stat-label">Closed</span>
+
+            <span class="stat-number">
+                @Model.TotalClosed
+            </span>
+
+            <span class="stat-label">
+                Closed
+            </span>
+
         </div>
+
     </div>
 
-    <!-- Filters - Full Width -->
+
+    <!-- ===================================================== -->
+    <!-- FILTERS -->
+    <!-- ===================================================== -->
+
     <div class="filters-bar">
+
         <form method="get" class="filters-form">
+
+
+            <!-- SEARCH -->
             <div class="filter-group">
                 <i class="fas fa-search"></i>
-                <input type="text" name="searchTerm" placeholder="Search reports..." 
-                       value="@Model.SearchTerm" class="filter-input" />
+
+                <input type="text"
+                       id="reportSearch"
+                       name="searchTerm"
+                       placeholder="Search by reference number..."
+                       value="@Model.SearchTerm"
+                       class="filter-input"
+                       autocomplete="off" />
             </div>
 
+
+            <!-- STATUS -->
+
             <div class="filter-group">
-                <select name="statusFilter" class="filter-select" onchange="this.form.submit()">
-                    <option value="All" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "All")">
+
+                <select name="statusFilter"
+                        class="filter-select"
+                        onchange="this.form.submit()">
+
+                    <option value="All"
+                            selected="@(Model.StatusFilter == "All")">
                         All Status
                     </option>
-                    <option value="Open" selected="@(Model.StatusFilter == "Open")">Open</option>
-                    <option value="Assigned" selected="@(Model.StatusFilter == "Assigned")">Assigned</option>
-                    <option value="Closed" selected="@(Model.StatusFilter == "Closed")">Closed</option>
+
+                    <option value="Open"
+                            selected="@(Model.StatusFilter == "Open")">
+                        Open
+                    </option>
+
+                    <option value="Assigned"
+                            selected="@(Model.StatusFilter == "Assigned")">
+                        Assigned
+                    </option>
+
+                    <option value="Closed"
+                            selected="@(Model.StatusFilter == "Closed")">
+                        Closed
+                    </option>
+
                 </select>
+
             </div>
 
+
+            <!-- CATEGORY -->
+
             <div class="filter-group">
-                <select name="categoryFilter" class="filter-select" onchange="this.form.submit()">
-                    <option value="All" selected="@(string.IsNullOrEmpty(Model.CategoryFilter) || Model.CategoryFilter == "All")">
+
+                <select name="categoryFilter"
+                        class="filter-select"
+                        onchange="this.form.submit()">
+
+                    <option value="All"
+                            selected="@(Model.CategoryFilter == "All")">
                         All Categories
                     </option>
+
                     @foreach (var category in Model.Categories)
                     {
-                        <option value="@category" selected="@(Model.CategoryFilter == category)">
+                        <option value="@category"
+                                selected="@(Model.CategoryFilter == category)">
                             @category
                         </option>
                     }
+
                 </select>
+
             </div>
 
-            <a href="/Reports" class="btn-clear"><i class="fas fa-times"></i> Clear</a>
+
+            <!-- DATE SORT -->
+
+            <div class="filter-group">
+
+                <select name="dateSort"
+                        class="filter-select"
+                        onchange="this.form.submit()">
+
+                    <option value="Newest"
+                            selected="@(Model.DateSort == "Newest")">
+                        Newest First
+                    </option>
+
+                    <option value="Oldest"
+                            selected="@(Model.DateSort == "Oldest")">
+                        Oldest First
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SEARCH BUTTON -->
+
+            <button type="submit"
+                    class="btn-search">
+
+                <i class="fas fa-search"></i>
+                Search
+
+            </button>
+
+
+            <!-- CLEAR FILTERS -->
+
+            <a asp-page="/Reports"
+               class="btn-clear">
+
+                <i class="fas fa-times"></i>
+                Clear
+
+            </a>
+
         </form>
+
     </div>
 
-    <!-- Reports Table - Full Width -->
+
+    <!-- ===================================================== -->
+    <!-- REPORT TABLE -->
+    <!-- ===================================================== -->
+
     <div class="table-container">
+
         @if (Model.Reports.Any())
         {
             <table class="reports-table">
+
                 <thead>
+
                     <tr>
                         <th>#</th>
                         <th>Priority</th>
@@ -96,112 +256,233 @@
                         <th>Location</th>
                         <th>Action</th>
                     </tr>
+
                 </thead>
+
+
                 <tbody>
+
                     @foreach (var report in Model.Reports)
                     {
                         <tr>
-                            <td><strong>#@report.ReportID</strong></td>
+
                             <td>
+                                <strong>
+                                    #@report.ReportID
+                                </strong>
+                            </td>
+
+
+                            <td>
+
                                 <span class="priority-badge priority-@(report.PriorityScore >= 80 ? "high" : report.PriorityScore >= 60 ? "medium" : "low")">
+
                                     @report.PriorityScore
+
                                 </span>
+
                             </td>
-                            <td><strong>@report.Title</strong></td>
-                            <td>@report.Category</td>
+
+
                             <td>
+                                <strong>
+                                    @report.Title
+                                </strong>
+                            </td>
+
+
+                            <td>
+                                @report.Category
+                            </td>
+
+
+                            <td>
+
                                 <span class="status-badge status-@report.Status.ToLower()">
+
                                     @report.Status
+
                                 </span>
+
                             </td>
-                            <td>@report.ReportedDate.ToString("dd MMM yyyy")</td>
-                            <td>@report.Location</td>
+
+
                             <td>
-                                <a asp-page="/FaultDetail" asp-route-id="@report.ReportID" class="btn-view" title="View Details">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                                @report.ReportedDate.ToString("dd MMM yyyy HH:mm")
                             </td>
+
+
+                            <td>
+                                @report.Location
+                            </td>
+
+
+                            <td>
+
+                                <a asp-page="/FaultDetail"
+                                   asp-route-id="@report.ReportID"
+                                   class="btn-view"
+                                   title="View Details">
+
+                                    <i class="fas fa-eye"></i>
+
+                                </a>
+
+                            </td>
+
                         </tr>
                     }
+
                 </tbody>
+
             </table>
         }
         else
         {
             <div class="no-results">
+
                 <i class="fas fa-inbox"></i>
-                <h4>No reports found</h4>
-                <p>Try adjusting your search or filter criteria</p>
+
+                <h4>
+                    No reports found
+                </h4>
+
+                <p>
+                    Try adjusting your search or filter criteria.
+                </p>
+
             </div>
         }
+
     </div>
 
-    <!-- Pagination -->
+
+    <!-- ===================================================== -->
+    <!-- PAGINATION -->
+    <!-- ===================================================== -->
     @if (Model.TotalPages > 1)
     {
         <div class="pagination-container">
+
             <div class="pagination-info">
-                Showing page @Model.CurrentPage of @Model.TotalPages
+
+                Showing page
+                @Model.CurrentPage
+                of
+                @Model.TotalPages
+
             </div>
+
+
             <div class="pagination-buttons">
+
+
+                <!-- PREVIOUS -->
                 @if (Model.CurrentPage > 1)
                 {
-                    <a href="@Url.Page("/Reports", new { 
-                        page = Model.CurrentPage - 1, 
-                        searchTerm = Model.SearchTerm, 
-                        statusFilter = Model.StatusFilter,
-                        categoryFilter = Model.CategoryFilter 
-                    })" class="btn-pagination">
-                        <i class="fas fa-chevron-left"></i> Previous
-                    </a>
-                }
+                    <a href="@Url.Page(
+                                               "/Reports",
+                                               new
+                                               {
+                                                   page = Model.CurrentPage - 1,
+                                                   searchTerm = Model.SearchTerm,
+                                                   statusFilter = Model.StatusFilter,
+                                                   categoryFilter = Model.CategoryFilter,
+                                                   dateSort = Model.DateSort
+                                               })"
+               class="btn-pagination">
 
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+
+                    </a>
+                        }
+
+
+                <!-- PAGE NUMBERS -->
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     if (i == Model.CurrentPage)
                     {
-                        <span class="page-number active">@i</span>
+                        <span class="page-number active">
+                            @i
+                        </span>
                     }
-                    else if (i <= 3 || i > Model.TotalPages - 2 || Math.Abs(i - Model.CurrentPage) <= 1)
+                    else if (
+                    i <= 3 ||
+                    i > Model.TotalPages - 2 ||
+                    Math.Abs(i - Model.CurrentPage) <= 1)
                     {
-                        <a href="@Url.Page("/Reports", new { 
-                            page = i, 
-                            searchTerm = Model.SearchTerm, 
-                            statusFilter = Model.StatusFilter,
-                            categoryFilter = Model.CategoryFilter 
-                        })" class="page-number">@i</a>
+                        <a href="@Url.Page(
+                                                       "/Reports",
+                                                       new
+                                                       {
+                                                           page = i,
+                                                           searchTerm = Model.SearchTerm,
+                                                           statusFilter = Model.StatusFilter,
+                                                           categoryFilter = Model.CategoryFilter,
+                                                           dateSort = Model.DateSort
+                                                       })"
+               class="page-number">
+
+                            @i
+
+                        </a>
+                        }
+                    else if (
+                    i == 4 &&
+                    Model.CurrentPage > 5)
+                    {
+                        <span class="page-number">
+                            ...
+                        </span>
                     }
-                    else if (i == 4 && Model.CurrentPage > 5)
+                    else if (
+                    i == Model.TotalPages - 3 &&
+                    Model.CurrentPage < Model.TotalPages - 4)
                     {
-                        <span class="page-number">...</span>
-                    }
-                    else if (i == Model.TotalPages - 3 && Model.CurrentPage < Model.TotalPages - 4)
-                    {
-                        <span class="page-number">...</span>
+                        <span class="page-number">
+                            ...
+                        </span>
                     }
                 }
 
+
+                <!-- NEXT -->
                 @if (Model.CurrentPage < Model.TotalPages)
                 {
-                    <a href="@Url.Page("/Reports", new { 
-                        page = Model.CurrentPage + 1, 
-                        searchTerm = Model.SearchTerm, 
-                        statusFilter = Model.StatusFilter,
-                        categoryFilter = Model.CategoryFilter 
-                    })" class="btn-pagination">
-                        Next <i class="fas fa-chevron-right"></i>
+                    <a href="@Url.Page(
+                                               "/Reports",
+                                               new
+                                               {
+                                                   page = Model.CurrentPage + 1,
+                                                   searchTerm = Model.SearchTerm,
+                                                   statusFilter = Model.StatusFilter,
+                                                   categoryFilter = Model.CategoryFilter,
+                                                   dateSort = Model.DateSort
+                                               })"
+               class="btn-pagination">
+
+                        Next
+                        <i class="fas fa-chevron-right"></i>
+
                     </a>
-                }
+                        }
+
             </div>
+
         </div>
     }
+
 </div>
 
-<!-- Styles -->
+
 <style>
+
     * {
         box-sizing: border-box;
     }
+
 
     .reports-container {
         max-width: 100%;
@@ -209,6 +490,11 @@
         margin: 0;
         padding: 0.5rem 1rem;
     }
+
+
+    /* ========================================================= */
+    /* HEADER */
+    /* ========================================================= */
 
     .reports-header {
         display: flex;
@@ -220,18 +506,18 @@
         width: 100%;
     }
 
-    .reports-header h2 {
-        font-size: 1.75rem;
-        font-weight: 600;
-        color: #1a1a2e;
-        margin-bottom: 0;
-    }
 
-    .reports-header .text-muted {
-        color: #6c757d;
-        font-size: 0.95rem;
-        margin-top: 0.1rem;
-    }
+        .reports-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 0;
+        }
+
+
+    /* ========================================================= */
+    /* BUTTONS */
+    /* ========================================================= */
 
     .btn-primary {
         background: #009688;
@@ -247,15 +533,20 @@
         gap: 0.5rem;
         font-size: 0.9rem;
         cursor: pointer;
-        border: none;
     }
 
-    .btn-primary:hover {
-        background: #007a6e;
-        color: white;
-        text-decoration: none;
-        box-shadow: 0 2px 8px rgba(0, 150, 136, 0.3);
-    }
+
+        .btn-primary:hover {
+            background: #007a6e;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 150, 136, 0.3);
+        }
+
+
+    /* ========================================================= */
+    /* STATISTICS */
+    /* ========================================================= */
 
     .stats-summary {
         display: grid;
@@ -265,6 +556,7 @@
         width: 100%;
     }
 
+
     .stat-item {
         background: white;
         border-radius: 12px;
@@ -272,33 +564,50 @@
         border: 1px solid #e8eaed;
         text-align: center;
         transition: transform 0.2s, box-shadow 0.2s;
-        flex: 1;
     }
 
-    .stat-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
 
-    .stat-item .stat-number {
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+
+    .stat-number {
         display: block;
         font-size: 2rem;
         font-weight: 700;
         color: #1a1a2e;
-        line-height: 1.2;
     }
 
-    .stat-item .stat-label {
+
+    .stat-label {
+        display: block;
         font-size: 0.85rem;
         color: #6c757d;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         margin-top: 0.25rem;
     }
 
-    .stat-open .stat-number { color: #dc3545; }
-    .stat-assigned .stat-number { color: #e68a00; }
-    .stat-closed .stat-number { color: #28a745; }
+
+    .stat-open .stat-number {
+        color: #dc3545;
+    }
+
+
+    .stat-assigned .stat-number {
+        color: #e68a00;
+    }
+
+
+    .stat-closed .stat-number {
+        color: #28a745;
+    }
+
+
+    /* ========================================================= */
+    /* FILTERS */
+    /* ========================================================= */
 
     .filters-bar {
         background: white;
@@ -309,6 +618,7 @@
         width: 100%;
     }
 
+
     .filters-form {
         display: flex;
         gap: 1rem;
@@ -316,6 +626,7 @@
         align-items: center;
         width: 100%;
     }
+
 
     .filter-group {
         display: flex;
@@ -329,10 +640,11 @@
         min-width: 160px;
     }
 
-    .filter-group i {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
+
+        .filter-group i {
+            color: #6c757d;
+        }
+
 
     .filter-input {
         border: none;
@@ -343,9 +655,6 @@
         font-size: 0.95rem;
     }
 
-    .filter-input::placeholder {
-        color: #adb5bd;
-    }
 
     .filter-select {
         border: none;
@@ -360,71 +669,98 @@
         width: 100%;
     }
 
+
+    .btn-search {
+        background: #009688;
+        border: none;
+        color: white;
+        border-radius: 8px;
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+
+        .btn-search:hover {
+            background: #007a6e;
+        }
+
+
     .btn-clear {
         color: #dc3545;
         text-decoration: none;
         font-size: 0.85rem;
-        padding: 0.4rem 0.75rem;
+        padding: 0.6rem 0.75rem;
         border-radius: 6px;
-        transition: all 0.2s;
         display: flex;
         align-items: center;
         gap: 0.3rem;
         white-space: nowrap;
     }
 
-    .btn-clear:hover {
-        background: #f8d7da;
-        text-decoration: none;
-        color: #c82333;
-    }
+
+        .btn-clear:hover {
+            background: #f8d7da;
+            color: #c82333;
+            text-decoration: none;
+        }
+
+
+    /* ========================================================= */
+    /* TABLE */
+    /* ========================================================= */
 
     .table-container {
         background: white;
         border-radius: 12px;
         border: 1px solid #e8eaed;
-        overflow: hidden;
+        overflow-x: auto;
         width: 100%;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
+
 
     .reports-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.9rem;
-        table-layout: auto;
     }
 
-    .reports-table thead {
-        background: #f8f9fa;
-    }
 
-    .reports-table th {
-        padding: 0.9rem 1rem;
-        text-align: left;
-        font-weight: 600;
-        color: #495057;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e8eaed;
-        white-space: nowrap;
-    }
+        .reports-table thead {
+            background: #f8f9fa;
+        }
 
-    .reports-table td {
-        padding: 0.8rem 1rem;
-        border-bottom: 1px solid #f0f0f0;
-        color: #1a1a2e;
-        vertical-align: middle;
-    }
 
-    .reports-table tbody tr:hover {
-        background: #f8f9fa;
-    }
+        .reports-table th {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e8eaed;
+            white-space: nowrap;
+        }
 
-    .reports-table tbody tr:last-child td {
-        border-bottom: none;
-    }
+
+        .reports-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: #1a1a2e;
+            vertical-align: middle;
+        }
+
+
+        .reports-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+
+    /* ========================================================= */
+    /* PRIORITY */
+    /* ========================================================= */
 
     .priority-badge {
         display: inline-block;
@@ -436,9 +772,28 @@
         text-align: center;
     }
 
-    .priority-high { background: #f8d7da; color: #721c24; }
-    .priority-medium { background: #fff3cd; color: #856404; }
-    .priority-low { background: #d4edda; color: #155724; }
+
+    .priority-high {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+
+    .priority-medium {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+
+    .priority-low {
+        background: #d4edda;
+        color: #155724;
+    }
+
+
+    /* ========================================================= */
+    /* STATUS */
+    /* ========================================================= */
 
     .status-badge {
         display: inline-block;
@@ -447,27 +802,48 @@
         font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
     }
 
-    .status-open { background: #f8d7da; color: #dc3545; }
-    .status-assigned { background: #fff3cd; color: #856404; }
-    .status-closed { background: #d4edda; color: #28a745; }
+
+    .status-open {
+        background: #f8d7da;
+        color: #dc3545;
+    }
+
+
+    .status-assigned {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+
+    .status-closed {
+        background: #d4edda;
+        color: #28a745;
+    }
+
+
+    /* ========================================================= */
+    /* VIEW BUTTON */
+    /* ========================================================= */
 
     .btn-view {
         color: #009688;
         text-decoration: none;
         padding: 0.3rem 0.6rem;
         border-radius: 6px;
-        transition: all 0.2s;
-        display: inline-block;
     }
 
-    .btn-view:hover {
-        background: #e0f2f1;
-        color: #007a6e;
-        text-decoration: none;
-    }
+
+        .btn-view:hover {
+            background: #e0f2f1;
+            color: #007a6e;
+        }
+
+
+    /* ========================================================= */
+    /* NO RESULTS */
+    /* ========================================================= */
 
     .no-results {
         text-align: center;
@@ -475,17 +851,17 @@
         color: #6c757d;
     }
 
-    .no-results i {
-        font-size: 3rem;
-        display: block;
-        margin-bottom: 1rem;
-        color: #dadce0;
-    }
 
-    .no-results h4 {
-        color: #1a1a2e;
-        margin-bottom: 0.25rem;
-    }
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dadce0;
+        }
+
+
+    /* ========================================================= */
+    /* PAGINATION */
+    /* ========================================================= */
 
     .pagination-container {
         display: flex;
@@ -494,13 +870,14 @@
         margin-top: 1.5rem;
         flex-wrap: wrap;
         gap: 1rem;
-        width: 100%;
     }
+
 
     .pagination-info {
         font-size: 0.85rem;
         color: #6c757d;
     }
+
 
     .pagination-buttons {
         display: flex;
@@ -508,6 +885,7 @@
         gap: 0.3rem;
         flex-wrap: wrap;
     }
+
 
     .btn-pagination {
         padding: 0.4rem 1rem;
@@ -517,18 +895,8 @@
         color: #1a1a2e;
         text-decoration: none;
         font-size: 0.85rem;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
     }
 
-    .btn-pagination:hover {
-        background: #f8f9fa;
-        border-color: #009688;
-        color: #009688;
-        text-decoration: none;
-    }
 
     .page-number {
         display: inline-block;
@@ -536,120 +904,110 @@
         border-radius: 6px;
         color: #1a1a2e;
         text-decoration: none;
-        font-size: 0.85rem;
-        transition: all 0.2s;
         min-width: 35px;
         text-align: center;
     }
 
-    .page-number:hover {
-        background: #f8f9fa;
-        text-decoration: none;
-        color: #1a1a2e;
-    }
 
-    .page-number.active {
-        background: #009688;
-        color: white;
-        font-weight: 600;
-    }
+        .page-number.active {
+            background: #009688;
+            color: white;
+            font-weight: 600;
+        }
 
-    /* ===== RESPONSIVE ===== */
+
+    /* ========================================================= */
+    /* RESPONSIVE */
+    /* ========================================================= */
+
     @@media (max-width: 992px) {
+
         .stats-summary {
             grid-template-columns: repeat(2, 1fr);
         }
     }
+
 
     @@media (max-width: 768px) {
-        .reports-container {
-            padding: 0 0.5rem;
-        }
-
-        .stats-summary {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
-
-        .stat-item .stat-number {
-            font-size: 1.5rem;
-        }
 
         .filters-form {
             flex-direction: column;
             align-items: stretch;
         }
 
+
         .filter-group {
             min-width: unset;
             flex: 1 1 100%;
         }
 
-        .filter-select {
-            width: 100%;
+
+        .btn-search {
+            justify-content: center;
         }
+
+
+        .stats-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
 
         .reports-table {
             font-size: 0.8rem;
         }
 
-        .reports-table th,
-        .reports-table td {
-            padding: 0.5rem 0.6rem;
-        }
-
-        /* Hide less important columns on mobile */
-        .reports-table th:nth-child(4),
-        .reports-table td:nth-child(4),
-        .reports-table th:nth-child(6),
-        .reports-table td:nth-child(6),
-        .reports-table th:nth-child(7),
-        .reports-table td:nth-child(7) {
-            display: none;
-        }
 
         .pagination-container {
             flex-direction: column;
             align-items: center;
         }
-
-        .reports-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .btn-primary {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
     }
 
-    @@media (max-width: 480px) {
-        .stats-summary {
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-        }
-
-        .stat-item {
-            padding: 0.75rem 0.5rem;
-        }
-
-        .stat-item .stat-number {
-            font-size: 1.3rem;
-        }
-
-        .stat-item .stat-label {
-            font-size: 0.7rem;
-        }
-    }
 </style>
 
+
 <script>
+    // =========================================================
+    // DEBOUNCED SEARCH
+    // =========================================================
+
+    const searchInput = document.getElementById("reportSearch");
+
+    let searchTimer;
+
+    searchInput.addEventListener("input", function () {
+
+        // Cancel the previous timer whenever the user types
+        clearTimeout(searchTimer);
+
+        // Wait 300ms after the user stops typing
+        searchTimer = setTimeout(function () {
+
+            // Reset to page 1 before submitting
+            const form = searchInput.form;
+
+            const pageInput = form.querySelector('[name="page"]');
+
+            if (pageInput) {
+                pageInput.value = "1";
+            }
+
+            form.submit();
+
+        }, 300);
+
+    });
+
+
+    // =========================================================
+    // EXPORT
+    // =========================================================
+
     function exportCSV() {
-        alert('CSV Export functionality coming soon!');
+        alert("CSV Export functionality coming soon!");
     }
 
     function exportPDF() {
-        alert('PDF Export functionality coming soon!');
+        alert("PDF Export functionality coming soon!");
     }
 </script>
