@@ -3638,11 +3638,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ICT\\OneDrive\\Documents\\Third Year Modules\\ITPV302 Project\\FixITCityAPI\\FixITCityAPI\\FixITCityAPI.csproj",
+      "projectUniqueName": "C:\\Users\\ICT\\Documents\\GitHub\\FixITCityDatabase\\FixITCityAPI.csproj",
       "projectName": "FixITCityAPI",
-      "projectPath": "C:\\Users\\ICT\\OneDrive\\Documents\\Third Year Modules\\ITPV302 Project\\FixITCityAPI\\FixITCityAPI\\FixITCityAPI.csproj",
+      "projectPath": "C:\\Users\\ICT\\Documents\\GitHub\\FixITCityDatabase\\FixITCityAPI.csproj",
       "packagesPath": "C:\\Users\\ICT\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ICT\\OneDrive\\Documents\\Third Year Modules\\ITPV302 Project\\FixITCityAPI\\FixITCityAPI\\obj\\",
+      "outputPath": "C:\\Users\\ICT\\Documents\\GitHub\\FixITCityDatabase\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

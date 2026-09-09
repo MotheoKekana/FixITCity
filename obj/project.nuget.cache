@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TgakBznzsZY=",
+  "dgSpecHash": "KbzaZSU2qTw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ICT\\OneDrive\\Documents\\Third Year Modules\\ITPV302 Project\\FixITCityAPI\\FixITCityAPI\\FixITCityAPI.csproj",
+  "projectFilePath": "C:\\Users\\ICT\\Documents\\GitHub\\FixITCityDatabase\\FixITCityAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ICT\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\ICT\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
