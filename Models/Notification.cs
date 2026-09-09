@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("notifications")]
 public partial class Notification
 {
     public int NotificationId { get; set; }

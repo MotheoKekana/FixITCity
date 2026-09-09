@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("report_feedback")]
 public partial class ReportFeedback
 {
     public int FeedbackId { get; set; }

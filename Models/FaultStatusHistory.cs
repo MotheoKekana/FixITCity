@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("fault_status_history")]
 public partial class FaultStatusHistory
 {
     public int HistoryId { get; set; }

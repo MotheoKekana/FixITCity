@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("fault_reports")]
 public partial class FaultReport
 {
     public int ReportId { get; set; }
@@ -14,7 +13,7 @@ public partial class FaultReport
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
     
-    // ========== ADD THESE MISSING PROPERTIES ==========
+    // ===== ADD THESE IF MISSING =====
     public string AddressLine { get; set; }          // address_line
     public string Status { get; set; }               // status
     public int? PriorityScore { get; set; }          // priority_score
@@ -29,7 +28,7 @@ public partial class FaultReport
     public string SyncStatus { get; set; }           // sync_status
     public string OfflineId { get; set; }            // offline_id
     public DateTime? UpdatedAt { get; set; }         // updated_at
-    // =================================================
+    // =================================
 
     public DateTime CreatedAt { get; set; }
 

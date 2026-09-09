@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("users")]
 public partial class User
 {
     public int UserId { get; set; }
@@ -17,5 +18,6 @@ public partial class User
 
     public virtual ICollection<CitizenProfile> CitizenProfiles { get; set; } = new List<CitizenProfile>();
 
+    public virtual ICollection<DeviceToken> DeviceTokens { get; set; } = new List<DeviceToken>();
     public virtual ICollection<MunicipalUser> MunicipalUsers { get; set; } = new List<MunicipalUser>();
 }

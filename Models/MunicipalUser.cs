@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("municipal_users")]
 public partial class MunicipalUser
 {
     public int MunicipalUserId { get; set; }

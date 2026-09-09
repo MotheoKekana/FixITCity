@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using FixITCityAPI.Models;  // <-- Add this
+using FixITCityAPI.Models; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 
 // Register DbContext
 builder.Services.AddDbContext<FixITCityAPI.Models.FixITCityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

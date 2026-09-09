@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("duplicate_reports")]
 public partial class DuplicateReport
 {
     public int DuplicateLinkId { get; set; }

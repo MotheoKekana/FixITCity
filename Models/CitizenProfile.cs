@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FixITCityAPI.Models;
-
+[Table("citizen_profiles")]
 public partial class CitizenProfile
 {
     public int CitizenProfileId { get; set; }
