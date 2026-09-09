@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FixITCityAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+919d873c90bd9a14681ad3cafcbfd98431dd4f32")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc61be06dc37d4ba9647746daa7b8860ca4aeefb")]
 [assembly: System.Reflection.AssemblyProductAttribute("FixITCityAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FixITCityAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
