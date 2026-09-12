@@ -7,228 +7,26 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(to bottom, #009688 0%, #ffffff 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 1rem;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 16px;
-            padding: 2.5rem 2.5rem;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-        }
-
-        /* Logo Section */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo-section .logo-text {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-section .logo-text span {
-            color: #2d9e6b;
-        }
-
-        .logo-section .logo-sub {
-            font-size: 0.85rem;
-            color: #9aa0a6;
-            margin-top: 0.25rem;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.4rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.7rem 0rem;
-            border: none;
-            border-bottom: 2px solid #e8eaed;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background: transparent;
-            border-radius: 0;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-bottom-color: #009688;
-        }
-
-        .form-group input::placeholder {
-            color: #c5c7cc;
-            font-size: 0.9rem;
-        }
-
-        .form-group .validation-message {
-            font-size: 0.8rem;
-            color: #d93025;
-            margin-top: 0.3rem;
-            display: block;
-        }
-
-        /* Password Row */
-        .password-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.25rem;
-        }
-
-        .password-row .forgot-link {
-            font-size: 0.8rem;
-            color: #2d9e6b;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .password-row .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Submit Button */
-        .btn-login {
-            width: 100%;
-            padding: 0.75rem;
-            background: #009688;
-            color: white(252, 251, 251);
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 0.5rem;
-        }
-
-        .btn-login:hover {
-            background-color: #009688;
-            color: #ffffff;
-            
-            /* Optional: Add a slight shadow or lift effect */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .btn-login:active {
-            transform: scale(0.98);
-        }
-
-    
-}
-
-        /* Alerts */
-        .alert {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.25rem;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .alert-success {
-            background: #e6f4ea;
-            color: #1e7e34;
-            border: 1px solid #c8e6c9;
-        }
-
-        .alert-danger {
-            background: #fce8e6;
-            color: #d93025;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert i {
-            font-size: 1.1rem;
-        }
-
-        /* Footer */
-        .login-footer {
-            text-align: center;
-            margin-top: 1.75rem;
-            font-size: 0.85rem;
-            color: #5f6368;
-        }
-
-        .login-footer a {
-            color: #2d9e6b;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .login-footer .brand-name {
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-            color: #c5c7cc;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* Responsive */
-        @@media (max-width: 480px) {
-            .login-card {
-                padding: 1.75rem 1.25rem;
-            }
-        }
-    </style>
+    <link rel="icon" type="image/png" href="~/images/favicon.ico" />
+    <link rel="stylesheet" href="~/css/login.css" />
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
             <!-- Logo Section -->
             <div class="logo-section">
-                <img src="~/images/logo.png" alt="FixITCity" style="height: 50px; margin-bottom: 0.75rem;" />
+                <img src="~/images/android-chrome-512x512.png" alt="FixITCity"
+                     style="height: 100px; margin-bottom: 0.75rem;" />
                 <h1>FixITCity</h1>
-                <p>Sign in to the dashboard</p>
+                <p>Login</p>
             </div>
             <!-- Alerts -->
             @if (TempData["SuccessMessage"] != null)
@@ -250,17 +48,18 @@
             <!-- Login Form -->
             <form method="post">
                 <div class="form-group">
-                    <label asp-for="Input.Username">Email Address</label>
-                    <input asp-for="Input.Username" placeholder="john@nmb.com" autofocus />
+                    <label asp-for="Input.Username">Username</label>
+                    <input asp-for="Input.Username" placeholder="john@nmb.com" autofocus required />
                     <span asp-validation-for="Input.Username" class="validation-message"></span>
                 </div>
 
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" placeholder="Enter your password" />
+                    <input asp-for="Input.Password" maxlength="100" type="password" required />
+                    <span asp-validation-for="Input.Password" class="validation-message"></span>
                     <div class="password-row">
                         <span></span>
-                        <a href="#" class="forgot-link">Forgot Password?</a>
+                        <a href="ForgotPass" class="forgot-link">Forgot Password?</a>
                     </div>
                 </div>
 
@@ -270,7 +69,6 @@
                 </button>
 
                 <div class="login-footer">
-                    Don't have an account? <a href="#">Create your account</a>
                     <span class="brand-name">FixITCity</span>
                 </div>
             </form>
@@ -280,4 +78,5 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

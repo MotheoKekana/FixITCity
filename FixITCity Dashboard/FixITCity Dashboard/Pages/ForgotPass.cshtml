@@ -1,0 +1,191 @@
+@page
+
+@model FixITCity_Dashboard.Pages.ForgotPassModel
+
+@{
+    ViewData["Title"] = "Forgot Password";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Forgot Password</title>
+
+    <link rel="stylesheet" href="~/css/ForgotPass.css" />
+    <link rel="icon" type="image/png" href="~/images/favicon.ico" />
+
+</head>
+
+<body>
+
+    <div class="forgot-password-container">
+
+        <div class="forgot-password-card">
+
+            <h1>Forgot Password</h1>
+
+            <p class="subtitle">
+                Reset your municipal account password
+            </p>
+
+
+            @if (!Model.ShowCodeStep &&
+                 !Model.ShowPasswordStep &&
+                 !Model.ShowSuccessStep)
+            {
+
+                <form method="post" asp-page-handler="SendCode">
+
+                    <div class="form-group">
+
+                        <label asp-for="Email">
+                            Email Address
+                        </label>
+
+                        <input asp-for="Email" type="email" placeholder="Enter your email address" />
+
+                        <span asp-validation-for="Email" class="error-message">
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="primary-button">
+
+                        Send Reset Code
+
+                    </button>
+
+                </form>
+
+            }
+
+
+
+            @if (Model.ShowCodeStep)
+            {
+
+                <form method="post" asp-page-handler="VerifyCode">
+
+                    <p class="instructions">
+
+                        A verification code has been sent
+                        to your email address.
+
+                    </p>
+
+                    <div class="form-group">
+
+                        <label asp-for="VerificationCode">
+                            Verification Code
+                        </label>
+
+                        <input asp-for="VerificationCode" maxlength="6" placeholder="Enter 6-digit code" />
+
+                        <span asp-validation-for="VerificationCode" class="error-message">
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="primary-button">
+
+                        Verify Code
+
+                    </button>
+
+                </form>
+
+            }
+
+
+
+            @if (Model.ShowPasswordStep)
+            {
+
+                <form method="post" asp-page-handler="ResetPassword">
+
+                    <div class="form-group">
+
+                        <label asp-for="NewPassword">
+                            New Password
+                        </label>
+
+                        <input asp-for="NewPassword" type="password" placeholder="Enter new password" />
+
+                        <span asp-validation-for="NewPassword" class="error-message">
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label asp-for="ConfirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <input asp-for="ConfirmPassword" type="password" placeholder="Confirm new password" />
+
+                        <span asp-validation-for="ConfirmPassword" class="error-message">
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="primary-button">
+
+                        Reset Password
+
+                    </button>
+
+                </form>
+
+            }
+
+
+
+            @if (Model.ShowSuccessStep)
+            {
+
+                <div class="success-message">
+
+                    <h2>
+                        Password Changed Successfully
+                    </h2>
+
+                    <p>
+                        Your password has been updated.
+                    </p>
+
+                    <p>
+                        Redirecting to login in
+                        <span id="countdown">5</span>
+                        seconds...
+                    </p>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+
+
+    @if (Model.ShowSuccessStep)
+    {
+        <script src="~/js/ForgotPass.js"></script>
+    }
+
+</body>
+
+</html>

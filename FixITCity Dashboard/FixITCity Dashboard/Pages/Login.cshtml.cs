@@ -4,48 +4,49 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FixITCity_Dashboard.Pages
 {
-   public class LoginModel : PageModel
-{
-    [BindProperty]
-    public LoginInput Input { get; set; }
-
-    public void OnGet()
+    public class LoginModel : PageModel
     {
-        // Just display the login page
-    }
+        [BindProperty]
+        public LoginInput Input { get; set; }
 
-    public IActionResult OnPost()
-    {
-        // Check if the username was entered
-        if (string.IsNullOrWhiteSpace(Input.Username))
+        public void OnGet()
         {
-            TempData["ErrorMessage"] = "Please enter a username.";
-            return Page();
+            // Just display the login page
         }
 
-        // Simple login - accept any username
-        // In a real app, you'd check against a database here
-        TempData["SuccessMessage"] = $"Welcome back, {Input.Username}!";
+        public IActionResult OnPost()
+        {
+            // Check if the username was entered
+            if (!ModelState.IsValid)
+            {
 
-        // Store the username in session so we can use it later
-        HttpContext.Session.SetString("Username", Input.Username);
+                return Page();
+            }
 
-        // Redirect to the home page or dashboard
-        return RedirectToPage("/Dashboard");
+            // Simple login - accept any username
+            // In a real app, you'd check against a database here
+            TempData["SuccessMessage"] = $"Welcome back, {Input.Username}!";
+
+            // Store the username in session so we can use it later
+            HttpContext.Session.SetString("Username", Input.Username);
+
+            // Redirect to the home page or dashboard
+            return RedirectToPage("/Dashboard");
+        }
     }
-}
 
-   
-  
+
+
     public class LoginInput
-{
-    [Required(ErrorMessage = "Username is required")]
-    [Display(Name = "Username")]
-    public string Username { get; set; }
+    {
+        [Required(ErrorMessage = "Username is required")]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
 
-    [Display(Name = "Password")]
-    public string Password { get; set; } 
-}
+        [Required(ErrorMessage = "Password is required")]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+    }
 
 }
 
