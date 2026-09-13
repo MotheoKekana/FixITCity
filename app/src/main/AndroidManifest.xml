@@ -9,11 +9,13 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".FixITCityApp"
@@ -26,9 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FixITCity">
 
-        <!-- Launcher: Guest Dashboard -->
+        <!-- Splash Screen (LAUNCHER) -->
         <activity
-            android:name=".Guest_Dashboard_Activity"
+            android:name=".Splash_Activity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +38,12 @@
             </intent-filter>
         </activity>
 
-        <!-- Report flow (in order) -->
+        <!-- Guest Dashboard (NOT launcher anymore) -->
+        <activity
+            android:name=".Guest_Dashboard_Activity"
+            android:exported="false" />
+
+        <!-- Report flow -->
         <activity android:name=".ReportFaultCategoryActivity" />
         <activity android:name=".ReportFaultGPSActivity" />
         <activity android:name=".ProximityCheckActivity" />
