@@ -1,6 +1,7 @@
 package com.example.fixitcity;
 
 public class FaultCategory {
+
     private int id;
     private String title;
     private String description;
@@ -8,6 +9,7 @@ public class FaultCategory {
 
     // Optionally, an icon resource id can be determined by category type
     private int iconResId;
+
 
     public FaultCategory(int id, String title, String description, int severity, int iconResId) {
         this.id = id;

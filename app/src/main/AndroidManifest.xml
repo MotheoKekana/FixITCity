@@ -38,23 +38,36 @@
             </intent-filter>
         </activity>
 
-        <!-- Guest Dashboard (NOT launcher anymore) -->
+        <!-- Auth screens — keyboard-aware -->
+        <activity
+            android:name=".Login_Activity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Register_Activity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Guest Dashboard -->
         <activity
             android:name=".Guest_Dashboard_Activity"
             android:exported="false" />
 
         <!-- Report flow -->
-        <activity android:name=".ReportFaultCategoryActivity" />
-        <activity android:name=".ReportFaultGPSActivity" />
+        <activity android:name=".ReportFaultCategoryActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ReportFaultGPSActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ProximityCheckActivity" />
         <activity android:name=".ThankYouActivity" />
         <activity android:name=".ReportFaultPhotoActivity" />
-        <activity android:name=".ReportFaultSummaryActivity" />
+        <activity android:name=".ReportFaultSummaryActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ReportSuccessActivity" />
-        <activity android:name=".ProfileSettingsActivity" />
+        <activity android:name=".ProfileSettingsActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Help & Guide -->
-        <activity android:name=".HelpGuideActivity" />
+        <activity android:name=".HelpGuideActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- FileProvider for camera photos -->
         <provider

@@ -13,7 +13,7 @@ public class Onboard_Report_Faults_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_onboard_report_faults);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.onboard_report_faults), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

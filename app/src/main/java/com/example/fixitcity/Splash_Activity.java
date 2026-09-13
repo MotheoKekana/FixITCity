@@ -8,12 +8,13 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseClient;
 
 public class Splash_Activity extends AppCompatActivity {
 
     private static final String TAG = "SupabaseTest";
-    private static final int SPLASH_DELAY_MS = 2000; // Show splash for 2 seconds
+    private static final int SPLASH_DELAY_MS = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +31,21 @@ public class Splash_Activity extends AppCompatActivity {
             }
         }).start();
 
-        // After delay, go to Dashboard
+        // After delay, decide where to go
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(Splash_Activity.this, Guest_Dashboard_Activity.class));
+            SessionManager session = new SessionManager(this);
+
+            if (session.isLoggedIn()) {
+                // Already logged in → go to dashboard
+                startActivity(new Intent(Splash_Activity.this, Guest_Dashboard_Activity.class));
+            } else {
+                // Not logged in → go to login
+                startActivity(new Intent(Splash_Activity.this, Login_Activity.class));
+            }
+
             finish();
         }, SPLASH_DELAY_MS);
+        new SessionManager(this).logout();
+
     }
 }

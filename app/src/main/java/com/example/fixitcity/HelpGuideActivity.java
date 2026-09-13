@@ -11,6 +11,8 @@ public class HelpGuideActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help_guide);
         // All static content – just set up listeners if needed
+
         findViewById(R.id.back_button).setOnClickListener(v -> finish());
+
     }
 }

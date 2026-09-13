@@ -55,15 +55,6 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center"
-                        android:text="Create an account to report and track civic\nissues."
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
-
-                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
@@ -96,7 +87,8 @@
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="John Doe"
-                            android:textColorHint="#BCBCBC"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textPersonName"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
@@ -136,7 +128,8 @@
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="john@example.com"
-                            android:textColorHint="#BCBCBC"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
@@ -175,8 +168,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
-                            android:hint="+1 (555) 000-0000"
-                            android:textColorHint="#BCBCBC"
+                            android:hint="+27 83 132 1144"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="phone"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
@@ -200,7 +194,7 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="8dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
@@ -211,16 +205,30 @@
 
                         <EditText
                             android:id="@+id/etPassword"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
+                            android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
-                            android:textColorHint="#BCBCBC"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
                             android:importantForAutofill="no" />
+
+                        <ImageView
+                            android:id="@+id/ivTogglePassword"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="8dp"
+                            android:src="@android:drawable/ic_menu_view"
+                            app:tint="#6B7280"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Toggle password visibility"
+                            android:clickable="true"
+                            android:focusable="true" />
                     </LinearLayout>
 
                     <TextView
@@ -240,7 +248,7 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="8dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
@@ -251,16 +259,30 @@
 
                         <EditText
                             android:id="@+id/etConfirmPassword"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
+                            android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
-                            android:textColorHint="#BCBCBC"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
                             android:importantForAutofill="no" />
+
+                        <ImageView
+                            android:id="@+id/ivToggleConfirmPassword"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="8dp"
+                            android:src="@android:drawable/ic_menu_view"
+                            app:tint="#6B7280"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Toggle confirm password visibility"
+                            android:clickable="true"
+                            android:focusable="true" />
                     </LinearLayout>
 
                     <LinearLayout

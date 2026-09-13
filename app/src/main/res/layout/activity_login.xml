@@ -93,9 +93,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
+                            android:id="@+id/etEmail"
                             android:background="@android:color/transparent"
                             android:hint="citizen@example.com"
-                            android:textColorHint="#BCBCBC"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
@@ -119,7 +121,7 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="8dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
@@ -129,19 +131,35 @@
                             android:contentDescription="Password Icon" />
 
                         <EditText
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
+                            android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
-                            android:textColorHint="#BCBCBC"
+                            android:id="@+id/etPassword"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
                             android:importantForAutofill="no" />
+
+                        <ImageView
+                            android:id="@+id/ivTogglePassword"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="8dp"
+                            android:src="@android:drawable/ic_menu_view"
+                            app:tint="#6B7280"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Toggle password visibility"
+                            android:clickable="true"
+                            android:focusable="true" />
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvForgotPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -205,6 +223,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Register"
+                            android:id="@+id/btnRegisterLink"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
