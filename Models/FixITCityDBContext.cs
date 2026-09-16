@@ -101,6 +101,10 @@ public partial class FixITCityDbContext : DbContext
             entity.HasOne(d => d.User)
                 .WithMany(p => p.CitizenProfiles)
                 .HasForeignKey(d => d.UserId);
+            
+            entity.Property(e => e.NotificationPreference).HasColumnName("notification_preference").HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<DeviceToken>(entity =>
@@ -177,6 +181,11 @@ public partial class FixITCityDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("name");
             entity.Property(e => e.SeverityWeight).HasColumnName("severity_weight");
+            entity.Property(e => e.EstimatedFixTime).HasColumnName("estimated_fix_time");
+            entity.Property(e => e.Icon)
+                .HasMaxLength(50)
+                .HasColumnName("icon");
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
         });
 
         modelBuilder.Entity<FaultReport>(entity =>
@@ -284,6 +293,15 @@ public partial class FixITCityDbContext : DbContext
             entity.HasOne(d => d.Report)
                 .WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.ReportId);
+            entity.Property(e => e.NotificationType).HasColumnName("notification_type").HasMaxLength(50);
+            entity.Property(e => e.Subject).HasColumnName("subject").HasMaxLength(200);
+            entity.Property(e => e.DeviceToken).HasColumnName("device_token").HasMaxLength(255);
+            entity.Property(e => e.FcmMessageId).HasColumnName("fcm_message_id").HasMaxLength(100);
+            entity.Property(e => e.IsSent).HasColumnName("is_sent").HasDefaultValue(false);
+            entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
+            entity.Property(e => e.IsDelivered).HasColumnName("is_delivered").HasDefaultValue(false);
+            entity.Property(e => e.DeliveredAt).HasColumnName("delivered_at");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<PriorityScore>(entity =>
@@ -323,6 +341,9 @@ public partial class FixITCityDbContext : DbContext
             entity.HasOne(d => d.Report)
                 .WithMany(p => p.ReportFeedbacks)
                 .HasForeignKey(d => d.ReportId);
+            entity.Property(e => e.ResponseTime).HasColumnName("response_time");
+            entity.Property(e => e.IsAnonymous).HasColumnName("is_anonymous").HasDefaultValue(false);
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<ReportPhoto>(entity =>
@@ -338,6 +359,11 @@ public partial class FixITCityDbContext : DbContext
             entity.HasOne(d => d.Report)
                 .WithMany(p => p.ReportPhotos)
                 .HasForeignKey(d => d.ReportId);
+            entity.Property(e => e.SupabaseStoragePath).HasColumnName("supabase_storage_path").HasMaxLength(500);
+            entity.Property(e => e.IsPrimary).HasColumnName("is_primary").HasDefaultValue(false);
+            entity.Property(e => e.IsOffline).HasColumnName("is_offline").HasDefaultValue(false);
+            entity.Property(e => e.SyncStatus).HasColumnName("sync_status").HasMaxLength(20);
+            entity.Property(e => e.OfflinePhotoPath).HasColumnName("offline_photo_path").HasMaxLength(500);
         });
 
         modelBuilder.Entity<ServiceArea>(entity =>
@@ -355,6 +381,8 @@ public partial class FixITCityDbContext : DbContext
             entity.Property(e => e.WardNumber)
                 .HasMaxLength(10)
                 .HasColumnName("ward_number");
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -371,6 +399,9 @@ public partial class FixITCityDbContext : DbContext
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasColumnName("role");
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            entity.Property(e => e.LastLogin).HasColumnName("last_login");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });
 
         OnModelCreatingPartial(modelBuilder);

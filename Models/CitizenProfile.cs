@@ -26,6 +26,9 @@ public partial class CitizenProfile
 
     public string NotificationPreference { get; set; }  // notification_preference
     
+
+    public DateTime? CreatedAt { get; set; }            // created_at
+    
     public DateTime? UpdatedAt { get; set; }            // updated_at
 
     public virtual ICollection<FaultReport> FaultReports { get; set; } = new List<FaultReport>();

@@ -18,5 +18,9 @@ public partial class ServiceArea
 
     public decimal? Longitude { get; set; }
 
+    public bool? IsActive { get; set; }          
+    
+    public DateTime? CreatedAt { get; set; }
+
     public virtual ICollection<FaultReport> FaultReports { get; set; } = new List<FaultReport>();
 }

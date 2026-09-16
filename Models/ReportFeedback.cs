@@ -16,7 +16,12 @@ public partial class ReportFeedback
 
     public string? Comment { get; set; }
 
+    public int? ResponseTime { get; set; }        
+    public bool? IsAnonymous { get; set; }
+
     public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual CitizenProfile? Citizen { get; set; }
 

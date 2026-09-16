@@ -16,6 +16,10 @@ public partial class User
 
     public DateTime? CreatedAt { get; set; }
 
+     public bool? IsActive { get; set; }          
+    public DateTime? LastLogin { get; set; }    
+    public DateTime? UpdatedAt { get; set; }
+
     public virtual ICollection<CitizenProfile> CitizenProfiles { get; set; } = new List<CitizenProfile>();
 
     public virtual ICollection<DeviceToken> DeviceTokens { get; set; } = new List<DeviceToken>();

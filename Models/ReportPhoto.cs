@@ -12,6 +12,12 @@ public partial class ReportPhoto
 
     public string? PhotoUrl { get; set; }
 
+     public string SupabaseStoragePath { get; set; }   
+    public bool? IsPrimary { get; set; }              
+    public bool? IsOffline { get; set; }              
+    public string SyncStatus { get; set; }            
+    public string OfflinePhotoPath { get; set; }
+
     public DateTime? UploadedAt { get; set; }
 
     public virtual FaultReport? Report { get; set; }

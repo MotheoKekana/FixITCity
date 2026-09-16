@@ -14,5 +14,9 @@ public partial class FaultCategory
 
     public decimal? SeverityWeight { get; set; }
 
+     public int? EstimatedFixTime { get; set; }   
+    public string Icon { get; set; }              
+    public bool? IsActive { get; set; }
+
     public virtual ICollection<FaultReport> FaultReports { get; set; } = new List<FaultReport>();
 }
