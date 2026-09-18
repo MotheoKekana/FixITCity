@@ -1,22 +1,22 @@
 using FixITCity_Dashboard.ViewModels.Dashboard;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace FixITCity_Dashboard.Services.Dashboard
 {
     public class DashboardService : IDashboardService
     {
-        public Task<DashboardViewModel> GetDashboardSummaryAsync()
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public DashboardService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        public async Task<DashboardViewModel> GetDashboardSummaryAsync()
         {
             var model = new DashboardViewModel
             {
-                Statistics = new DashboardStatisticsViewModel
-                {
-                    ApprovedCount = 132,
-                    PendingApprovalCount = 45,
-                    UnresolvedCount = 89,
-                    EmergencyCount = 9
-                },
                 Map = new MapSummaryViewModel
                 {
                     CenterLatitude = -33.9608,
@@ -32,24 +32,14 @@ namespace FixITCity_Dashboard.Services.Dashboard
                 {
                     ReportsByCategory = new Dictionary<string, int>
                     {
-                        { "Roads", 120 },
-                        { "Water", 90 },
-                        { "Electricity", 65 },
-                        { "Waste", 50 },
-                        { "Street Lighting", 32 }
+                        { "Roads", 120 }, { "Water", 90 }, { "Electricity", 65 }, { "Waste", 50 }, { "Street Lighting", 32 }
                     }
                 },
                 Activity = new ActivityStatisticsViewModel
                 {
                     ReportsByDay = new Dictionary<string, int>
                     {
-                        { "Mon", 12 },
-                        { "Tue", 18 },
-                        { "Wed", 15 },
-                        { "Thu", 29 },
-                        { "Fri", 21 },
-                        { "Sat", 8 },
-                        { "Sun", 5 }
+                        { "Mon", 12 }, { "Tue", 18 }, { "Wed", 15 }, { "Thu", 29 }, { "Fri", 21 }, { "Sat", 8 }, { "Sun", 5 }
                     }
                 },
                 Emergencies = new EmergencySummaryViewModel
@@ -57,21 +47,49 @@ namespace FixITCity_Dashboard.Services.Dashboard
                     TotalEmergencies = 9,
                     EmergenciesByCategory = new Dictionary<string, int>
                     {
-                        { "Water", 3 },
-                        { "Electricity", 2 },
-                        { "Roads", 2 },
-                        { "Other", 2 }
+                        { "Water", 3 }, { "Electricity", 2 }, { "Roads", 2 }, { "Other", 2 }
                     }
                 },
-                Alerts = new List<DashboardAlertViewModel>
-                {
-                    new DashboardAlertViewModel { Message = "9 emergency reports require attention", Type = "danger" },
-                    new DashboardAlertViewModel { Message = "18 reports have been awaiting approval for more than 48 hours", Type = "warning" },
-                    new DashboardAlertViewModel { Message = "Report volume has increased by 14% this week", Type = "info" }
-                }
+                Alerts = new List<DashboardAlertViewModel>(),
+                Statistics = new DashboardStatisticsViewModel()
             };
 
-            return Task.FromResult(model);
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Api");
+                var stats = await client.GetFromJsonAsync<DashboardStatsApiResponse>("Dashboard/stats");
+
+                if (stats != null)
+                {
+                    model.Statistics = new DashboardStatisticsViewModel
+                    {
+                        ApprovedCount = stats.Verified,
+                        PendingApprovalCount = stats.Pending,
+                        UnresolvedCount = stats.InProgress,
+                        EmergencyCount = 0
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                model.Alerts.Add(new DashboardAlertViewModel
+                {
+                    Message = "Could not reach API: " + ex.Message,
+                    Type = "warning"
+                });
+            }
+
+            return model;
         }
+    }
+
+    public class DashboardStatsApiResponse
+    {
+        [JsonPropertyName("total")] public int Total { get; set; }
+        [JsonPropertyName("pending")] public int Pending { get; set; }
+        [JsonPropertyName("verified")] public int Verified { get; set; }
+        [JsonPropertyName("inProgress")] public int InProgress { get; set; }
+        [JsonPropertyName("resolved")] public int Resolved { get; set; }
+        [JsonPropertyName("rejected")] public int Rejected { get; set; }
     }
 }

@@ -34,8 +34,8 @@
     <main class="dashboard-main">
         <header class="dashboard-header" id="overview">
             <div>
-                <p class="eyebrow">Operations overview</p>
-                <h1>Good day, Admin</h1>
+                <p class="eyebrow">Operations overview</p>            
+                 <h1>Good day, @(ViewContext.HttpContext.Session.GetString("Username") ?? "Admin")</h1>
                 <p class="header-copy">Monitor service reports, approvals and urgent issues across the city.</p>
             </div>
 
@@ -92,7 +92,6 @@
                 </div>
                 <strong class="stat-value">@stats.UnresolvedCount.ToString("N0")</strong>
                 <p>Open issues still requiring action</p>
-            </a>
 
             <a class="stat-card stat-card--emergency stat-card-link" href="/Reports?priority=Emergency">
                 <div class="stat-card-top">
