@@ -209,7 +209,16 @@ public partial class FixITCityDbContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(200)
                 .HasColumnName("title");
-
+            entity.Property(e => e.PriorityScore).HasColumnName("priority_score");
+            entity.Property(e => e.ReferenceNumber).HasColumnName("reference_number").HasMaxLength(50);
+            entity.Property(e => e.AddressLine).HasColumnName("address_line").HasMaxLength(255);
+            entity.Property(e => e.VerifiedBy).HasColumnName("verified_by");
+            entity.Property(e => e.VerifiedAt).HasColumnName("verified_at");
+            entity.Property(e => e.IsDuplicate).HasColumnName("is_duplicate");
+            entity.Property(e => e.IsOffline).HasColumnName("is_offline");
+            entity.Property(e => e.SyncStatus).HasColumnName("sync_status").HasMaxLength(20);
+            entity.Property(e => e.OfflineId).HasColumnName("offline_id").HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasOne(d => d.Area)
                 .WithMany(p => p.FaultReports)
                 .HasForeignKey(d => d.AreaId);
