@@ -1,3 +1,4 @@
+using FixITCity_Dashboard.Services.Dashboard.Dtos;
 using FixITCity_Dashboard.ViewModels.Dashboard;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -58,6 +59,9 @@ namespace FixITCity_Dashboard.Services.Dashboard
             {
                 var client = _httpClientFactory.CreateClient("Api");
                 var stats = await client.GetFromJsonAsync<DashboardStatsApiResponse>("Dashboard/stats");
+                var categories = await client.GetFromJsonAsync<List<CategoryCountDto>>("Dashboard/reports-by-category");
+                var reports = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports");
+
 
                 if (stats != null)
                 {
@@ -67,7 +71,24 @@ namespace FixITCity_Dashboard.Services.Dashboard
                         PendingApprovalCount = stats.Pending,
                         UnresolvedCount = stats.InProgress,
                         EmergencyCount = 0
+                        //EmergencyCount = stats.Emergency
                     };
+
+                    model.Categories = new CategoryStatisticsViewModel
+                    {
+                        ReportsByCategory = categories.ToDictionary(c => c.CategoryName ?? "", c => c.Count)
+                    };
+                    model.Map.MapPoints = reports
+                   .Where(r => r.Latitude != 0 && r.Longitude != 0)
+                   .Select(r => new MapPointViewModel
+                   {
+                       Latitude = r.Latitude,
+                       Longitude = r.Longitude,
+                       Title = r.Title,
+                       Description = r.Description,
+                       IsEmergency = false  // priorityScore is null in the API for now
+                   })
+                   .ToList();
                 }
             }
             catch (Exception ex)
