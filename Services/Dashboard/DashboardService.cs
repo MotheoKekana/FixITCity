@@ -89,7 +89,31 @@ namespace FixITCity_Dashboard.Services.Dashboard
                        IsEmergency = false  // priorityScore is null in the API for now
                    })
                    .ToList();
+
+                   var today = DateTime.Today;
+                    var startDate = today.AddDays(-6);  // 7 days including today
+
+                    var countsByDate = reports
+                        .Where(r => r.CreatedAt.HasValue)
+                        .Select(r => r.CreatedAt!.Value.Date)
+                        .Where(d => d >= startDate && d <= today)
+                        .GroupBy(d => d)
+                        .ToDictionary(g => g.Key, g => g.Count());
+
+                    var activity = new Dictionary<string, int>();
+                    for (int i = 0; i < 7; i++)
+                    {
+                        var day = startDate.AddDays(i);
+                        var label = day.ToString("ddd");  // Mon, Tue, Wed...
+                        activity[label] = countsByDate.TryGetValue(day, out var c) ? c : 0;
+                    }
+
+                    model.Activity = new ActivityStatisticsViewModel
+                    {
+                        ReportsByDay = activity
+                    };
                 }
+
             }
             catch (Exception ex)
             {
