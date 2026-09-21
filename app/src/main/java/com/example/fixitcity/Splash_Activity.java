@@ -21,7 +21,6 @@ public class Splash_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Test Supabase connection in background
         new Thread(() -> {
             try {
                 String response = SupabaseClient.get("/fault_categories?select=*");
@@ -31,21 +30,17 @@ public class Splash_Activity extends AppCompatActivity {
             }
         }).start();
 
-        // After delay, decide where to go
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             SessionManager session = new SessionManager(this);
 
-            if (session.isLoggedIn()) {
-                // Already logged in → go to dashboard
+            if (session.isLoggedIn() && !session.isGuest() && session.getCitizenProfileId() > 0) {
+                startActivity(new Intent(Splash_Activity.this, Dashboard_Activity.class));
+            } else if (session.isLoggedIn() && session.isGuest()) {
                 startActivity(new Intent(Splash_Activity.this, Guest_Dashboard_Activity.class));
             } else {
-                // Not logged in → go to login
                 startActivity(new Intent(Splash_Activity.this, Login_Activity.class));
             }
-
             finish();
         }, SPLASH_DELAY_MS);
-        new SessionManager(this).logout();
-
     }
 }

@@ -2,13 +2,21 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.SupabaseClient;
+import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class ReportFaultSummaryActivity extends AppCompatActivity {
+
+    private static final String TAG = "ReportSummary";
 
     private TextView tvCategory, tvPhoto, tvLocation;
     private TextInputEditText etDetails;
@@ -32,9 +40,116 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_submit).setOnClickListener(v -> {
             reportData.setAdditionalDetails(etDetails.getText().toString());
-            // Call your API here
-            startActivity(new Intent(this, ReportSuccessActivity.class));
-            finishAffinity();
+            submitReportToSupabase();
         });
+    }
+
+    private void submitReportToSupabase() {
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+        long citizenProfileId = session.getCitizenProfileId();
+
+        if (accessToken == null || session.isGuest()) {
+            Toast.makeText(this, "Please log in to submit a report", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (citizenProfileId <= 0) {
+            Toast.makeText(this,
+                    "Your account profile is incomplete. Please log out, then register a new account.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        long categoryId = reportData.getCategoryId();
+        if (categoryId <= 0) {
+            Toast.makeText(this, "Please select a fault category", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        View submitBtn = findViewById(R.id.btn_submit);
+        submitBtn.setEnabled(false);
+
+        new Thread(() -> {
+            try {
+                Log.d(TAG, "Using citizen_profile_id = " + citizenProfileId);
+                Log.d(TAG, "Using category_id = " + categoryId);
+                Log.d(TAG, "Using severity_weight = " + reportData.getCategorySeverityWeight());
+
+                // 1) Submit the report
+                FaultReport created = SupabaseReports.submitReport(
+                        citizenProfileId,
+                        categoryId,
+                        reportData.getCategorySeverityWeight(),
+                        reportData.getCategory(),
+                        reportData.getAdditionalDetails(),
+                        reportData.getLatitude(),
+                        reportData.getLongitude(),
+                        reportData.getLocationAddress(),
+                        accessToken
+                );
+
+                Log.d(TAG, "Report created: " + created.getReferenceNumber());
+
+                // 2) Upload photo if present
+                byte[] photoBytes = reportData.getPhotoBytes();
+                if (photoBytes != null && photoBytes.length > 0) {
+                    try {
+                        String storagePath = "reports/"
+                                + created.getReportId() + "/"
+                                + System.currentTimeMillis() + ".jpg";
+
+                        Log.d(TAG, "Uploading photo, size = " + photoBytes.length + " bytes");
+                        String publicUrl = SupabaseClient.uploadToStorage(
+                                SupabaseClient.REPORT_PHOTOS_BUCKET,
+                                storagePath,
+                                photoBytes,
+                                reportData.getPhotoMimeType() != null ? reportData.getPhotoMimeType() : "image/jpeg",
+                                accessToken
+                        );
+
+                        Log.d(TAG, "Photo uploaded: " + publicUrl);
+
+                        SupabaseReports.insertPhoto(
+                                created.getReportId(),
+                                publicUrl,
+                                storagePath,
+                                true,
+                                accessToken
+                        );
+
+                        Log.d(TAG, "Photo row inserted");
+                    } catch (Exception photoEx) {
+                        Log.e(TAG, "Photo upload failed (report still saved): " + photoEx.getMessage(), photoEx);
+                    }
+                }
+
+                // 3) Compute priority fallback (in case DB returned null)
+                final int finalPriority = created.getPriorityScore() != null
+                        ? created.getPriorityScore()
+                        : SupabaseReports.computePriorityScore(reportData.getCategorySeverityWeight());
+
+                // 4) Move to success screen
+                final FaultReport reportFinal = created;
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(this, ReportSuccessActivity.class);
+                    intent.putExtra("reference_number", reportFinal.getReferenceNumber());
+                    intent.putExtra("priority_score", finalPriority);
+                    startActivity(intent);
+
+                    // Clear the wizard data but NOT the session
+                    ((FixITCityApp) getApplication()).clearReportData();
+
+                    finishAffinity();
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "Submit error: " + e.getMessage(), e);
+                runOnUiThread(() -> {
+                    submitBtn.setEnabled(true);
+                    Toast.makeText(this, "Submit failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
     }
 }

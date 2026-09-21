@@ -10,15 +10,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Random;
+import com.example.fixitcity.data.SessionManager;
 
 public class ReportSuccessActivity extends AppCompatActivity {
 
     private TextView tvReference, tvPriority, tvStatus;
     private String referenceNumber;
+    private int priorityScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +27,14 @@ public class ReportSuccessActivity extends AppCompatActivity {
         tvPriority = findViewById(R.id.tv_priority_score);
         tvStatus = findViewById(R.id.tv_status);
 
-        // Generate reference
-        referenceNumber = "FIX-" + new SimpleDateFormat("yyyy", Locale.getDefault()).format(new Date())
-                + "-" + String.format("%03d", new Random().nextInt(1000));
-        tvReference.setText(referenceNumber);
+        // Get real data from previous activity
+        referenceNumber = getIntent().getStringExtra("reference_number");
+        priorityScore = getIntent().getIntExtra("priority_score", 0);
 
-        // Priority – replace with actual value from API
-        int priority = 92;
-        tvPriority.setText(priority + "/100");
+        if (referenceNumber == null) referenceNumber = "FIX-0000-0000";
+
+        tvReference.setText(referenceNumber);
+        tvPriority.setText(priorityScore + "/100");
         tvStatus.setText("Pending");
 
         // Copy Ref
@@ -52,27 +50,55 @@ public class ReportSuccessActivity extends AppCompatActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             String shareText = "FixITCity Report\nReference: " + referenceNumber +
-                    "\nPriority: " + priority + "/100" +
+                    "\nPriority: " + priorityScore + "/100" +
                     "\nStatus: Pending\n\nTrack at: https://fixitcity.gov/track/" + referenceNumber;
             shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
             startActivity(Intent.createChooser(shareIntent, "Share via"));
         });
 
-        // Go to Dashboard
-        findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> finish());
+        // ===== FIXED: Go to Dashboard =====
+        // We can't just finish() here because ReportFaultSummaryActivity called
+        // finishAffinity() after starting this activity, so the whole task stack
+        // is gone. Instead, launch Dashboard_Activity explicitly and clear the task.
+        findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> {
+            SessionManager session = new SessionManager(this);
+            Class<?> target = session.isGuest()
+                    ? Guest_Dashboard_Activity.class
+                    : Dashboard_Activity.class;
 
-        // Report Another – clear data and start fresh
+            Intent intent = new Intent(this, target);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        // Report Another
         findViewById(R.id.btn_report_another).setOnClickListener(v -> {
             ((FixITCityApp) getApplication()).clearReportData();
-            Intent intent = new Intent(this, ProximityCheckActivity.class);
+            Intent intent = new Intent(this, ReportFaultCategoryActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
 
         // Track Report
         findViewById(R.id.btn_track_report).setOnClickListener(v -> {
-            Toast.makeText(this, "Tracking report: " + referenceNumber, Toast.LENGTH_SHORT).show();
-            // Open tracking screen later
+            Intent intent = new Intent(this, TrackReportSearchActivity.class);
+            intent.putExtra("prefill_reference", referenceNumber);
+            startActivity(intent);
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Same as tapping "Go to Dashboard" — we can't pop the stack because it's empty
+        SessionManager session = new SessionManager(this);
+        Class<?> target = session.isGuest()
+                ? Guest_Dashboard_Activity.class
+                : Dashboard_Activity.class;
+
+        Intent intent = new Intent(this, target);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

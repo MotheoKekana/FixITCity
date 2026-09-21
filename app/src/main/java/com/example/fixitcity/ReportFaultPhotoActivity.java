@@ -3,11 +3,17 @@ package com.example.fixitcity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,19 +22,26 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class ReportFaultPhotoActivity extends AppCompatActivity {
 
+    private static final String TAG = "ReportFaultPhoto";
     private ReportData reportData;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
     private static final int REQUEST_PERMISSION_CAMERA = 100;
     private Uri photoUri;
+
+    private ImageView ivPhotoPreview;
+    private ImageView ivCameraIcon;
+    private TextView tvTapHint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +50,15 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
-        // Camera placeholder click
+        ivPhotoPreview = findViewById(R.id.iv_photo_preview);
+        ivCameraIcon = findViewById(R.id.iv_camera_icon);
+        tvTapHint = findViewById(R.id.tv_tap_hint);
+
+        // Restore preview if we already have a photo (e.g. user came back)
+        if (reportData.getPhotoUri() != null && !reportData.getPhotoUri().isEmpty()) {
+            showPreviewFromUri(Uri.parse(reportData.getPhotoUri()));
+        }
+
         findViewById(R.id.camera_placeholder).setOnClickListener(v -> {
             if (checkCameraPermission()) {
                 dispatchTakePictureIntent();
@@ -56,21 +77,25 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_retake).setOnClickListener(v -> {
             photoUri = null;
+            reportData.setPhotoUri(null);
+            reportData.setPhotoBytes(null);
+            reportData.setPhotoMimeType(null);
             reportData.setPhotoCount(0);
+            clearPreview();
             Toast.makeText(this, "Photo cleared", Toast.LENGTH_SHORT).show();
         });
 
         findViewById(R.id.btn_skip).setOnClickListener(v -> {
             reportData.setPhotoCount(0);
+            reportData.setPhotoUri(null);
+            reportData.setPhotoBytes(null);
+            reportData.setPhotoMimeType(null);
             startNextActivity(ReportFaultSummaryActivity.class);
         });
 
         findViewById(R.id.btn_continue).setOnClickListener(v -> {
             startNextActivity(ReportFaultSummaryActivity.class);
         });
-
-        // Bottom nav and back button as before
-        // ...
     }
 
     private boolean checkCameraPermission() {
@@ -83,7 +108,7 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
 
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return true; // Android 13+ uses granular media permissions, we'll handle via intent
+            return true;
         }
         return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
@@ -103,7 +128,7 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
             }
             if (photoFile != null) {
                 photoUri = FileProvider.getUriForFile(this,
-                        "com.example.fixitcity.fileprovider", // must match provider authority in manifest
+                        "com.example.fixitcity.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -128,15 +153,91 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                reportData.setPhotoCount(reportData.getPhotoCount() + 1);
-                Toast.makeText(this, "Photo taken (" + reportData.getPhotoCount() + ")", Toast.LENGTH_SHORT).show();
-                // You can also save photoUri to reportData for later upload
+                if (photoUri != null) {
+                    reportData.setPhotoUri(photoUri.toString());
+                    reportData.setPhotoCount(1);
+                    loadBytesFromUri(photoUri);
+                    showPreviewFromUri(photoUri);
+                    Toast.makeText(this, "Photo taken", Toast.LENGTH_SHORT).show();
+                }
             } else if (requestCode == REQUEST_IMAGE_GALLERY && data != null) {
                 Uri selectedImage = data.getData();
-                reportData.setPhotoCount(reportData.getPhotoCount() + 1);
-                Toast.makeText(this, "Photo selected (" + reportData.getPhotoCount() + ")", Toast.LENGTH_SHORT).show();
+                if (selectedImage != null) {
+                    reportData.setPhotoUri(selectedImage.toString());
+                    reportData.setPhotoCount(1);
+                    loadBytesFromUri(selectedImage);
+                    showPreviewFromUri(selectedImage);
+                    Toast.makeText(this, "Photo selected", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+    }
+
+    private void showPreviewFromUri(Uri uri) {
+        if (ivPhotoPreview == null) return;
+        try {
+            ivPhotoPreview.setImageURI(uri);
+            ivPhotoPreview.setVisibility(View.VISIBLE);
+            if (ivCameraIcon != null) ivCameraIcon.setVisibility(View.GONE);
+            if (tvTapHint != null) tvTapHint.setText("Tap to retake");
+        } catch (Exception e) {
+            Log.e(TAG, "showPreviewFromUri failed: " + e.getMessage(), e);
+        }
+    }
+
+    private void clearPreview() {
+        if (ivPhotoPreview != null) {
+            ivPhotoPreview.setImageDrawable(null);
+            ivPhotoPreview.setVisibility(View.GONE);
+        }
+        if (ivCameraIcon != null) ivCameraIcon.setVisibility(View.VISIBLE);
+        if (tvTapHint != null) tvTapHint.setText("Tap to take photo");
+    }
+
+    /**
+     * Downscale + convert to JPEG bytes, store in ReportData.
+     * Max dimension = 1200px, quality = 80.
+     */
+    private void loadBytesFromUri(Uri uri) {
+        new Thread(() -> {
+            try {
+                InputStream is = getContentResolver().openInputStream(uri);
+                Bitmap original = BitmapFactory.decodeStream(is);
+                if (is != null) is.close();
+
+                if (original == null) {
+                    Log.e(TAG, "Could not decode bitmap from " + uri);
+                    return;
+                }
+
+                int maxDim = 1200;
+                int w = original.getWidth();
+                int h = original.getHeight();
+                if (w > maxDim || h > maxDim) {
+                    float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                    Bitmap scaled = Bitmap.createScaledBitmap(
+                            original,
+                            Math.round(w * scale),
+                            Math.round(h * scale),
+                            true);
+                    original.recycle();
+                    original = scaled;
+                }
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                original.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                byte[] bytes = baos.toByteArray();
+                original.recycle();
+
+                reportData.setPhotoBytes(bytes);
+                reportData.setPhotoMimeType("image/jpeg");
+
+                Log.d(TAG, "Loaded " + bytes.length + " bytes from " + uri);
+
+            } catch (Exception e) {
+                Log.e(TAG, "loadBytesFromUri failed: " + e.getMessage(), e);
+            }
+        }).start();
     }
 
     @Override

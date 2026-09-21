@@ -1,6 +1,7 @@
 package com.example.fixitcity;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import java.util.List;
 
 public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapter.ViewHolder> {
 
+    private static final String TAG = "NearbyReportAdapter";
+
     private Context context;
     private List<NearbyReport> reports;
     private OnItemClickListener listener;
@@ -26,6 +29,7 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         this.context = context;
         this.reports = reports;
         this.listener = listener;
+        Log.d(TAG, "Adapter created. Listener: " + (listener != null ? "NOT NULL" : "NULL"));
     }
 
     @NonNull
@@ -43,7 +47,7 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         holder.tvVotes.setText("⬆ " + report.getVoteCount());
         holder.tvDistance.setText(String.format("%.0fm away", report.getDistance()));
 
-        // Icon mapping (optional)
+        // Icon mapping
         int iconRes = android.R.drawable.ic_dialog_alert;
         String cat = report.getCategory().toLowerCase();
         if (cat.contains("pothole")) iconRes = android.R.drawable.ic_menu_report_image;
@@ -52,12 +56,15 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         else if (cat.contains("light")) iconRes = android.R.drawable.ic_menu_camera;
         holder.ivIcon.setImageResource(iconRes);
 
-        // ✅ Set click listener on the whole item
+        Log.d(TAG, "Binding position " + position + ", listener: " + (listener != null ? "NOT NULL" : "NULL"));
+
+        // ✅ Set click listener on the root itemView
         holder.itemView.setOnClickListener(v -> {
+            Log.d(TAG, "Item CLICKED at position " + position);
             if (listener != null) {
                 listener.onItemClick(report, position);
             } else {
-                android.util.Log.e("Adapter", "Listener is null!");
+                Log.e(TAG, "Listener is NULL - cannot fire!");
             }
         });
     }

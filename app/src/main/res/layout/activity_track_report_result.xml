@@ -62,9 +62,10 @@
             android:padding="20dp">
 
             <TextView
+                android:id="@+id/tv_report_status_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Report Status: #FIX-2024-001"
+                android:text="Report Status"
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -76,62 +77,63 @@
                 android:text="@string/track_progress_result"
                 android:textColor="@color/text_secondary" />
 
+            <!-- Report detail card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="16dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="200dp">
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@android:drawable/ic_menu_gallery" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_margin="12dp"
-                            android:background="@drawable/bg_circle_red"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="4dp"
-                            android:text="Urgent"
-                            android:textColor="@color/white"
-                            android:textStyle="bold" />
-                    </RelativeLayout>
+
                     <TextView
+                        android:id="@+id/tv_report_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Burst Water Pipe"
                         android:textColor="@color/secondary_blue"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:text="Report Title" />
+
                     <TextView
+                        android:id="@+id/tv_report_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/text_secondary"
+                        android:text="📍 Location" />
+
+                    <TextView
+                        android:id="@+id/tv_report_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="📍 123 Main Street"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_secondary"
+                        android:text="📅 Reported: —" />
+
                     <TextView
+                        android:id="@+id/tv_report_priority"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="📅 Reported: Oct 15"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_secondary"
+                        android:text="❗ Priority Score: 0/100" />
+
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_report_description"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="❗ Priority Score: 92/100"
-                        android:textColor="@color/text_secondary" />
+                        android:layout_marginTop="12dp"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_share_status"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -141,17 +143,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Current status card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="16dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp">
+
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
@@ -159,20 +164,19 @@
                         android:padding="16dp"
                         android:src="@android:drawable/ic_menu_manage"
                         app:tint="@color/white" />
+
                     <TextView
+                        android:id="@+id/tv_report_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="In Progress"
+                        android:text="Pending"
                         android:textColor="@color/secondary_blue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Water Services Team A"
-                        android:textColor="@color/text_secondary" />
+
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_notify_me"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginTop="20dp"
@@ -183,16 +187,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Status history card (placeholder — populated once Person 1 adds policies) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -201,9 +209,13 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <include layout="@layout/item_status_history" android:layout_marginTop="16dp" />
-                    <include layout="@layout/item_status_history" />
-                    <include layout="@layout/item_status_history" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Status history will appear here once available."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

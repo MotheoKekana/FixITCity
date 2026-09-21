@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseAuth;
+import com.example.fixitcity.data.SupabaseUsers;
 
 import org.json.JSONObject;
 
@@ -41,7 +42,6 @@ public class Login_Activity extends AppCompatActivity {
             return insets;
         });
 
-        // Find views
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnSignIn = findViewById(R.id.btnSignIn);
@@ -50,7 +50,6 @@ public class Login_Activity extends AppCompatActivity {
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
 
-        // ===== Password visibility toggle =====
         final boolean[] isPasswordVisible = {false};
 
         ivTogglePassword.setOnClickListener(v -> {
@@ -66,21 +65,23 @@ public class Login_Activity extends AppCompatActivity {
             etPassword.setSelection(etPassword.getText().length());
         });
 
-        // Sign In
         btnSignIn.setOnClickListener(v -> attemptLogin());
 
-        // Guest mode
         btnGuest.setOnClickListener(v -> {
+            // Guest path: clear any stale session, mark as guest
+            new SessionManager(this).logout();
+            SessionManager guestSession = new SessionManager(this);
+            guestSession.saveSession("guest", "guest", "guest@local", "guest");
+            guestSession.setHasCitizenProfile(false);
+
             startActivity(new Intent(this, Guest_Dashboard_Activity.class));
             finish();
         });
 
-        // Register link
         btnRegisterLink.setOnClickListener(v -> {
             startActivity(new Intent(Login_Activity.this, Register_Activity.class));
         });
 
-        // Forgot password
         tvForgotPassword.setOnClickListener(v -> {
             Toast.makeText(this, "Forgot password coming soon", Toast.LENGTH_SHORT).show();
         });
@@ -103,15 +104,47 @@ public class Login_Activity extends AppCompatActivity {
                 String response = SupabaseAuth.login(email, password);
                 JSONObject json = new JSONObject(response);
                 String accessToken = json.getString("access_token");
-                String userId = json.getJSONObject("user").getString("id");
+                String authUserId = json.getJSONObject("user").getString("id");
                 String userEmail = json.getJSONObject("user").getString("email");
 
                 SessionManager session = new SessionManager(this);
-                session.saveSession(accessToken, userId, userEmail, "citizen");
+                session.saveSession(accessToken, authUserId, userEmail, "citizen");
+
+                // ===== Fetch citizen_profile_id and store it =====
+                long userId = -1;
+                long profileId = -1;
+                try {
+                    userId = SupabaseUsers.findUserIdByAuthUuid(authUserId);
+                    Log.d(TAG, "Found user_id = " + userId);
+
+                    if (userId > 0) {
+                        profileId = SupabaseUsers.findCitizenProfileIdByUserId(userId, accessToken);
+                        Log.d(TAG, "Found citizen_profile_id = " + profileId);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to fetch profile chain: " + e.getMessage(), e);
+                }
+
+                if (profileId > 0) {
+                    session.saveCitizenProfileId(profileId);
+                    session.setHasCitizenProfile(true);
+                } else {
+                    session.setHasCitizenProfile(false);
+                    Log.w(TAG, "No citizen_profile found — user will not be able to submit reports");
+                }
+
+                final long fUserId = userId;
+                final long fProfileId = profileId;
 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, Guest_Dashboard_Activity.class));
+                    if (fProfileId > 0) {
+                        Toast.makeText(this, "Welcome back, " + userEmail, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this,
+                                "Profile incomplete. Please re-register if you can't submit reports.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    startActivity(new Intent(this, Dashboard_Activity.class));
                     finish();
                 });
 

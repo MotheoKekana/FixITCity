@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
@@ -39,6 +40,18 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="26sp"
                 android:textStyle="bold" />
+
+            <!-- Report name -->
+            <TextView
+                android:id="@+id/tv_report_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textColor="@color/secondary_blue"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Burst Water Pipe" />
 
             <!-- Subtitle -->
             <TextView

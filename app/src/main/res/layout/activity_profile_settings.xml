@@ -80,6 +80,7 @@
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.FixITCity.Circle" />
 
                     <TextView
+                        android:id="@+id/tv_profile_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -89,57 +90,48 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_profile_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="john.doe@example.com"
                         android:textColor="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tv_profile_phone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+1 (555) 123-4567"
                         android:textColor="@color/text_secondary" />
 
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
+                        app:cardBackgroundColor="#E8EFFF"
+                        app:cardElevation="0dp"
+                        app:cardCornerRadius="8dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            app:cardBackgroundColor="#E8EFFF"
-                            app:cardElevation="0dp">
-                            <LinearLayout
-                                android:layout_width="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="8dp">
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MEMBER SINCE" android:textSize="10sp" android:textColor="@color/secondary_blue" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jan 2024" android:textStyle="bold" android:textColor="@color/secondary_blue" />
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="4dp"
-                            app:cardBackgroundColor="#E8EFFF"
-                            app:cardElevation="0dp">
-                            <LinearLayout
-                                android:layout_width="match_parent"
+                                android:text="REPORTS"
+                                android:textSize="10sp"
+                                android:textColor="@color/secondary_blue" />
+                            <TextView
+                                android:id="@+id/tv_profile_reports_count"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="8dp">
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="REPORTS" android:textSize="10sp" android:textColor="@color/secondary_blue" />
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12" android:textStyle="bold" android:textColor="@color/secondary_blue" />
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
+                                android:text="0"
+                                android:textStyle="bold"
+                                android:textColor="@color/secondary_blue" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -218,7 +210,6 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -245,7 +236,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -272,7 +262,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -299,7 +288,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Settings (selected) -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

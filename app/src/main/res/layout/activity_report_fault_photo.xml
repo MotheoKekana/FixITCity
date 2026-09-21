@@ -4,35 +4,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@color/background_main_light_blue">
 
-    <!-- App Bar -->
+    <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/app_bar"
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
-            android:id="@+id/back_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_revert"
+            android:id="@+id/iv_logo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="@string/content_desc_app_logo"
+            android:src="@drawable/app_logo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/primary_green" />
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
+            android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="@string/app_name"
-            android:textColor="@color/primary_green"
+            android:textColor="@color/secondary_blue"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivNotifications"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="@string/content_desc_notifications"
+            android:src="@drawable/ic_notification"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Progress -->
@@ -43,7 +58,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/app_bar">
+        app:layout_constraintTop_toBottomOf="@id/header">
 
         <TextView
             android:id="@+id/tv_step_label"
@@ -60,9 +75,9 @@
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginTop="8dp"
-            android:progress="50"
+            android:progress="75"
             app:trackColor="#E1F5FE"
-            app:indicatorColor="@color/primary_green"
+            app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
     </LinearLayout>
 
@@ -84,7 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/take_photo_title"
-                android:textColor="@color/primary_green"
+                android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -97,10 +112,9 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="4dp"
                 android:text="💧 Burst Water Pipe ✓"
-                android:textColor="@color/primary_green"
+                android:textColor="@color/secondary_blue"
                 android:textStyle="bold" />
 
-            <!-- Optional photo hint -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -109,7 +123,7 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
-            <!-- Camera placeholder -->
+            <!-- Camera placeholder / preview -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/camera_placeholder"
                 android:layout_width="match_parent"
@@ -117,22 +131,38 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="#E8F5E9"
+                app:cardBackgroundColor="#E6F0FA"
                 app:cardCornerRadius="24dp"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
+                    <!-- Photo preview (hidden until a photo is chosen) -->
                     <ImageView
+                        android:id="@+id/iv_photo_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="Photo preview" />
+
+                    <!-- Camera icon (hidden once a photo is chosen) -->
+                    <ImageView
+                        android:id="@+id/iv_camera_icon"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:layout_centerInParent="true"
-                        android:background="@drawable/bg_circle_green"
+                        android:background="@drawable/bg_circle_blue"
                         android:padding="20dp"
                         android:src="@android:drawable/ic_menu_camera"
                         app:tint="@color/white" />
+
+                    <!-- Hint pill (text changes once a photo is chosen) -->
                     <TextView
+                        android:id="@+id/tv_tap_hint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
@@ -142,7 +172,7 @@
                         android:paddingHorizontal="24dp"
                         android:paddingVertical="12dp"
                         android:text="@string/tap_to_take_photo"
-                        android:textColor="@color/primary_green"
+                        android:textColor="@color/secondary_blue"
                         android:textStyle="bold" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -153,6 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:orientation="horizontal">
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_gallery"
                     style="@style/Widget.Material3.Button.TonalButton"
@@ -161,10 +192,12 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="@string/gallery"
-                    android:backgroundTint="#E8F5E9"
-                    android:textColor="@color/primary_green"
+                    android:backgroundTint="#F4F6F8"
+                    android:textColor="@color/secondary_blue"
+                    app:cornerRadius="28dp"
                     app:icon="@android:drawable/ic_menu_gallery"
-                    app:iconTint="@color/primary_green" />
+                    app:iconTint="@color/secondary_blue" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_retake"
                     style="@style/Widget.Material3.Button.TonalButton"
@@ -173,10 +206,11 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="@string/retake"
-                    android:backgroundTint="#E8F5E9"
-                    android:textColor="@color/primary_green"
+                    android:backgroundTint="#F4F6F8"
+                    android:textColor="@color/secondary_blue"
+                    app:cornerRadius="28dp"
                     app:icon="@android:drawable/ic_menu_revert"
-                    app:iconTint="@color/primary_green" />
+                    app:iconTint="@color/secondary_blue" />
             </LinearLayout>
 
             <!-- Tips card -->
@@ -184,37 +218,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardBackgroundColor="#F1F8E9"
+                app:cardBackgroundColor="#F4F6F8"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical">
+
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@android:drawable/ic_dialog_info"
-                            app:tint="@color/primary_green" />
+                            app:tint="@color/secondary_blue" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:text="@string/photo_tips"
-                            android:textColor="@color/primary_green"
+                            android:textColor="@color/secondary_blue"
                             android:textStyle="bold" />
                     </LinearLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="✓ Ensure the fault is clearly visible in the center."
                         android:textColor="@color/text_secondary" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -244,9 +284,9 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Skip"
-            android:textColor="@color/primary_green"
-            app:strokeColor="@color/primary_green"
-            app:cornerRadius="8dp" />
+            android:textColor="@color/secondary_blue"
+            app:strokeColor="@color/secondary_blue"
+            app:cornerRadius="30dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_continue"
@@ -256,7 +296,7 @@
             android:layout_marginStart="8dp"
             android:text="Continue"
             android:backgroundTint="@color/primary_green"
-            app:cornerRadius="8dp"
+            app:cornerRadius="30dp"
             app:icon="@android:drawable/ic_media_next"
             app:iconGravity="textEnd" />
     </LinearLayout>
@@ -270,7 +310,6 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Home (unselected) -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -297,7 +336,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Report (selected – highlighted with yellow pill) -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -332,7 +370,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Track (unselected) -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -359,7 +396,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Settings (unselected) -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseAuth;
+import com.example.fixitcity.data.SupabaseUsers;
 
 import org.json.JSONObject;
 
@@ -32,7 +33,6 @@ public class Register_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Find views
         etFullName = findViewById(R.id.etFullName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
@@ -41,12 +41,9 @@ public class Register_Activity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         btnSignIn = findViewById(R.id.btnSignIn);
         cbTerms = findViewById(R.id.cbTerms);
-
-        // Password toggle icons
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
         ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
 
-        // ===== Set up password visibility toggles =====
         final boolean[] isPasswordVisible = {false};
         final boolean[] isConfirmVisible = {false};
 
@@ -76,7 +73,6 @@ public class Register_Activity extends AppCompatActivity {
             etConfirmPassword.setSelection(etConfirmPassword.getText().length());
         });
 
-        // Button listeners
         btnRegister.setOnClickListener(v -> attemptRegister());
         btnSignIn.setOnClickListener(v -> {
             startActivity(new Intent(this, Login_Activity.class));
@@ -91,7 +87,10 @@ public class Register_Activity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String confirm = etConfirmPassword.getText().toString().trim();
 
-        // Validation
+        if (fullName.isEmpty()) {
+            Toast.makeText(this, "Please enter your full name", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show();
             return;
@@ -108,18 +107,63 @@ public class Register_Activity extends AppCompatActivity {
         btnRegister.setEnabled(false);
         btnRegister.setText("Creating account...");
 
+        // Split full name into first + last
+        String firstName;
+        String lastName = "";
+        int spaceIdx = fullName.indexOf(' ');
+        if (spaceIdx > 0) {
+            firstName = fullName.substring(0, spaceIdx).trim();
+            lastName = fullName.substring(spaceIdx + 1).trim();
+        } else {
+            firstName = fullName;
+        }
+
+        final String fFirstName = firstName;
+        final String fLastName = lastName;
+        final String fPhone = phone;
+
         new Thread(() -> {
             try {
-                String response = SupabaseAuth.register(email, password);
-                Log.d(TAG, "Register response: " + response);
+                // STEP 1: Register with Supabase Auth
+                String signupResponse = SupabaseAuth.register(email, password);
+                Log.d(TAG, "Signup response: " + signupResponse);
 
-                // Save profile to users table + citizen_profiles table
-                // (We'll do this in Phase 3 — for now, just show success)
+                JSONObject signupJson = new JSONObject(signupResponse);
+                String authUuid = signupJson.optString("id", null);
+                if (authUuid == null || authUuid.isEmpty()) {
+                    // Some Supabase versions return user under "user"
+                    if (signupJson.has("user")) {
+                        authUuid = signupJson.getJSONObject("user").optString("id", null);
+                    }
+                }
+                if (authUuid == null || authUuid.isEmpty()) {
+                    throw new Exception("Could not read auth user id from signup response");
+                }
+
+                // STEP 2: Log in to get an access token (needed for the next inserts)
+                String loginResponse = SupabaseAuth.login(email, password);
+                JSONObject loginJson = new JSONObject(loginResponse);
+                String accessToken = loginJson.getString("access_token");
+
+                // STEP 3: Insert into public.users
+                long userId = SupabaseUsers.createUserRecord(authUuid, email, accessToken);
+                Log.d(TAG, "Created user_id = " + userId);
+
+                // STEP 4: Insert into public.citizen_profiles
+                long citizenProfileId = SupabaseUsers.createCitizenProfile(
+                        userId, fFirstName, fLastName, fPhone, accessToken);
+                Log.d(TAG, "Created citizen_profile_id = " + citizenProfileId);
+
+                // STEP 5: Save everything to session
+                SessionManager session = new SessionManager(this);
+                session.saveSession(accessToken, authUuid, email, "citizen");
+                session.saveCitizenProfileId(citizenProfileId);
+                session.saveProfileInfo(fFirstName, fLastName, fPhone);
 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Account created! Please sign in.", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(this, Login_Activity.class));
-                    finish();
+                    Toast.makeText(this, "Account created! Welcome.", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(this, Dashboard_Activity.class));
+                    finishAffinity();
                 });
 
             } catch (Exception e) {

@@ -21,6 +21,9 @@ public class SupabaseClient {
     public static final String AUTH_URL = SUPABASE_URL + "/auth/v1";
     public static final String STORAGE_URL = SUPABASE_URL + "/storage/v1";
 
+    // Bucket name (already created by Person 1)
+    public static final String REPORT_PHOTOS_BUCKET = "reports";
+
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private static OkHttpClient httpClient;
@@ -78,5 +81,92 @@ public class SupabaseClient {
             if (response.body() == null) return "";
             return response.body().string();
         }
+    }
+
+    // ============ PATCH ============
+    public static String patch(String path, String jsonBody) throws IOException {
+        RequestBody body = RequestBody.create(jsonBody, JSON);
+        Request request = baseRequest(REST_URL + path)
+                .patch(body)
+                .addHeader("Prefer", "return=representation")
+                .build();
+        try (Response response = getHttpClient().newCall(request).execute()) {
+            if (response.body() == null) return "";
+            return response.body().string();
+        }
+    }
+
+    // ============ DELETE ============
+    public static String delete(String path) throws IOException {
+        Request request = baseRequest(REST_URL + path).delete().build();
+        try (Response response = getHttpClient().newCall(request).execute()) {
+            if (response.body() == null) return "";
+            return response.body().string();
+        }
+    }
+
+    // ============ USER-AUTHENTICATED GET ============
+    public static String getWithAuth(String path, String accessToken) throws IOException {
+        Request request = userRequest(REST_URL + path, accessToken).get().build();
+        try (Response response = getHttpClient().newCall(request).execute()) {
+            if (response.body() == null) return "";
+            return response.body().string();
+        }
+    }
+
+    // ============ USER-AUTHENTICATED POST ============
+    public static String postWithAuth(String path, String jsonBody, String accessToken) throws IOException {
+        RequestBody body = RequestBody.create(jsonBody, JSON);
+        Request request = userRequest(REST_URL + path, accessToken)
+                .post(body)
+                .addHeader("Prefer", "return=representation")
+                .build();
+        try (Response response = getHttpClient().newCall(request).execute()) {
+            if (response.body() == null) return "";
+            return response.body().string();
+        }
+    }
+
+    // ============ STORAGE UPLOAD ============
+    /**
+     * Uploads raw bytes to a storage bucket and returns the public URL.
+     *
+     * @param bucketName e.g. "reports"
+     * @param storagePath e.g. "user42/photo_123.jpg"
+     * @param imageBytes the actual image data
+     * @param mimeType e.g. "image/jpeg"
+     * @param accessToken the logged-in user's token
+     * @return public URL of the uploaded file
+     */
+    public static String uploadToStorage(String bucketName,
+                                         String storagePath,
+                                         byte[] imageBytes,
+                                         String mimeType,
+                                         String accessToken) throws IOException {
+
+        // Build the upload URL: {STORAGE_URL}/object/{bucket}/{path}
+        String url = STORAGE_URL + "/object/" + bucketName + "/" + storagePath;
+
+        MediaType mediaType = MediaType.get(mimeType != null ? mimeType : "image/jpeg");
+        RequestBody body = RequestBody.create(imageBytes, mediaType);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("apikey", SUPABASE_ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Content-Type", mediaType.toString())
+                .addHeader("x-upsert", "true")
+                .post(body)
+                .build();
+
+        try (Response response = getHttpClient().newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String err = response.body() != null ? response.body().string() : "unknown";
+                throw new IOException("Storage upload failed: " + response.code() + " " + err);
+            }
+        }
+
+        // Build the public URL: {SUPABASE_URL}/storage/v1/object/public/{bucket}/{path}
+        return SUPABASE_URL + "/storage/v1/object/public/" + bucketName + "/" + storagePath;
     }
 }

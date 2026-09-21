@@ -97,7 +97,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
         findViewById(R.id.navSettings).setOnClickListener(v ->
                 Toast.makeText(this, "Settings screen coming soon", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.back_button).setOnClickListener(v -> finish());
+
     }
 
     private boolean checkLocationPermission() {

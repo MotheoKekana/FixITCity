@@ -82,27 +82,35 @@
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="16dp"
                 app:cardBackgroundColor="#F9FBF9">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/reference_number"
                         android:textColor="@color/secondary_blue"
                         android:textStyle="bold" />
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:startIconDrawable="@android:drawable/ic_menu_search">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_reference"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="FIX-2024-001" />
+                            android:hint="FIX-2024-001"
+                            android:inputType="text"
+                            android:imeOptions="actionSearch" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -110,7 +118,9 @@
                         android:text="ⓘ You can find this number in your confirmation email."
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
+
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_track"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
                         android:layout_marginTop="20dp"
@@ -121,30 +131,6 @@
                         app:iconGravity="textEnd" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/recent_history"
-                    android:textColor="@color/secondary_blue"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:text="@string/view_all_archive"
-                    android:textColor="@color/secondary_blue"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-
-            <include layout="@layout/item_track_history" android:layout_marginTop="16dp" />
-            <include layout="@layout/item_track_history" android:layout_marginTop="12dp" />
 
         </LinearLayout>
     </ScrollView>

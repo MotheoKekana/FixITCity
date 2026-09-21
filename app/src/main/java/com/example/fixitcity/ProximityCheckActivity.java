@@ -8,6 +8,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +35,7 @@ import java.util.Locale;
 
 public class ProximityCheckActivity extends AppCompatActivity {
 
+    private static final String TAG = "ProximityCheck";
     private static final int LOCATION_PERMISSION_REQUEST = 100;
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -45,10 +48,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
     private TextView tvStatus, tvReportsCount;
     private LinearProgressIndicator progressIndicator;
     private MaterialButton btnNewIssue;
-    // No Continue button
 
-    private boolean hasUpvoted = false;
-    private int upvotedReportId = -1;
     private ReportData reportData;
 
     @Override
@@ -76,12 +76,13 @@ public class ProximityCheckActivity extends AppCompatActivity {
             }
         }
 
-        // New Issue – go to Photo (category & location are already set)
-        btnNewIssue.setOnClickListener(v -> {
-            // Do NOT clear data – keep category and location
-            startActivity(new Intent(this, ReportFaultPhotoActivity.class));
-            finish();
-        });
+        // New Issue – go to Photo
+        if (btnNewIssue != null) {
+            btnNewIssue.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultPhotoActivity.class));
+                finish();
+            });
+        }
     }
 
     private void initViews() {
@@ -94,19 +95,40 @@ public class ProximityCheckActivity extends AppCompatActivity {
         rvReports.setLayoutManager(new LinearLayoutManager(this));
         adapter = new NearbyReportAdapter(this, reportList, this::onReportUpvoted);
         rvReports.setAdapter(adapter);
+
+        Log.d(TAG, "initViews complete. Adapter set with " + reportList.size() + " reports");
     }
 
     private void setupBottomNavigation() {
-        findViewById(R.id.navHome).setOnClickListener(v -> finish());
-        findViewById(R.id.navReport).setOnClickListener(v ->
-                startActivity(new Intent(this, ReportFaultCategoryActivity.class))
-        );
-        findViewById(R.id.navTrack).setOnClickListener(v ->
-                Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.navSettings).setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileSettingsActivity.class))
-        );
-        findViewById(R.id.back_button).setOnClickListener(v -> finish());
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> finish());
+        }
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v ->
+                    startActivity(new Intent(this, ReportFaultCategoryActivity.class))
+            );
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            navTrack.setOnClickListener(v ->
+                    Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileSettingsActivity.class))
+            );
+        }
+
+        View backBtn = findViewById(R.id.back_button);
+        if (backBtn != null) {
+            backBtn.setOnClickListener(v -> finish());
+        }
     }
 
     private boolean checkLocationPermission() {
@@ -168,8 +190,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
     private void queryNearbyReports(double lat, double lng) {
         tvStatus.setText("Searching for nearby reports...");
         progressIndicator.setIndeterminate(true);
-
-        // Simulate API call – replace with real network call
         simulateApiResponse();
     }
 
@@ -180,6 +200,17 @@ public class ProximityCheckActivity extends AppCompatActivity {
             reportList.add(new NearbyReport(102, "Burst Water Pipe", "Water", 12, 78));
             reportList.add(new NearbyReport(103, "Blocked Storm Drain", "Drain", 3, 120));
             reportList.add(new NearbyReport(104, "Streetlight Outage", "Lighting", 5, 160));
+
+            // Re-apply saved upvote so it persists across screen rebuilds
+            if (reportData.getUpvotedReportId() != -1) {
+                for (NearbyReport r : reportList) {
+                    if (r.getId() == reportData.getUpvotedReportId()) {
+                        r.incrementVote();
+                        break;
+                    }
+                }
+            }
+
             updateUI();
         }, 1500);
     }
@@ -190,34 +221,35 @@ public class ProximityCheckActivity extends AppCompatActivity {
         tvReportsCount.setText(reportList.size() + " report(s) found within 200m");
         adapter.notifyDataSetChanged();
 
-        if (reportList.isEmpty()) {
-            // No reports – suggest new report
+        if (reportList.isEmpty() && btnNewIssue != null) {
             btnNewIssue.performClick();
         }
     }
 
     private void onReportUpvoted(NearbyReport report, int position) {
-        if (hasUpvoted) {
+        Log.d(TAG, "=== onReportUpvoted called ===");
+        Log.d(TAG, "Report: " + report.getTitle() + ", position: " + position);
+        Log.d(TAG, "hasUpvoted: " + reportData.hasUpvoted());
+
+        if (reportData.hasUpvoted()) {
             Toast.makeText(this, "You already upvoted a report", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Increment vote
+        // Increment vote and refresh the list row
         report.incrementVote();
         adapter.notifyItemChanged(position);
 
-        hasUpvoted = true;
-        upvotedReportId = report.getId();
+        // Persist across screen rebuilds
+        reportData.setHasUpvoted(true);
+        reportData.setUpvotedReportId(report.getId());
 
-        // Discard draft (but keep category & location? They are already saved)
-        // We don't need to clear here because we are going to ThankYou
-        // If you want to clear draft, call clearReportData() – but be careful not to lose category/location
-        // For this flow, we just navigate to ThankYou
-
+        Log.d(TAG, "Navigating to ThankYouActivity...");
         Toast.makeText(this, "Upvoted: " + report.getTitle(), Toast.LENGTH_SHORT).show();
 
-        // Navigate to ThankYouActivity (upvote confirmation)
-        startActivity(new Intent(this, ThankYouActivity.class));
+        Intent intent = new Intent(this, ThankYouActivity.class);
+        intent.putExtra("report_name", report.getTitle());
+        startActivity(intent);
         finish();
     }
 
