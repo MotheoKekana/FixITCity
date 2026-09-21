@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SupabaseReports {
@@ -18,14 +19,56 @@ public class SupabaseReports {
 
     // ==========================================
     // Compute a client-side priority score (0-100).
-    // Formula: severity_weight (0-10) * 10, clamped to [0, 100].
-    // Long-term this should move to a Supabase trigger.
     // ==========================================
     public static int computePriorityScore(double severityWeight) {
         int score = (int) Math.round(severityWeight * 10.0);
         if (score < 0) score = 0;
         if (score > 100) score = 100;
         return score;
+    }
+
+    // ==========================================
+    // Haversine distance between two lat/lng in meters.
+    // ==========================================
+    public static double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
+        final double R = 6371000.0; // Earth radius in meters
+        double phi1 = Math.toRadians(lat1);
+        double phi2 = Math.toRadians(lat2);
+        double dPhi = Math.toRadians(lat2 - lat1);
+        double dLambda = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dPhi / 2) * Math.sin(dPhi / 2)
+                + Math.cos(phi1) * Math.cos(phi2)
+                * Math.sin(dLambda / 2) * Math.sin(dLambda / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    // ==========================================
+    // Fetch all "open" reports (Pending / Assigned).
+    // Distance filtering happens client-side.
+    // ==========================================
+    public static List<FaultReport> getOpenReports(String accessToken) throws IOException {
+        // Fix X: Pending counts as open
+        String path = "/fault_reports?status=in.(Pending,Assigned)"
+                + "&order=created_at.desc";
+
+        String response;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            response = SupabaseClient.getWithAuth(path, accessToken);
+        } else {
+            response = SupabaseClient.get(path);
+        }
+        Log.d(TAG, "getOpenReports response: " + response);
+
+        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
+            Log.w(TAG, "getOpenReports: non-array response");
+            return new ArrayList<>();
+        }
+
+        Type listType = new TypeToken<List<FaultReport>>(){}.getType();
+        List<FaultReport> results = gson.fromJson(response, listType);
+        return results != null ? results : new ArrayList<>();
     }
 
     // ==========================================
@@ -37,14 +80,14 @@ public class SupabaseReports {
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
             Log.e(TAG, "Invalid response: " + response);
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
 
         try {
             Type listType = new TypeToken<List<FaultCategoryDTO>>(){}.getType();
             List<FaultCategoryDTO> dtos = gson.fromJson(response, listType);
 
-            java.util.List<FaultCategory> result = new java.util.ArrayList<>();
+            List<FaultCategory> result = new ArrayList<>();
             if (dtos != null) {
                 for (FaultCategoryDTO dto : dtos) {
                     result.add(new FaultCategory(
@@ -60,7 +103,7 @@ public class SupabaseReports {
             return result;
         } catch (Exception e) {
             Log.e(TAG, "JSON parse error: " + e.getMessage(), e);
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
     }
 
@@ -82,7 +125,6 @@ public class SupabaseReports {
 
     // ==========================================
     // Submit a new fault report
-    // Now also writes priority_score computed client-side.
     // ==========================================
     public static FaultReport submitReport(
             long citizenId,
@@ -96,7 +138,6 @@ public class SupabaseReports {
             String accessToken
     ) throws IOException {
 
-        // Generate reference number: FIX-YYYY-NNNN
         String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
         String random = String.format("%04d", (int)(Math.random() * 10000));
         String referenceNumber = "FIX-" + year + "-" + random;
@@ -167,12 +208,12 @@ public class SupabaseReports {
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
             Log.w(TAG, "getUserReports: non-array response");
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
 
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
         List<FaultReport> results = gson.fromJson(response, listType);
-        return results != null ? results : new java.util.ArrayList<>();
+        return results != null ? results : new ArrayList<>();
     }
 
     // ==========================================

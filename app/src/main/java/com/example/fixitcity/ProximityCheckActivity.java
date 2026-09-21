@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -30,6 +32,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +40,9 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private static final String TAG = "ProximityCheck";
     private static final int LOCATION_PERMISSION_REQUEST = 100;
+
+    /** Radius in meters — changed from 200m to 2km per Phase 4 spec. */
+    private static final double RADIUS_METERS = 2000.0;
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
@@ -93,7 +99,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
         btnNewIssue = findViewById(R.id.btn_new_issue);
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NearbyReportAdapter(this, reportList, this::onReportUpvoted);
+        adapter = new NearbyReportAdapter(this, reportList, this::onReportTapped);
         rvReports.setAdapter(adapter);
 
         Log.d(TAG, "initViews complete. Adapter set with " + reportList.size() + " reports");
@@ -101,15 +107,12 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         View navHome = findViewById(R.id.navHome);
-        if (navHome != null) {
-            navHome.setOnClickListener(v -> finish());
-        }
+        if (navHome != null) navHome.setOnClickListener(v -> finish());
 
         View navReport = findViewById(R.id.navReport);
         if (navReport != null) {
             navReport.setOnClickListener(v ->
-                    startActivity(new Intent(this, ReportFaultCategoryActivity.class))
-            );
+                    startActivity(new Intent(this, ReportFaultCategoryActivity.class)));
         }
 
         View navTrack = findViewById(R.id.navTrack);
@@ -121,14 +124,11 @@ public class ProximityCheckActivity extends AppCompatActivity {
         View navSettings = findViewById(R.id.navSettings);
         if (navSettings != null) {
             navSettings.setOnClickListener(v ->
-                    startActivity(new Intent(this, ProfileSettingsActivity.class))
-            );
+                    startActivity(new Intent(this, ProfileSettingsActivity.class)));
         }
 
         View backBtn = findViewById(R.id.back_button);
-        if (backBtn != null) {
-            backBtn.setOnClickListener(v -> finish());
-        }
+        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
     private boolean checkLocationPermission() {
@@ -187,70 +187,89 @@ public class ProximityCheckActivity extends AppCompatActivity {
         }
     }
 
+    // ================================================================
+    // Phase 4.1 / 4.2 / 4.3 / 4.4 — real Supabase query
+    // ================================================================
     private void queryNearbyReports(double lat, double lng) {
         tvStatus.setText("Searching for nearby reports...");
         progressIndicator.setIndeterminate(true);
-        simulateApiResponse();
-    }
 
-    private void simulateApiResponse() {
-        new android.os.Handler().postDelayed(() -> {
-            reportList.clear();
-            reportList.add(new NearbyReport(101, "Large Pothole", "Pothole", 8, 45));
-            reportList.add(new NearbyReport(102, "Burst Water Pipe", "Water", 12, 78));
-            reportList.add(new NearbyReport(103, "Blocked Storm Drain", "Drain", 3, 120));
-            reportList.add(new NearbyReport(104, "Streetlight Outage", "Lighting", 5, 160));
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
 
-            // Re-apply saved upvote so it persists across screen rebuilds
-            if (reportData.getUpvotedReportId() != -1) {
-                for (NearbyReport r : reportList) {
-                    if (r.getId() == reportData.getUpvotedReportId()) {
-                        r.incrementVote();
-                        break;
+        new Thread(() -> {
+            try {
+                List<FaultReport> allOpen = SupabaseReports.getOpenReports(accessToken);
+                Log.d(TAG, "Fetched " + allOpen.size() + " open reports from Supabase");
+
+                List<NearbyReport> withinRadius = new ArrayList<>();
+
+                for (FaultReport r : allOpen) {
+                    double d = SupabaseReports.haversineMeters(
+                            lat, lng, r.getLatitude(), r.getLongitude());
+                    if (d <= RADIUS_METERS) {
+                        String ref = r.getReferenceNumber() != null ? r.getReferenceNumber() : "";
+                        String title = r.getTitle() != null ? r.getTitle() : "Report";
+                        String status = r.getStatus() != null ? r.getStatus() : "Pending";
+                        int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
+
+                        withinRadius.add(new NearbyReport(
+                                r.getReportId(),
+                                ref,
+                                title,
+                                title,      // category fallback — we only have title in FaultReport
+                                status,
+                                score,
+                                0,          // voteCount: always 0 until 4.5
+                                d
+                        ));
                     }
                 }
-            }
 
-            updateUI();
-        }, 1500);
+                // Sort by distance ascending
+                Collections.sort(withinRadius, (a, b) ->
+                        Double.compare(a.getDistance(), b.getDistance()));
+
+                runOnUiThread(() -> updateUI(withinRadius));
+
+            } catch (Exception e) {
+                Log.e(TAG, "Nearby query failed: " + e.getMessage(), e);
+                runOnUiThread(() -> {
+                    progressIndicator.setIndeterminate(false);
+                    tvStatus.setText("Could not load nearby reports");
+                    tvReportsCount.setText("0 reports found");
+                    reportList.clear();
+                    adapter.notifyDataSetChanged();
+                    if (btnNewIssue != null) btnNewIssue.setEnabled(true);
+                });
+            }
+        }).start();
     }
 
-    private void updateUI() {
+    private void updateUI(List<NearbyReport> withinRadius) {
         progressIndicator.setIndeterminate(false);
-        tvStatus.setText("Nearby reports found:");
-        tvReportsCount.setText(reportList.size() + " report(s) found within 200m");
+        reportList.clear();
+        reportList.addAll(withinRadius);
         adapter.notifyDataSetChanged();
 
-        if (reportList.isEmpty() && btnNewIssue != null) {
-            btnNewIssue.performClick();
+        if (withinRadius.isEmpty()) {
+            tvStatus.setText("No nearby reports found within " + (int)(RADIUS_METERS) + "m");
+            tvReportsCount.setText("0 reports found");
+        } else {
+            tvStatus.setText("Nearby reports found:");
+            tvReportsCount.setText(withinRadius.size() + " report(s) found within "
+                    + (int)(RADIUS_METERS) + "m");
         }
     }
 
-    private void onReportUpvoted(NearbyReport report, int position) {
-        Log.d(TAG, "=== onReportUpvoted called ===");
-        Log.d(TAG, "Report: " + report.getTitle() + ", position: " + position);
-        Log.d(TAG, "hasUpvoted: " + reportData.hasUpvoted());
-
-        if (reportData.hasUpvoted()) {
-            Toast.makeText(this, "You already upvoted a report", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Increment vote and refresh the list row
-        report.incrementVote();
-        adapter.notifyItemChanged(position);
-
-        // Persist across screen rebuilds
-        reportData.setHasUpvoted(true);
-        reportData.setUpvotedReportId(report.getId());
-
-        Log.d(TAG, "Navigating to ThankYouActivity...");
-        Toast.makeText(this, "Upvoted: " + report.getTitle(), Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(this, ThankYouActivity.class);
-        intent.putExtra("report_name", report.getTitle());
-        startActivity(intent);
-        finish();
+    // ================================================================
+    // Item tap handler — Phase 4.5 deferred, so this just shows details
+    // ================================================================
+    private void onReportTapped(NearbyReport report, int position) {
+        Log.d(TAG, "Tapped report: " + report.getTitle());
+        Toast.makeText(this,
+                "Upvoting coming soon for: " + report.getTitle(),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override

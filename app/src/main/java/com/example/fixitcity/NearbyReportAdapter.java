@@ -44,21 +44,36 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         NearbyReport report = reports.get(position);
 
         holder.tvTitle.setText(report.getTitle());
-        holder.tvVotes.setText("⬆ " + report.getVoteCount());
-        holder.tvDistance.setText(String.format("%.0fm away", report.getDistance()));
 
-        // Icon mapping
+        // Vote badge — always "⬆ 0" until Phase 4.5
+        holder.tvVotes.setText("⬆ " + report.getVoteCount());
+
+        // Distance — format as m under 1km, else km
+        double d = report.getDistance();
+        String distStr;
+        if (d < 1000) {
+            distStr = String.format(java.util.Locale.US, "%.0fm away", d);
+        } else {
+            distStr = String.format(java.util.Locale.US, "%.1fkm away", d / 1000.0);
+        }
+        holder.tvDistance.setText(distStr);
+
+        // Hint line — reference number + status
+        String ref = report.getReferenceNumber() != null ? report.getReferenceNumber() : "";
+        String status = report.getStatus() != null ? report.getStatus() : "";
+        holder.tvHint.setText(ref + " · " + status + " · Score " + report.getPriorityScore());
+
+        // Icon mapping by category/title
         int iconRes = android.R.drawable.ic_dialog_alert;
-        String cat = report.getCategory().toLowerCase();
+        String cat = report.getCategory() != null
+                ? report.getCategory().toLowerCase()
+                : "";
         if (cat.contains("pothole")) iconRes = android.R.drawable.ic_menu_report_image;
-        else if (cat.contains("water")) iconRes = android.R.drawable.ic_dialog_alert;
+        else if (cat.contains("water") || cat.contains("pipe")) iconRes = android.R.drawable.ic_dialog_alert;
         else if (cat.contains("drain")) iconRes = android.R.drawable.ic_menu_compass;
         else if (cat.contains("light")) iconRes = android.R.drawable.ic_menu_camera;
         holder.ivIcon.setImageResource(iconRes);
 
-        Log.d(TAG, "Binding position " + position + ", listener: " + (listener != null ? "NOT NULL" : "NULL"));
-
-        // ✅ Set click listener on the root itemView
         holder.itemView.setOnClickListener(v -> {
             Log.d(TAG, "Item CLICKED at position " + position);
             if (listener != null) {
@@ -76,7 +91,7 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivIcon;
-        TextView tvTitle, tvVotes, tvDistance;
+        TextView tvTitle, tvVotes, tvDistance, tvHint;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,6 +99,7 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvVotes = itemView.findViewById(R.id.tv_votes);
             tvDistance = itemView.findViewById(R.id.tv_distance);
+            tvHint = itemView.findViewById(R.id.tv_hint);
         }
     }
 }

@@ -52,7 +52,7 @@
             android:background="#FFF3E0"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
-            android:text="12"
+            android:text="⬆ 0"
             android:textColor="#E65100"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -69,19 +69,20 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@+id/tv_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_title"
-            tools:text="45m away" />
+            tools:text="450m away" />
 
-        <!-- Status / Votes hint -->
+        <!-- Reference + Status + Score -->
         <TextView
             android:id="@+id/tv_hint"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Tap to upvote"
             android:textColor="#9E9E9E"
             android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_title"
-            app:layout_constraintTop_toBottomOf="@+id/tv_distance" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_distance"
+            tools:text="FIX-2026-9711 · Pending · Score 100" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
