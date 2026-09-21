@@ -129,6 +129,7 @@ public class DashboardController : ControllerBase
                 .ToListAsync();
 
             return Ok(data);
+
         }
         catch (Exception ex)
         {

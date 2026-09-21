@@ -1,6 +1,7 @@
+using FixITCityAPI.Models;
+using FixITCityAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FixITCityAPI.Models;
 
 namespace FixITCityAPI.Controllers;
 
@@ -9,39 +10,51 @@ namespace FixITCityAPI.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly FixITCityDbContext _context;
+    private readonly JwtTokenService _jwtTokenService;
 
-    public AuthController(FixITCityDbContext context)
+    public AuthController(FixITCityDbContext context, JwtTokenService jwtTokenService)
     {
         _context = context;
+        _jwtTokenService = jwtTokenService;
     }
 
     // POST: api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        try
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash)
+            || !VerifyPassword(request.Password, user.PasswordHash))
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
-
-            if (user == null)
-                return Unauthorized(new { message = "Invalid email or password" });
-
-            if (user.PasswordHash != request.Password)
-                return Unauthorized(new { message = "Invalid email or password" });
-
-            return Ok(new
-            {
-                message = "Login successful",
-                user_id = user.UserId,
-                email = user.Email,
-                role = user.Role
-            });
+            return Unauthorized(new { message = "Invalid email or password" });
         }
-        catch (Exception ex)
+
+        // Lazy migration: if the stored password isn't BCrypt yet, upgrade it now
+        if (!user.PasswordHash.StartsWith("$2"))
         {
-            return StatusCode(500, new { message = "Login failed", error = ex.Message });
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            await _context.SaveChangesAsync();
         }
+
+        // Determine role — municipal users have a record in municipal_users
+        var role = "Citizen";
+        var municipal = await _context.MunicipalUsers
+            .FirstOrDefaultAsync(m => m.UserId == user.UserId);
+        if (municipal != null) role = "Municipal";
+
+        // Generate the token
+        var token = _jwtTokenService.GenerateToken(user.UserId, user.Email, role);
+
+        return Ok(new
+        {
+            message = "Login successful",
+            token,
+            user_id = user.UserId,
+            email = user.Email,
+            role
+        });
     }
 
     // POST: api/auth/register
@@ -56,7 +69,7 @@ public class AuthController : ControllerBase
             var user = new User
             {
                 Email = request.Email,
-                PasswordHash = request.Password,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 Role = "Citizen",
                 IsActive = true,
                 CreatedAt = DateTime.Now
@@ -92,6 +105,19 @@ public class AuthController : ControllerBase
         {
             return StatusCode(500, new { message = "Registration failed", error = ex.Message });
         }
+    }
+
+    private static bool VerifyPassword(string provided, string stored)
+    {
+        // New accounts: stored is a BCrypt hash starting with $2
+        if (stored.StartsWith("$2"))
+        {
+            try { return BCrypt.Net.BCrypt.Verify(provided, stored); }
+            catch { return false; }
+        }
+
+        // Legacy accounts: stored is plaintext — verify with plain comparison
+        return provided == stored;
     }
 }
 
