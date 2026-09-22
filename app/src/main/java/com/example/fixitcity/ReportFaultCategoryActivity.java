@@ -8,6 +8,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -28,6 +31,12 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_fault_category);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
@@ -82,22 +91,24 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             }
         });
 
-        // Bottom navigation
+        // ===== Bottom navigation =====
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
+
         findViewById(R.id.navReport).setOnClickListener(v -> {
-            startActivity(new Intent(this, ReportFaultCategoryActivity.class));
-            finish();
+            // Already on the Report screen — do nothing (was reloading from scratch)
+            Toast.makeText(this, "You're already reporting", Toast.LENGTH_SHORT).show();
         });
+
         findViewById(R.id.navTrack).setOnClickListener(v ->
-                Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, TrackReportSearchActivity.class)));
+
         findViewById(R.id.navSettings).setOnClickListener(v ->
-                Toast.makeText(this, "Settings screen coming soon", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, ProfileSettingsActivity.class)));
     }
 
     /**
      * Fallback list — matches the real Supabase fault_categories table exactly.
      * Only used if the Supabase query fails for some reason.
-     * severity values are mirrored into severityWeight by the FaultCategory constructor.
      */
     private void loadFallbackCategories() {
         fullCategoryList.clear();

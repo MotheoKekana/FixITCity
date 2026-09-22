@@ -17,6 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,7 +44,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
     private static final String TAG = "ProximityCheck";
     private static final int LOCATION_PERMISSION_REQUEST = 100;
 
-    /** Radius in meters — changed from 200m to 2km per Phase 4 spec. */
     private static final double RADIUS_METERS = 2000.0;
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -62,6 +64,12 @@ public class ProximityCheckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proximity_check);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
         initViews();
@@ -69,7 +77,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Use stored location if available, else GPS
         if (reportData.getLatitude() != 0 && reportData.getLongitude() != 0) {
             queryNearbyReports(reportData.getLatitude(), reportData.getLongitude());
         } else if (reportData.getLocationAddress() != null) {
@@ -82,7 +89,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
             }
         }
 
-        // New Issue – go to Photo
         if (btnNewIssue != null) {
             btnNewIssue.setOnClickListener(v -> {
                 startActivity(new Intent(this, ReportFaultPhotoActivity.class));
@@ -187,9 +193,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         }
     }
 
-    // ================================================================
-    // Phase 4.1 / 4.2 / 4.3 / 4.4 — real Supabase query
-    // ================================================================
     private void queryNearbyReports(double lat, double lng) {
         tvStatus.setText("Searching for nearby reports...");
         progressIndicator.setIndeterminate(true);
@@ -217,16 +220,15 @@ public class ProximityCheckActivity extends AppCompatActivity {
                                 r.getReportId(),
                                 ref,
                                 title,
-                                title,      // category fallback — we only have title in FaultReport
+                                title,
                                 status,
                                 score,
-                                0,          // voteCount: always 0 until 4.5
+                                0,
                                 d
                         ));
                     }
                 }
 
-                // Sort by distance ascending
                 Collections.sort(withinRadius, (a, b) ->
                         Double.compare(a.getDistance(), b.getDistance()));
 
@@ -262,9 +264,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         }
     }
 
-    // ================================================================
-    // Item tap handler — Phase 4.5 deferred, so this just shows details
-    // ================================================================
     private void onReportTapped(NearbyReport report, int position) {
         Log.d(TAG, "Tapped report: " + report.getTitle());
         Toast.makeText(this,

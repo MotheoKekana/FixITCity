@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
@@ -25,10 +28,74 @@ public class TrackReportSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_report_search);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         etReference = findViewById(R.id.et_reference);
         btnTrack = findViewById(R.id.btn_track);
 
+        // Prefill if launched from ReportSuccessActivity
+        String prefill = getIntent().getStringExtra("prefill_reference");
+        if (prefill != null && !prefill.isEmpty() && etReference != null) {
+            etReference.setText(prefill);
+        }
+
         btnTrack.setOnClickListener(v -> attemptTrack());
+
+        // "View All Archive" → ReportHistoryActivity
+        View viewAll = findViewById(R.id.tv_view_all_archive);
+        if (viewAll != null) {
+            viewAll.setOnClickListener(v -> {
+                Log.d(TAG, "Opening ReportHistoryActivity");
+                startActivity(new Intent(this, ReportHistoryActivity.class));
+            });
+        }
+
+        // ===== Bottom navigation =====
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                startActivity(new Intent(this, target));
+                finish();
+            });
+        }
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+                finish();
+            });
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            // Already on Track — no-op
+            navTrack.setOnClickListener(v ->
+                    Toast.makeText(this, "You're on Track", Toast.LENGTH_SHORT).show());
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v -> {
+                startActivity(new Intent(this, ProfileSettingsActivity.class));
+                finish();
+            });
+        }
+
+        // Notification bell
+        View ivNotif = findViewById(R.id.ivNotifications);
+        if (ivNotif != null) {
+            ivNotif.setOnClickListener(v ->
+                    startActivity(new Intent(this, Notifications_Activity.class)));
+        }
     }
 
     private void attemptTrack() {

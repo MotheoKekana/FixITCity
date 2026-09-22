@@ -21,6 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.example.fixitcity.data.SessionManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,13 +53,18 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_fault_photo);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
         ivPhotoPreview = findViewById(R.id.iv_photo_preview);
         ivCameraIcon = findViewById(R.id.iv_camera_icon);
         tvTapHint = findViewById(R.id.tv_tap_hint);
 
-        // Restore preview if we already have a photo (e.g. user came back)
         if (reportData.getPhotoUri() != null && !reportData.getPhotoUri().isEmpty()) {
             showPreviewFromUri(Uri.parse(reportData.getPhotoUri()));
         }
@@ -96,6 +106,38 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         findViewById(R.id.btn_continue).setOnClickListener(v -> {
             startNextActivity(ReportFaultSummaryActivity.class);
         });
+
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                startActivity(new Intent(this, target));
+                finish();
+            });
+        }
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+                finish();
+            });
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            navTrack.setOnClickListener(v ->
+                    startActivity(new Intent(this, TrackReportSearchActivity.class)));
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileSettingsActivity.class)));
+        }
     }
 
     private boolean checkCameraPermission() {
@@ -194,10 +236,6 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         if (tvTapHint != null) tvTapHint.setText("Tap to take photo");
     }
 
-    /**
-     * Downscale + convert to JPEG bytes, store in ReportData.
-     * Max dimension = 1200px, quality = 80.
-     */
     private void loadBytesFromUri(Uri uri) {
         new Thread(() -> {
             try {

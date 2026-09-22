@@ -13,12 +13,21 @@ import java.util.List;
 
 public class FaultReportAdapter extends RecyclerView.Adapter<FaultReportAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(FaultReport report);
+    }
+
     private Context context;
     private List<FaultReport> reports;
+    private OnItemClickListener listener;
 
     public FaultReportAdapter(Context context, List<FaultReport> reports) {
         this.context = context;
         this.reports = reports;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -40,11 +49,16 @@ public class FaultReportAdapter extends RecyclerView.Adapter<FaultReportAdapter.
 
         String created = report.getCreatedAt();
         if (created != null && created.length() >= 10) {
-            // "2024-10-15T12:34:56" → "2024-10-15"
             holder.tvDate.setText(created.substring(0, 10));
         } else {
             holder.tvDate.setText("—");
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(report);
+            }
+        });
     }
 
     @Override

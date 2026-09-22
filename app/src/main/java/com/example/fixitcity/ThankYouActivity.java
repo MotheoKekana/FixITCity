@@ -6,6 +6,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class ThankYouActivity extends AppCompatActivity {
 
@@ -14,7 +17,12 @@ public class ThankYouActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thank_you);
 
-        // Read the report name passed from ProximityCheckActivity
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         String reportName = getIntent().getStringExtra("report_name");
         TextView tvReportName = findViewById(R.id.tv_report_name);
         if (tvReportName != null) {
@@ -25,7 +33,6 @@ public class ThankYouActivity extends AppCompatActivity {
             }
         }
 
-        // Go to Dashboard
         View btnGoDashboard = findViewById(R.id.btn_go_dashboard);
         if (btnGoDashboard != null) {
             btnGoDashboard.setOnClickListener(v -> {

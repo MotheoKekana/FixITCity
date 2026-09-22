@@ -9,6 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 
@@ -23,11 +26,16 @@ public class ReportSuccessActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_success);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         tvReference = findViewById(R.id.tv_reference_number);
         tvPriority = findViewById(R.id.tv_priority_score);
         tvStatus = findViewById(R.id.tv_status);
 
-        // Get real data from previous activity
         referenceNumber = getIntent().getStringExtra("reference_number");
         priorityScore = getIntent().getIntExtra("priority_score", 0);
 
@@ -37,7 +45,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
         tvPriority.setText(priorityScore + "/100");
         tvStatus.setText("Pending");
 
-        // Copy Ref
         findViewById(R.id.btn_copy_ref).setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("Reference", referenceNumber);
@@ -45,7 +52,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
             Toast.makeText(this, "Reference copied: " + referenceNumber, Toast.LENGTH_SHORT).show();
         });
 
-        // Share
         findViewById(R.id.btn_share).setOnClickListener(v -> {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -56,10 +62,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
             startActivity(Intent.createChooser(shareIntent, "Share via"));
         });
 
-        // ===== FIXED: Go to Dashboard =====
-        // We can't just finish() here because ReportFaultSummaryActivity called
-        // finishAffinity() after starting this activity, so the whole task stack
-        // is gone. Instead, launch Dashboard_Activity explicitly and clear the task.
         findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> {
             SessionManager session = new SessionManager(this);
             Class<?> target = session.isGuest()
@@ -72,7 +74,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
             finish();
         });
 
-        // Report Another
         findViewById(R.id.btn_report_another).setOnClickListener(v -> {
             ((FixITCityApp) getApplication()).clearReportData();
             Intent intent = new Intent(this, ReportFaultCategoryActivity.class);
@@ -80,7 +81,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Track Report
         findViewById(R.id.btn_track_report).setOnClickListener(v -> {
             Intent intent = new Intent(this, TrackReportSearchActivity.class);
             intent.putExtra("prefill_reference", referenceNumber);
@@ -90,7 +90,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Same as tapping "Go to Dashboard" — we can't pop the stack because it's empty
         SessionManager session = new SessionManager(this);
         Class<?> target = session.isGuest()
                 ? Guest_Dashboard_Activity.class

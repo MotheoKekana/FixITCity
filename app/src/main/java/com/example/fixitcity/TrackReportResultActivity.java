@@ -2,11 +2,16 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
+import com.example.fixitcity.data.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
 public class TrackReportResultActivity extends AppCompatActivity {
@@ -15,6 +20,12 @@ public class TrackReportResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_report_result);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         String ref = getIntent().getStringExtra("reference_number");
         String title = getIntent().getStringExtra("title");
@@ -34,13 +45,11 @@ public class TrackReportResultActivity extends AppCompatActivity {
             dateStr = createdAt.substring(0, 10);
         }
 
-        // Header
         TextView tvHeader = findViewById(R.id.tv_report_status_header);
         if (tvHeader != null) {
             tvHeader.setText("Report Status: " + ref);
         }
 
-        // Details
         TextView tvTitle = findViewById(R.id.tv_report_title);
         if (tvTitle != null) tvTitle.setText(title);
 
@@ -62,7 +71,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             tvDescription.setVisibility(TextView.VISIBLE);
         }
 
-        // ---- Final copies for lambda capture ----
         final String fRef = ref;
         final String fStatus = status;
         final String fAddress = address;
@@ -83,6 +91,46 @@ public class TrackReportResultActivity extends AppCompatActivity {
         if (btnNotify != null) {
             btnNotify.setOnClickListener(v ->
                     Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show());
+        }
+
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                startActivity(new Intent(this, target));
+                finish();
+            });
+        }
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+                finish();
+            });
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            navTrack.setOnClickListener(v -> {
+                startActivity(new Intent(this, TrackReportSearchActivity.class));
+                finish();
+            });
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileSettingsActivity.class)));
+        }
+
+        View ivNotif = findViewById(R.id.ivNotifications);
+        if (ivNotif != null) {
+            ivNotif.setOnClickListener(v ->
+                    startActivity(new Intent(this, Notifications_Activity.class)));
         }
     }
 }

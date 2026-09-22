@@ -41,6 +41,9 @@
         <activity android:name=".Dashboard_Activity" android:exported="false" />
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
         <activity android:name=".TrackReportResultActivity" android:exported="false" />
+        <activity
+            android:name=".ReportHistoryActivity"
+            android:exported="false" />
 
         <!-- Auth screens — keyboard-aware -->
         <activity

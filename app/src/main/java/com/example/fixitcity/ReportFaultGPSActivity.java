@@ -16,6 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -42,20 +45,24 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_fault_gps);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         reportData = ((FixITCityApp) getApplication()).getReportData();
         tvAddress = findViewById(R.id.tv_location_address);
         etAddressSearch = findViewById(R.id.et_address_search);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Check permission and get location
         if (checkLocationPermission()) {
             getCurrentLocation();
         } else {
             requestLocationPermission();
         }
 
-        // Address search with validation
         etAddressSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
                 String query = etAddressSearch.getText().toString().trim();
@@ -67,18 +74,15 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             return false;
         });
 
-        // Adjust Pin – open map picker
         findViewById(R.id.btn_adjust_pin).setOnClickListener(v -> {
             String address = tvAddress.getText().toString();
             openMapPicker(address);
         });
 
-        // Next button – goes to ProximityCheck
         findViewById(R.id.btn_next).setOnClickListener(v -> {
             if (reportData.getLocationAddress() == null || reportData.getLocationAddress().isEmpty()) {
                 Toast.makeText(this, "Please confirm your location", Toast.LENGTH_SHORT).show();
             } else {
-                // Ensure we have lat/lng – if not, geocode the address
                 if (reportData.getLatitude() == 0 && reportData.getLongitude() == 0) {
                     geocodeAddressForLocation(reportData.getLocationAddress());
                 } else {
@@ -87,17 +91,15 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             }
         });
 
-        // Bottom navigation
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
         findViewById(R.id.navReport).setOnClickListener(v -> {
             startActivity(new Intent(this, ReportFaultCategoryActivity.class));
             finish();
         });
         findViewById(R.id.navTrack).setOnClickListener(v ->
-                Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, TrackReportSearchActivity.class)));
         findViewById(R.id.navSettings).setOnClickListener(v ->
-                Toast.makeText(this, "Settings screen coming soon", Toast.LENGTH_SHORT).show());
-
+                startActivity(new Intent(this, ProfileSettingsActivity.class)));
     }
 
     private boolean checkLocationPermission() {

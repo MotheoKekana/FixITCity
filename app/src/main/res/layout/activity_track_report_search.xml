@@ -132,14 +132,40 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Recent History section -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recent History"
+                    android:textColor="@color/secondary_blue"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_view_all_archive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="View All Archive"
+                    android:textColor="@color/secondary_blue"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
         </LinearLayout>
     </ScrollView>
 
     <!-- Bottom Navigation (same as dashboard) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:orientation="horizontal"
         android:background="@color/white"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -152,8 +178,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navReport"
-            app:layout_constraintStart_toStartOf="parent">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="24dp"
@@ -179,8 +205,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navTrack"
-            app:layout_constraintStart_toEndOf="@+id/navHome">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="24dp"
@@ -206,8 +232,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navSettings"
-            app:layout_constraintStart_toEndOf="@+id/navReport">
+            android:clickable="true"
+            android:focusable="true">
 
             <View
                 android:layout_width="48dp"
@@ -241,8 +267,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/navTrack">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="24dp"
@@ -260,6 +286,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

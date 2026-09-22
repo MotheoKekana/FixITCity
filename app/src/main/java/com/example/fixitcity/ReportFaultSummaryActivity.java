@@ -8,6 +8,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseClient;
@@ -27,6 +30,12 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_fault_summary);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
         tvCategory = findViewById(R.id.tv_category_value);
@@ -42,6 +51,38 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             reportData.setAdditionalDetails(etDetails.getText().toString());
             submitReportToSupabase();
         });
+
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                startActivity(new Intent(this, target));
+                finish();
+            });
+        }
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultCategoryActivity.class));
+                finish();
+            });
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            navTrack.setOnClickListener(v ->
+                    startActivity(new Intent(this, TrackReportSearchActivity.class)));
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileSettingsActivity.class)));
+        }
     }
 
     private void submitReportToSupabase() {
@@ -76,7 +117,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                 Log.d(TAG, "Using category_id = " + categoryId);
                 Log.d(TAG, "Using severity_weight = " + reportData.getCategorySeverityWeight());
 
-                // 1) Submit the report
                 FaultReport created = SupabaseReports.submitReport(
                         citizenProfileId,
                         categoryId,
@@ -91,7 +131,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
                 Log.d(TAG, "Report created: " + created.getReferenceNumber());
 
-                // 2) Upload photo if present
                 byte[] photoBytes = reportData.getPhotoBytes();
                 if (photoBytes != null && photoBytes.length > 0) {
                     try {
@@ -124,12 +163,10 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                     }
                 }
 
-                // 3) Compute priority fallback (in case DB returned null)
                 final int finalPriority = created.getPriorityScore() != null
                         ? created.getPriorityScore()
                         : SupabaseReports.computePriorityScore(reportData.getCategorySeverityWeight());
 
-                // 4) Move to success screen
                 final FaultReport reportFinal = created;
                 runOnUiThread(() -> {
                     Intent intent = new Intent(this, ReportSuccessActivity.class);
@@ -137,9 +174,7 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                     intent.putExtra("priority_score", finalPriority);
                     startActivity(intent);
 
-                    // Clear the wizard data but NOT the session
                     ((FixITCityApp) getApplication()).clearReportData();
-
                     finishAffinity();
                 });
 
