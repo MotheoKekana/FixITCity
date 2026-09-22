@@ -28,6 +28,10 @@ public partial class FixITCityDbContext : DbContext
     public virtual DbSet<PriorityScore> PriorityScores { get; set; }
     public virtual DbSet<ReportFeedback> ReportFeedbacks { get; set; }
     public virtual DbSet<ReportPhoto> ReportPhotos { get; set; }
+
+    public virtual DbSet<ReportVote> ReportVotes { get; set; }
+    public virtual DbSet<FaultReportWithVote> FaultReportsWithVotes { get; set; }
+
     public virtual DbSet<ServiceArea> ServiceAreas { get; set; }
     public virtual DbSet<User> Users { get; set; }
 
@@ -186,6 +190,37 @@ public partial class FixITCityDbContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("icon");
             entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+        });
+
+                modelBuilder.Entity<FaultReportWithVote>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToView("fault_reports_with_votes");
+
+            entity.Property(e => e.ReportId).HasColumnName("report_id");
+            entity.Property(e => e.CitizenId).HasColumnName("citizen_id");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.AreaId).HasColumnName("area_id");
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Latitude).HasColumnName("latitude");
+            entity.Property(e => e.Longitude).HasColumnName("longitude");
+            entity.Property(e => e.AddressLine).HasColumnName("address_line");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.PriorityScore).HasColumnName("priority_score");
+            entity.Property(e => e.ReferenceNumber).HasColumnName("reference_number");
+            entity.Property(e => e.VerifiedBy).HasColumnName("verified_by");
+            entity.Property(e => e.VerifiedAt).HasColumnName("verified_at");
+            entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+            entity.Property(e => e.ResolutionNotes).HasColumnName("resolution_notes");
+            entity.Property(e => e.ResolvedAt).HasColumnName("resolved_at");
+            entity.Property(e => e.IsDuplicate).HasColumnName("is_duplicate");
+            entity.Property(e => e.IsOffline).HasColumnName("is_offline");
+            entity.Property(e => e.SyncStatus).HasColumnName("sync_status");
+            entity.Property(e => e.OfflineId).HasColumnName("offline_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.VoteCount).HasColumnName("vote_count");
         });
 
         modelBuilder.Entity<FaultReport>(entity =>
@@ -373,6 +408,32 @@ public partial class FixITCityDbContext : DbContext
             entity.Property(e => e.IsOffline).HasColumnName("is_offline").HasDefaultValue(false);
             entity.Property(e => e.SyncStatus).HasColumnName("sync_status").HasMaxLength(20);
             entity.Property(e => e.OfflinePhotoPath).HasColumnName("offline_photo_path").HasMaxLength(500);
+        });
+
+                modelBuilder.Entity<ReportVote>(entity =>
+        {
+            entity.HasKey(e => e.VoteId).HasName("report_votes_pkey");
+
+            entity.Property(e => e.VoteId).HasColumnName("vote_id");
+            entity.Property(e => e.ReportId).HasColumnName("report_id");
+            entity.Property(e => e.CitizenId).HasColumnName("citizen_id");
+            entity.Property(e => e.VotedAt)
+                .HasColumnName("voted_at")
+                .HasDefaultValueSql("now()");
+
+            entity.HasOne(d => d.Report)
+                .WithMany()
+                .HasForeignKey(d => d.ReportId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Citizen)
+                .WithMany()
+                .HasForeignKey(d => d.CitizenId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.ReportId, e.CitizenId })
+                .IsUnique()
+                .HasDatabaseName("report_votes_unique_per_citizen");
         });
 
         modelBuilder.Entity<ServiceArea>(entity =>
