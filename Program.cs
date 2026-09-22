@@ -14,10 +14,13 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]
                  ?? "http://localhost:5283/api/";
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<AuthTokenHandler>();
+
 builder.Services.AddHttpClient("Api", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
-});
+}).AddHttpMessageHandler<AuthTokenHandler>();
 
 var app = builder.Build();
 

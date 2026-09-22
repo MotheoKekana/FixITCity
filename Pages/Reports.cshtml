@@ -5,6 +5,8 @@
     ViewData["Title"] = "Reports";
     Layout = "_SidebarLayout";
 }
+<link rel="stylesheet" href="~/css/Reports.css" />
+<link rel=""
 
 <div class="reports-container">
 
@@ -46,61 +48,28 @@
     <!-- ===================================================== -->
     <!-- STATISTICS -->
     <!-- ===================================================== -->
-
     <div class="stats-summary">
-
         <div class="stat-item">
-
-            <span class="stat-number">
-                @Model.TotalReports
-            </span>
-
-            <span class="stat-label">
-                Total Reports
-            </span>
-
+            <span class="stat-number">@Model.TotalReports</span>
+            <span class="stat-label">Total Reports</span>
         </div>
-
 
         <div class="stat-item stat-open">
-
-            <span class="stat-number">
-                @Model.TotalOpen
-            </span>
-
-            <span class="stat-label">
-                Open
-            </span>
-
+            <span class="stat-number">@Model.TotalPending</span>
+            <span class="stat-label">Pending</span>
         </div>
-
 
         <div class="stat-item stat-assigned">
-
-            <span class="stat-number">
-                @Model.TotalAssigned
-            </span>
-
-            <span class="stat-label">
-                Assigned
-            </span>
-
+            <span class="stat-number">@Model.TotalInProgress</span>
+            <span class="stat-label">In Progress</span>
         </div>
-
 
         <div class="stat-item stat-closed">
-
-            <span class="stat-number">
-                @Model.TotalClosed
-            </span>
-
-            <span class="stat-label">
-                Closed
-            </span>
-
+            <span class="stat-number">@Model.TotalResolved</span>
+            <span class="stat-label">Resolved</span>
         </div>
-
     </div>
+    
 
 
     <!-- ===================================================== -->
@@ -134,25 +103,12 @@
                         class="filter-select"
                         onchange="this.form.submit()">
 
-                    <option value="All"
-                            selected="@(Model.StatusFilter == "All")">
-                        All Status
-                    </option>
-
-                    <option value="Open"
-                            selected="@(Model.StatusFilter == "Open")">
-                        Open
-                    </option>
-
-                    <option value="Assigned"
-                            selected="@(Model.StatusFilter == "Assigned")">
-                        Assigned
-                    </option>
-
-                    <option value="Closed"
-                            selected="@(Model.StatusFilter == "Closed")">
-                        Closed
-                    </option>
+                    <option value="All" selected="@(Model.StatusFilter == "All")">All Status</option>
+                    <option value="Pending" selected="@(Model.StatusFilter == "Pending")">Pending</option>
+                    <option value="Verified" selected="@(Model.StatusFilter == "Verified")">Verified</option>
+                    <option value="InProgress" selected="@(Model.StatusFilter == "InProgress")">In Progress</option>
+                    <option value="Resolved" selected="@(Model.StatusFilter == "Resolved")">Resolved</option>
+                    <option value="Rejected" selected="@(Model.StatusFilter == "Rejected")">Rejected</option>
 
                 </select>
 
@@ -268,14 +224,14 @@
 
                             <td>
                                 <strong>
-                                    #@report.ReportID
+                                    #@report.ReportId
                                 </strong>
                             </td>
 
 
                             <td>
 
-                                <span class="priority-badge priority-@(report.PriorityScore >= 80 ? "high" : report.PriorityScore >= 60 ? "medium" : "low")">
+                                <span class="priority-badge priority-@((report.PriorityScore ?? 0) >= 80 ? "high" : (report.PriorityScore ?? 0) >= 60 ? "medium" : "low")">
 
                                     @report.PriorityScore
 
@@ -292,7 +248,7 @@
 
 
                             <td>
-                                @report.Category
+                                @report.CategoryName
                             </td>
 
 
@@ -308,19 +264,19 @@
 
 
                             <td>
-                                @report.ReportedDate.ToString("dd MMM yyyy HH:mm")
+                                @(report.CreatedAt?.ToString("dd MMM yyyy HH:mm") ?? "—")
                             </td>
 
 
                             <td>
-                                @report.Location
+                                @(string.IsNullOrWhiteSpace(report.AreaName) ? "—" : report.AreaName)
                             </td>
 
 
                             <td>
 
                                 <a asp-page="/FaultDetail"
-                                   asp-route-id="@report.ReportID"
+                                   asp-route-id="@report.ReportId"
                                    class="btn-view"
                                    title="View Details">
 
@@ -337,7 +293,7 @@
 
             </table>
         }
-        else
+      @*   else
         {
             <div class="no-results">
 
@@ -352,7 +308,7 @@
                 </p>
 
             </div>
-        }
+        } *@
 
     </div>
 
@@ -475,539 +431,4 @@
     }
 
 </div>
-
-
-<style>
-
-    * {
-        box-sizing: border-box;
-    }
-
-
-    .reports-container {
-        max-width: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0.5rem 1rem;
-    }
-
-
-    /* ========================================================= */
-    /* HEADER */
-    /* ========================================================= */
-
-    .reports-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-        width: 100%;
-    }
-
-
-        .reports-header h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin: 0;
-        }
-
-
-    /* ========================================================= */
-    /* BUTTONS */
-    /* ========================================================= */
-
-    .btn-primary {
-        background: #009688;
-        border: none;
-        padding: 0.6rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-    }
-
-
-        .btn-primary:hover {
-            background: #007a6e;
-            color: white;
-            text-decoration: none;
-            box-shadow: 0 2px 8px rgba(0, 150, 136, 0.3);
-        }
-
-
-    /* ========================================================= */
-    /* STATISTICS */
-    /* ========================================================= */
-
-    .stats-summary {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        width: 100%;
-    }
-
-
-    .stat-item {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem 1rem;
-        border: 1px solid #e8eaed;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-
-        .stat-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-
-
-    .stat-number {
-        display: block;
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1a1a2e;
-    }
-
-
-    .stat-label {
-        display: block;
-        font-size: 0.85rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        margin-top: 0.25rem;
-    }
-
-
-    .stat-open .stat-number {
-        color: #dc3545;
-    }
-
-
-    .stat-assigned .stat-number {
-        color: #e68a00;
-    }
-
-
-    .stat-closed .stat-number {
-        color: #28a745;
-    }
-
-
-    /* ========================================================= */
-    /* FILTERS */
-    /* ========================================================= */
-
-    .filters-bar {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        border: 1px solid #e8eaed;
-        margin-bottom: 1.5rem;
-        width: 100%;
-    }
-
-
-    .filters-form {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        align-items: center;
-        width: 100%;
-    }
-
-
-    .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 0 0.75rem;
-        border: 1px solid #e8eaed;
-        flex: 1 1 180px;
-        min-width: 160px;
-    }
-
-
-        .filter-group i {
-            color: #6c757d;
-        }
-
-
-    .filter-input {
-        border: none;
-        background: transparent;
-        padding: 0.7rem 0;
-        width: 100%;
-        outline: none;
-        font-size: 0.95rem;
-    }
-
-
-    .filter-select {
-        border: none;
-        background: #f8f9fa;
-        padding: 0.7rem 0.5rem;
-        border-radius: 8px;
-        outline: none;
-        font-size: 0.95rem;
-        color: #1a1a2e;
-        cursor: pointer;
-        min-width: 140px;
-        width: 100%;
-    }
-
-
-    .btn-search {
-        background: #009688;
-        border: none;
-        color: white;
-        border-radius: 8px;
-        padding: 0.7rem 1rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-
-        .btn-search:hover {
-            background: #007a6e;
-        }
-
-
-    .btn-clear {
-        color: #dc3545;
-        text-decoration: none;
-        font-size: 0.85rem;
-        padding: 0.6rem 0.75rem;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        white-space: nowrap;
-    }
-
-
-        .btn-clear:hover {
-            background: #f8d7da;
-            color: #c82333;
-            text-decoration: none;
-        }
-
-
-    /* ========================================================= */
-    /* TABLE */
-    /* ========================================================= */
-
-    .table-container {
-        background: white;
-        border-radius: 12px;
-        border: 1px solid #e8eaed;
-        overflow-x: auto;
-        width: 100%;
-    }
-
-
-    .reports-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-    }
-
-
-        .reports-table thead {
-            background: #f8f9fa;
-        }
-
-
-        .reports-table th {
-            padding: 0.9rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            border-bottom: 2px solid #e8eaed;
-            white-space: nowrap;
-        }
-
-
-        .reports-table td {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            color: #1a1a2e;
-            vertical-align: middle;
-        }
-
-
-        .reports-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-
-    /* ========================================================= */
-    /* PRIORITY */
-    /* ========================================================= */
-
-    .priority-badge {
-        display: inline-block;
-        padding: 0.2rem 0.6rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        min-width: 35px;
-        text-align: center;
-    }
-
-
-    .priority-high {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-
-    .priority-medium {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-
-    .priority-low {
-        background: #d4edda;
-        color: #155724;
-    }
-
-
-    /* ========================================================= */
-    /* STATUS */
-    /* ========================================================= */
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.2rem 0.7rem;
-        border-radius: 12px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-
-    .status-open {
-        background: #f8d7da;
-        color: #dc3545;
-    }
-
-
-    .status-assigned {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-
-    .status-closed {
-        background: #d4edda;
-        color: #28a745;
-    }
-
-
-    /* ========================================================= */
-    /* VIEW BUTTON */
-    /* ========================================================= */
-
-    .btn-view {
-        color: #009688;
-        text-decoration: none;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-    }
-
-
-        .btn-view:hover {
-            background: #e0f2f1;
-            color: #007a6e;
-        }
-
-
-    /* ========================================================= */
-    /* NO RESULTS */
-    /* ========================================================= */
-
-    .no-results {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: #6c757d;
-    }
-
-
-        .no-results i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #dadce0;
-        }
-
-
-    /* ========================================================= */
-    /* PAGINATION */
-    /* ========================================================= */
-
-    .pagination-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-
-    .pagination-info {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
-
-
-    .pagination-buttons {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        flex-wrap: wrap;
-    }
-
-
-    .btn-pagination {
-        padding: 0.4rem 1rem;
-        border-radius: 6px;
-        border: 1px solid #e8eaed;
-        background: white;
-        color: #1a1a2e;
-        text-decoration: none;
-        font-size: 0.85rem;
-    }
-
-
-    .page-number {
-        display: inline-block;
-        padding: 0.4rem 0.7rem;
-        border-radius: 6px;
-        color: #1a1a2e;
-        text-decoration: none;
-        min-width: 35px;
-        text-align: center;
-    }
-
-
-        .page-number.active {
-            background: #009688;
-            color: white;
-            font-weight: 600;
-        }
-
-
-    /* ========================================================= */
-    /* RESPONSIVE */
-    /* ========================================================= */
-
-    @@media (max-width: 992px) {
-
-        .stats-summary {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-
-    @@media (max-width: 768px) {
-
-        .filters-form {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-
-        .filter-group {
-            min-width: unset;
-            flex: 1 1 100%;
-        }
-
-
-        .btn-search {
-            justify-content: center;
-        }
-
-
-        .stats-summary {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-
-        .reports-table {
-            font-size: 0.8rem;
-        }
-
-
-        .pagination-container {
-            flex-direction: column;
-            align-items: center;
-        }
-    }
-
-</style>
-
-
-<script>
-    // =========================================================
-    // DEBOUNCED SEARCH
-    // =========================================================
-
-    const searchInput = document.getElementById("reportSearch");
-
-    let searchTimer;
-
-    searchInput.addEventListener("input", function () {
-
-        // Cancel the previous timer whenever the user types
-        clearTimeout(searchTimer);
-
-        // Wait 300ms after the user stops typing
-        searchTimer = setTimeout(function () {
-
-            // Reset to page 1 before submitting
-            const form = searchInput.form;
-
-            const pageInput = form.querySelector('[name="page"]');
-
-            if (pageInput) {
-                pageInput.value = "1";
-            }
-
-            form.submit();
-
-        }, 300);
-
-    });
-
-
-    // =========================================================
-    // EXPORT
-    // =========================================================
-
-    function exportCSV() {
-        alert("CSV Export functionality coming soon!");
-    }
-
-    function exportPDF() {
-        alert("PDF Export functionality coming soon!");
-    }
-</script>
+<script src="~/js/Reports.js"></script>
