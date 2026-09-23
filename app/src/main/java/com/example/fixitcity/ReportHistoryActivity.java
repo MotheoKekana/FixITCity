@@ -59,10 +59,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         View backBtn = findViewById(R.id.back_button);
         if (backBtn != null) backBtn.setOnClickListener(v -> finish());
-
-        // NOTE: loadReports() is intentionally NOT called here.
-        // onResume() handles the initial load AND every return to this screen,
-        // so we avoid firing two Supabase requests on first entry.
     }
 
     private void setupFilterChips() {
@@ -138,7 +134,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         Log.d(TAG, "Loading reports for citizen_profile_id = " + citizenProfileId);
 
-        // Loading state — only show if we don't already have content on screen
         if (filteredReports.isEmpty()) {
             showEmptyState("Loading reports…");
         }
@@ -164,13 +159,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * Phase 5.4 — filter by status.
-     * "Resolved" matches status = "Resolved" / "Completed" / "Closed".
-     * "In Progress" matches status = "In Progress" / "Assigned".
-     * "Pending" matches status = "Pending" / "Open".
-     * "All" shows everything.
-     */
     private void applyFilter() {
         filteredReports.clear();
 
@@ -223,13 +211,11 @@ public class ReportHistoryActivity extends AppCompatActivity {
         if (rvReports != null) rvReports.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Phase 5.5 — open details in TrackReportResultActivity.
-     */
     private void onReportClicked(FaultReport report) {
         Log.d(TAG, "Opening details for ref = " + report.getReferenceNumber());
 
         Intent intent = new Intent(this, TrackReportResultActivity.class);
+        intent.putExtra("report_id", report.getReportId());
         intent.putExtra("reference_number", report.getReferenceNumber());
         intent.putExtra("title", report.getTitle());
         intent.putExtra("description", report.getDescription());
@@ -244,8 +230,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refreshes on first entry AND whenever the user returns from a detail screen,
-        // so status changes made by municipal staff show up immediately.
         loadReports();
     }
 }

@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
 
 public class ReportFaultCategoryActivity extends AppCompatActivity {
@@ -94,10 +95,8 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         // ===== Bottom navigation =====
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
 
-        findViewById(R.id.navReport).setOnClickListener(v -> {
-            // Already on the Report screen — do nothing (was reloading from scratch)
-            Toast.makeText(this, "You're already reporting", Toast.LENGTH_SHORT).show();
-        });
+        findViewById(R.id.navReport).setOnClickListener(v ->
+                Toast.makeText(this, "You're already reporting", Toast.LENGTH_SHORT).show());
 
         findViewById(R.id.navTrack).setOnClickListener(v ->
                 startActivity(new Intent(this, TrackReportSearchActivity.class)));
@@ -108,7 +107,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
     /**
      * Fallback list — matches the real Supabase fault_categories table exactly.
-     * Only used if the Supabase query fails for some reason.
+     * Only used if the Supabase query fails or returns empty.
      */
     private void loadFallbackCategories() {
         fullCategoryList.clear();
@@ -168,9 +167,14 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromSupabase() {
+        // Use the logged-in user's token when available so RLS-protected
+        // reads of fault_categories succeed.
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+
         new Thread(() -> {
             try {
-                List<FaultCategory> categories = SupabaseReports.getCategories();
+                List<FaultCategory> categories = SupabaseReports.getCategories(accessToken);
                 android.util.Log.d("Categories", "Loaded " + categories.size() + " categories from Supabase");
 
                 runOnUiThread(() -> {

@@ -37,7 +37,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
         etReference = findViewById(R.id.et_reference);
         btnTrack = findViewById(R.id.btn_track);
 
-        // Prefill if launched from ReportSuccessActivity
         String prefill = getIntent().getStringExtra("prefill_reference");
         if (prefill != null && !prefill.isEmpty() && etReference != null) {
             etReference.setText(prefill);
@@ -45,7 +44,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
 
         btnTrack.setOnClickListener(v -> attemptTrack());
 
-        // "View All Archive" → ReportHistoryActivity
         View viewAll = findViewById(R.id.tv_view_all_archive);
         if (viewAll != null) {
             viewAll.setOnClickListener(v -> {
@@ -54,7 +52,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             });
         }
 
-        // ===== Bottom navigation =====
+        // Bottom navigation
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -77,7 +75,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
 
         View navTrack = findViewById(R.id.navTrack);
         if (navTrack != null) {
-            // Already on Track — no-op
             navTrack.setOnClickListener(v ->
                     Toast.makeText(this, "You're on Track", Toast.LENGTH_SHORT).show());
         }
@@ -90,7 +87,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             });
         }
 
-        // Notification bell
         View ivNotif = findViewById(R.id.ivNotifications);
         if (ivNotif != null) {
             ivNotif.setOnClickListener(v ->
@@ -108,9 +104,12 @@ public class TrackReportSearchActivity extends AppCompatActivity {
 
         btnTrack.setEnabled(false);
 
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+
         new Thread(() -> {
             try {
-                FaultReport report = SupabaseReports.getReportByReference(ref);
+                FaultReport report = SupabaseReports.getReportByReference(ref, accessToken);
                 runOnUiThread(() -> {
                     btnTrack.setEnabled(true);
                     if (report == null) {
@@ -119,6 +118,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show();
                     } else {
                         Intent intent = new Intent(this, TrackReportResultActivity.class);
+                        intent.putExtra("report_id", report.getReportId());
                         intent.putExtra("reference_number", report.getReferenceNumber());
                         intent.putExtra("title", report.getTitle());
                         intent.putExtra("description", report.getDescription());

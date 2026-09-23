@@ -2,6 +2,7 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,11 +11,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TrackReportResultActivity extends AppCompatActivity {
+
+    private static final String TAG = "TrackResult";
+
+    private RecyclerView rvStatusHistory;
+    private TextView tvHistoryEmpty;
+    private StatusHistoryAdapter historyAdapter;
+    private final List<StatusHistoryItem> historyItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +41,8 @@ public class TrackReportResultActivity extends AppCompatActivity {
             return insets;
         });
 
+        // ---- Read extras ----
+        long reportId = getIntent().getLongExtra("report_id", -1);
         String ref = getIntent().getStringExtra("reference_number");
         String title = getIntent().getStringExtra("title");
         String description = getIntent().getStringExtra("description");
@@ -45,6 +61,7 @@ public class TrackReportResultActivity extends AppCompatActivity {
             dateStr = createdAt.substring(0, 10);
         }
 
+        // ---- Bind header ----
         TextView tvHeader = findViewById(R.id.tv_report_status_header);
         if (tvHeader != null) {
             tvHeader.setText("Report Status: " + ref);
@@ -71,6 +88,7 @@ public class TrackReportResultActivity extends AppCompatActivity {
             tvDescription.setVisibility(TextView.VISIBLE);
         }
 
+        // ---- Share ----
         final String fRef = ref;
         final String fStatus = status;
         final String fAddress = address;
@@ -93,6 +111,25 @@ public class TrackReportResultActivity extends AppCompatActivity {
                     Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show());
         }
 
+        // ---- Status history (Phase 6.3) ----
+        rvStatusHistory = findViewById(R.id.rv_status_history);
+        tvHistoryEmpty = findViewById(R.id.tv_history_empty);
+
+        if (rvStatusHistory != null) {
+            rvStatusHistory.setLayoutManager(new LinearLayoutManager(this));
+            historyAdapter = new StatusHistoryAdapter(historyItems);
+            rvStatusHistory.setAdapter(historyAdapter);
+        }
+
+        if (reportId > 0) {
+            loadStatusHistory(reportId);
+        } else {
+            // Fallback: look up report_id by reference if the caller didn't pass it
+            Log.w(TAG, "No report_id passed — attempting lookup by reference: " + fRef);
+            lookupReportIdAndLoadHistory(fRef);
+        }
+
+        // ---- Bottom navigation ----
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -131,6 +168,102 @@ public class TrackReportResultActivity extends AppCompatActivity {
         if (ivNotif != null) {
             ivNotif.setOnClickListener(v ->
                     startActivity(new Intent(this, Notifications_Activity.class)));
+        }
+    }
+
+    private void loadStatusHistory(long reportId) {
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+
+        if (tvHistoryEmpty != null) {
+            tvHistoryEmpty.setText("Loading history…");
+            tvHistoryEmpty.setVisibility(View.VISIBLE);
+        }
+        if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
+
+        new Thread(() -> {
+            try {
+                List<SupabaseReports.StatusHistoryDTO> history =
+                        SupabaseReports.getStatusHistory(reportId, accessToken);
+
+                Log.d(TAG, "Loaded " + history.size() + " history rows for report " + reportId);
+
+                List<StatusHistoryItem> uiItems = new ArrayList<>();
+                for (SupabaseReports.StatusHistoryDTO dto : history) {
+                    uiItems.add(new StatusHistoryItem(
+                            dto.old_status,
+                            dto.new_status,
+                            dto.changed_at,
+                            dto.notes
+                    ));
+                }
+
+                runOnUiThread(() -> renderHistory(uiItems));
+
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to load status history: " + e.getMessage(), e);
+                runOnUiThread(() -> {
+                    if (tvHistoryEmpty != null) {
+                        tvHistoryEmpty.setText("Could not load status history.");
+                        tvHistoryEmpty.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void lookupReportIdAndLoadHistory(String referenceNumber) {
+        if (tvHistoryEmpty != null) {
+            tvHistoryEmpty.setText("Loading history…");
+            tvHistoryEmpty.setVisibility(View.VISIBLE);
+        }
+        if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
+
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+
+        new Thread(() -> {
+            try {
+                FaultReport report = SupabaseReports.getReportByReference(referenceNumber, accessToken);
+                if (report == null) {
+                    runOnUiThread(() -> {
+                        if (tvHistoryEmpty != null) {
+                            tvHistoryEmpty.setText("Status history unavailable.");
+                            tvHistoryEmpty.setVisibility(View.VISIBLE);
+                        }
+                    });
+                    return;
+                }
+                runOnUiThread(() -> loadStatusHistory(report.getReportId()));
+            } catch (Exception e) {
+                Log.e(TAG, "Lookup failed: " + e.getMessage(), e);
+                runOnUiThread(() -> {
+                    if (tvHistoryEmpty != null) {
+                        tvHistoryEmpty.setText("Could not load status history.");
+                        tvHistoryEmpty.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void renderHistory(List<StatusHistoryItem> items) {
+        historyItems.clear();
+        historyItems.addAll(items);
+
+        if (historyAdapter != null) {
+            historyAdapter.notifyDataSetChanged();
+        }
+
+        if (items.isEmpty()) {
+            if (tvHistoryEmpty != null) {
+                tvHistoryEmpty.setText("No status changes yet. Your report is in the queue.");
+                tvHistoryEmpty.setVisibility(View.VISIBLE);
+            }
+            if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
+        } else {
+            if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.GONE);
+            if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.VISIBLE);
         }
     }
 }

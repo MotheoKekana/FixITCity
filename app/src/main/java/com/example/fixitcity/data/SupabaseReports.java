@@ -31,7 +31,7 @@ public class SupabaseReports {
     // Haversine distance between two lat/lng in meters.
     // ==========================================
     public static double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
-        final double R = 6371000.0; // Earth radius in meters
+        final double R = 6371000.0;
         double phi1 = Math.toRadians(lat1);
         double phi2 = Math.toRadians(lat2);
         double dPhi = Math.toRadians(lat2 - lat1);
@@ -46,10 +46,8 @@ public class SupabaseReports {
 
     // ==========================================
     // Fetch all "open" reports (Pending / Assigned).
-    // Distance filtering happens client-side.
     // ==========================================
     public static List<FaultReport> getOpenReports(String accessToken) throws IOException {
-        // Fix X: Pending counts as open
         String path = "/fault_reports?status=in.(Pending,Assigned)"
                 + "&order=created_at.desc";
 
@@ -73,9 +71,18 @@ public class SupabaseReports {
 
     // ==========================================
     // Fetch all fault categories
+    // Uses the user's access token when available so RLS-protected
+    // reads succeed. Falls back to the anon key for pre-login screens.
     // ==========================================
-    public static List<FaultCategory> getCategories() throws IOException {
-        String response = SupabaseClient.get("/fault_categories?select=*&order=name.asc");
+    public static List<FaultCategory> getCategories(String accessToken) throws IOException {
+        String path = "/fault_categories?select=*&order=name.asc";
+
+        String response;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            response = SupabaseClient.getWithAuth(path, accessToken);
+        } else {
+            response = SupabaseClient.get(path);
+        }
         Log.d(TAG, "Categories raw: " + response);
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
@@ -105,6 +112,12 @@ public class SupabaseReports {
             Log.e(TAG, "JSON parse error: " + e.getMessage(), e);
             return new ArrayList<>();
         }
+    }
+
+    // Backwards-compatible overload for any old callers.
+    @Deprecated
+    public static List<FaultCategory> getCategories() throws IOException {
+        return getCategories(null);
     }
 
     // ==========================================
@@ -218,14 +231,60 @@ public class SupabaseReports {
 
     // ==========================================
     // Get a report by reference number
+    // Uses the user's token so RLS-protected reads succeed.
     // ==========================================
-    public static FaultReport getReportByReference(String referenceNumber) throws IOException {
+    public static FaultReport getReportByReference(String referenceNumber, String accessToken) throws IOException {
         String path = "/fault_reports?reference_number=eq." + referenceNumber + "&limit=1";
-        String response = SupabaseClient.get(path);
+
+        String response;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            response = SupabaseClient.getWithAuth(path, accessToken);
+        } else {
+            response = SupabaseClient.get(path);
+        }
+
+        Log.d(TAG, "getReportByReference[" + referenceNumber + "] response: " + response);
+
+        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
+            return null;
+        }
+
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
         List<FaultReport> results = gson.fromJson(response, listType);
         if (results == null || results.isEmpty()) return null;
         return results.get(0);
+    }
+
+    @Deprecated
+    public static FaultReport getReportByReference(String referenceNumber) throws IOException {
+        return getReportByReference(referenceNumber, null);
+    }
+
+    // ==========================================
+    // Get status history for a report (Phase 6.3)
+    // Returns rows ordered newest-first.
+    // ==========================================
+    public static List<StatusHistoryDTO> getStatusHistory(long reportId, String accessToken) throws IOException {
+        String path = "/fault_status_history?report_id=eq." + reportId
+                + "&order=changed_at.desc";
+
+        String response;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            response = SupabaseClient.getWithAuth(path, accessToken);
+        } else {
+            response = SupabaseClient.get(path);
+        }
+
+        Log.d(TAG, "getStatusHistory[" + reportId + "] response: " + response);
+
+        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
+            Log.w(TAG, "getStatusHistory: non-array response");
+            return new ArrayList<>();
+        }
+
+        Type listType = new TypeToken<List<StatusHistoryDTO>>(){}.getType();
+        List<StatusHistoryDTO> results = gson.fromJson(response, listType);
+        return results != null ? results : new ArrayList<>();
     }
 
     // ==========================================
@@ -254,5 +313,14 @@ public class SupabaseReports {
 
     public static class CategoryIdDTO {
         public long category_id;
+    }
+
+    public static class StatusHistoryDTO {
+        public long history_id;
+        public long report_id;
+        public String old_status;
+        public String new_status;
+        public String changed_at;
+        public String notes;
     }
 }
