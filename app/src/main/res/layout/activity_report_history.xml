@@ -64,6 +64,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header" />
 
+    <!-- Sync pending button (visible only when there are pending reports) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sync_pending"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="⟳ Sync pending (0)"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:cornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        tools:visibility="visible" />
+
     <!-- Filter Chips -->
     <HorizontalScrollView
         android:id="@+id/filter_scroll"
@@ -156,7 +172,6 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -183,7 +198,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -210,7 +224,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Track (selected) -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -245,7 +258,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

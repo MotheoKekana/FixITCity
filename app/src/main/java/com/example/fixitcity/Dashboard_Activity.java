@@ -1,6 +1,9 @@
 package com.example.fixitcity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,7 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +30,7 @@ import java.util.List;
 public class Dashboard_Activity extends AppCompatActivity {
 
     private static final String TAG = "DashboardActivity";
+    private static final int REQUEST_NOTIF_PERMISSION = 200;
 
     private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius;
     private RecyclerView rvRecentReports;
@@ -53,6 +60,9 @@ public class Dashboard_Activity extends AppCompatActivity {
             return insets;
         });
 
+        // Ask for notification permission on Android 13+ (safe timing — the user sees the dashboard)
+        requestNotificationPermissionIfNeeded();
+
         // Views
         tvWelcome = findViewById(R.id.tvWelcome);
         tvSubtitle = findViewById(R.id.tvSubtitle);
@@ -71,7 +81,7 @@ public class Dashboard_Activity extends AppCompatActivity {
         adapter = new FaultReportAdapter(this, recentReports);
         rvRecentReports.setAdapter(adapter);
 
-        // Nearby radius label (map card is a placeholder for now)
+        // Nearby radius label
         tvNearbyRadius.setText("Reports within a 200 m radius of your current location");
 
         // Notifications bell
@@ -95,8 +105,34 @@ public class Dashboard_Activity extends AppCompatActivity {
         loadMyReports();
     }
 
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIF_PERMISSION
+            );
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_NOTIF_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Notification permission granted");
+            } else {
+                Log.d(TAG, "Notification permission denied — FCM will be silent");
+            }
+        }
+    }
+
     private void setupBottomNav() {
-        // Home is current screen — no-op
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v ->
@@ -157,7 +193,6 @@ public class Dashboard_Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh when returning from report submission
         loadMyReports();
     }
 }

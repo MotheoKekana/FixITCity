@@ -16,6 +16,7 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".FixITCityApp"
@@ -41,11 +42,9 @@
         <activity android:name=".Dashboard_Activity" android:exported="false" />
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
         <activity android:name=".TrackReportResultActivity" android:exported="false" />
-        <activity
-            android:name=".ReportHistoryActivity"
-            android:exported="false" />
+        <activity android:name=".ReportHistoryActivity" android:exported="false" />
 
-        <!-- Auth screens — keyboard-aware -->
+        <!-- Auth screens -->
         <activity
             android:name=".Login_Activity"
             android:windowSoftInputMode="adjustResize" />
@@ -59,6 +58,7 @@
             android:exported="false" />
 
         <!-- Report flow -->
+        <activity android:name=".Notifications_Activity" android:exported="false" />
         <activity android:name=".ReportFaultCategoryActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ReportFaultGPSActivity"
@@ -86,6 +86,19 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Firebase Cloud Messaging service -->
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
 
     </application>
 

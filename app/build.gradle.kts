@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    // Uncomment AFTER you add google-services.json
-    // alias(libs.plugins.google.services)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -54,10 +53,13 @@ dependencies {
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
 
-    // Firebase — uncomment AFTER google-services.json is added
-    // implementation(platform(libs.firebase.bom))
-    // implementation(libs.firebase.messaging)
-    // implementation(libs.firebase.analytics)
+    // WorkManager (offline sync)
+    implementation(libs.work.runtime)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
 
     // Testing
     testImplementation(libs.junit)

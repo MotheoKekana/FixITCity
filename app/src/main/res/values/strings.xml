@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="default_notification_channel_id" translatable="false">fixitcity_default</string>
+    <string name="default_notification_channel_name">FixITCity Notifications</string>
     <string name="app_name">FixITCity</string>
     <string name="tagline">Report. Rank. Repair.</string>
     <string name="loading">Loading...</string>

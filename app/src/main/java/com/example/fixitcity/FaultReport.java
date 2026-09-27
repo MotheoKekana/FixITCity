@@ -17,6 +17,9 @@ public class FaultReport {
     public String created_at;
     public String updated_at;
 
+    // Phase 8: true when this report exists only in Room (not yet on server)
+    private boolean pendingSync = false;
+
     public FaultReport() {}
 
     public long getReportId() { return report_id; }
@@ -29,4 +32,7 @@ public class FaultReport {
     public Integer getPriorityScore() { return priority_score; }
     public String getReferenceNumber() { return reference_number; }
     public String getCreatedAt() { return created_at; }
+
+    public boolean isPendingSync() { return pendingSync; }
+    public void setPendingSync(boolean pending) { this.pendingSync = pending; }
 }

@@ -68,7 +68,6 @@ public class Login_Activity extends AppCompatActivity {
         btnSignIn.setOnClickListener(v -> attemptLogin());
 
         btnGuest.setOnClickListener(v -> {
-            // Guest path: clear any stale session, mark as guest
             new SessionManager(this).logout();
             SessionManager guestSession = new SessionManager(this);
             guestSession.saveSession("guest", "guest", "guest@local", "guest");
@@ -104,11 +103,16 @@ public class Login_Activity extends AppCompatActivity {
                 String response = SupabaseAuth.login(email, password);
                 JSONObject json = new JSONObject(response);
                 String accessToken = json.getString("access_token");
+                String refreshToken = json.optString("refresh_token", null);
                 String authUserId = json.getJSONObject("user").getString("id");
                 String userEmail = json.getJSONObject("user").getString("email");
 
                 SessionManager session = new SessionManager(this);
                 session.saveSession(accessToken, authUserId, userEmail, "citizen");
+                if (refreshToken != null && !refreshToken.isEmpty()) {
+                    session.saveRefreshToken(refreshToken);
+                    Log.d(TAG, "Refresh token saved");
+                }
 
                 // ===== Fetch citizen_profile_id and store it =====
                 long userId = -1;
@@ -118,6 +122,9 @@ public class Login_Activity extends AppCompatActivity {
                     Log.d(TAG, "Found user_id = " + userId);
 
                     if (userId > 0) {
+                        session.saveUserIdBigint(userId);
+                        Log.d(TAG, "Saved userIdBigint = " + userId);
+
                         profileId = SupabaseUsers.findCitizenProfileIdByUserId(userId, accessToken);
                         Log.d(TAG, "Found citizen_profile_id = " + profileId);
                     }

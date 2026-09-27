@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "67062829272",
+    "project_id": "fixitcity-a3297295",
+    "storage_bucket": "fixitcity-a3297295.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67062829272:android:c2e6429df5c27303aa87ad",
+        "android_client_info": {
+          "package_name": "com.android.fixitcity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMr3kK4zsFxg3q0VyCp5y-eWbANUo_AB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67062829272:android:2d5dcbe487ab4be2aa87ad",
+        "android_client_info": {
+          "package_name": "com.example.fixitcity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMr3kK4zsFxg3q0VyCp5y-eWbANUo_AB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

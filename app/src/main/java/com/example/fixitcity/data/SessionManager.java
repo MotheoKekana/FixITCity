@@ -7,7 +7,9 @@ public class SessionManager {
 
     private static final String PREF_NAME = "FixITCitySession";
     private static final String KEY_ACCESS_TOKEN = "access_token";
-    private static final String KEY_USER_ID = "user_id";                  // Supabase auth UUID
+    private static final String KEY_REFRESH_TOKEN = "refresh_token";
+    private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_USER_ID_BIGINT = "user_id_bigint";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_ROLE = "role";
     private static final String KEY_CITIZEN_PROFILE_ID = "citizen_profile_id";
@@ -32,6 +34,21 @@ public class SessionManager {
         editor.apply();
     }
 
+    public void saveRefreshToken(String refreshToken) {
+        editor.putString(KEY_REFRESH_TOKEN, refreshToken);
+        editor.apply();
+    }
+
+    public void saveAccessToken(String accessToken) {
+        editor.putString(KEY_ACCESS_TOKEN, accessToken);
+        editor.apply();
+    }
+
+    public void saveUserIdBigint(long userIdBigint) {
+        editor.putLong(KEY_USER_ID_BIGINT, userIdBigint);
+        editor.apply();
+    }
+
     public void saveCitizenProfileId(long citizenProfileId) {
         editor.putLong(KEY_CITIZEN_PROFILE_ID, citizenProfileId);
         editor.apply();
@@ -53,8 +70,16 @@ public class SessionManager {
         return prefs.getString(KEY_ACCESS_TOKEN, null);
     }
 
+    public String getRefreshToken() {
+        return prefs.getString(KEY_REFRESH_TOKEN, null);
+    }
+
     public String getUserId() {
         return prefs.getString(KEY_USER_ID, null);
+    }
+
+    public long getUserIdBigint() {
+        return prefs.getLong(KEY_USER_ID_BIGINT, -1);
     }
 
     public String getEmail() {

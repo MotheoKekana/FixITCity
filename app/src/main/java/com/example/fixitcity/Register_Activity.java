@@ -131,7 +131,6 @@ public class Register_Activity extends AppCompatActivity {
                 JSONObject signupJson = new JSONObject(signupResponse);
                 String authUuid = signupJson.optString("id", null);
                 if (authUuid == null || authUuid.isEmpty()) {
-                    // Some Supabase versions return user under "user"
                     if (signupJson.has("user")) {
                         authUuid = signupJson.getJSONObject("user").optString("id", null);
                     }
@@ -144,6 +143,7 @@ public class Register_Activity extends AppCompatActivity {
                 String loginResponse = SupabaseAuth.login(email, password);
                 JSONObject loginJson = new JSONObject(loginResponse);
                 String accessToken = loginJson.getString("access_token");
+                String refreshToken = loginJson.optString("refresh_token", null);
 
                 // STEP 3: Insert into public.users
                 long userId = SupabaseUsers.createUserRecord(authUuid, email, accessToken);
@@ -157,8 +157,13 @@ public class Register_Activity extends AppCompatActivity {
                 // STEP 5: Save everything to session
                 SessionManager session = new SessionManager(this);
                 session.saveSession(accessToken, authUuid, email, "citizen");
+                session.saveUserIdBigint(userId);
                 session.saveCitizenProfileId(citizenProfileId);
                 session.saveProfileInfo(fFirstName, fLastName, fPhone);
+                if (refreshToken != null && !refreshToken.isEmpty()) {
+                    session.saveRefreshToken(refreshToken);
+                    Log.d(TAG, "Refresh token saved");
+                }
 
                 runOnUiThread(() -> {
                     Toast.makeText(this, "Account created! Welcome.", Toast.LENGTH_LONG).show();

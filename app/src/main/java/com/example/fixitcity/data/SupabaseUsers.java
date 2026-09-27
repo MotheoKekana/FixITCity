@@ -142,6 +142,58 @@ public class SupabaseUsers {
         return results.get(0).citizen_profile_id;
     }
 
+    public static void saveDeviceToken(long userId,
+                                       String token,
+                                       String deviceName,
+                                       String accessToken) throws IOException {
+
+        String lookupPath = "/device_tokens?user_id=eq." + userId
+                + "&device_token=eq." + escape(token)
+                + "&select=token_id&limit=1";
+
+        String lookupResponse = SupabaseClient.getWithAuth(lookupPath, accessToken);
+        Log.d(TAG, "saveDeviceToken lookup: " + lookupResponse);
+
+        boolean exists = lookupResponse != null
+                && lookupResponse.trim().startsWith("[")
+                && !lookupResponse.trim().equals("[]");
+
+        if (exists) {
+            String patchBody = "{"
+                    + "\"is_active\":true,"
+                    + "\"last_used_at\":\"" + nowIso() + "\""
+                    + "}";
+            String patchPath = "/device_tokens?user_id=eq." + userId
+                    + "&device_token=eq." + escape(token);
+            SupabaseClient.patch(patchPath, patchBody);
+            Log.d(TAG, "Device token refreshed");
+        } else {
+            String json = "{"
+                    + "\"user_id\":" + userId + ","
+                    + "\"device_token\":\"" + escape(token) + "\","
+                    + "\"device_name\":\"" + escape(deviceName) + "\","
+                    + "\"is_active\":true"
+                    + "}";
+            String response = SupabaseClient.postWithAuth("/device_tokens", json, accessToken);
+            Log.d(TAG, "Device token inserted: " + response);
+        }
+    }
+
+    public static void deactivateDeviceToken(long userId, String token, String accessToken) throws IOException {
+        String patchBody = "{\"is_active\":false}";
+        String patchPath = "/device_tokens?user_id=eq." + userId
+                + "&device_token=eq." + escape(token);
+        SupabaseClient.patch(patchPath, patchBody);
+        Log.d(TAG, "Device token deactivated");
+    }
+
+    private static String nowIso() {
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US);
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        return sdf.format(new java.util.Date());
+    }
+
     /**
      * Overload for backward compatibility — uses anon read only.
      */

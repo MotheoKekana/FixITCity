@@ -13,10 +13,6 @@ import okhttp3.Response;
 
 public class SupabaseAuth {
 
-    /**
-     * Register a new user with Supabase Auth.
-     * Returns the JSON response as a String, or null if failed.
-     */
     public static String register(String email, String password) throws IOException {
         JSONObject body = new JSONObject();
         try {
@@ -51,10 +47,6 @@ public class SupabaseAuth {
         }
     }
 
-    /**
-     * Login with email and password.
-     * Returns JSON containing access_token, user info, etc.
-     */
     public static String login(String email, String password) throws IOException {
         JSONObject body = new JSONObject();
         try {
@@ -90,8 +82,42 @@ public class SupabaseAuth {
     }
 
     /**
-     * Logout (revoke token).
+     * Refresh an expired access token using the stored refresh_token.
+     * Returns the full JSON response on success, or null on failure.
      */
+    public static String refreshToken(String refreshToken) throws IOException {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("refresh_token", refreshToken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        RequestBody requestBody = RequestBody.create(
+                body.toString(),
+                SupabaseClient.JSON
+        );
+
+        Request request = new Request.Builder()
+                .url(SupabaseClient.AUTH_URL + "/token?grant_type=refresh_token")
+                .addHeader("apikey", SupabaseClient.SUPABASE_ANON_KEY)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        OkHttpClient client = SupabaseClient.getHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.body() == null) return null;
+            String responseStr = response.body().string();
+
+            if (!response.isSuccessful()) {
+                throw new IOException("Token refresh failed: " + responseStr);
+            }
+            return responseStr;
+        }
+    }
+
     public static void logout(String accessToken) throws IOException {
         Request request = new Request.Builder()
                 .url(SupabaseClient.AUTH_URL + "/logout")
@@ -102,7 +128,7 @@ public class SupabaseAuth {
 
         OkHttpClient client = SupabaseClient.getHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            // Ignore response — token is invalidated server-side
+            // Ignore
         }
     }
 }

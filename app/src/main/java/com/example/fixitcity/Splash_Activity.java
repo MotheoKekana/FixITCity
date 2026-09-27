@@ -1,6 +1,7 @@
 package com.example.fixitcity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,6 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseClient;
+import com.example.fixitcity.data.SupabaseUsers;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class Splash_Activity extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class Splash_Activity extends AppCompatActivity {
             return insets;
         });
 
+        // Quick connectivity test to Supabase
         new Thread(() -> {
             try {
                 String response = SupabaseClient.get("/fault_categories?select=*");
@@ -38,6 +42,9 @@ public class Splash_Activity extends AppCompatActivity {
                 Log.e(TAG, "❌ Supabase connection failed: " + e.getMessage(), e);
             }
         }).start();
+
+        // Fetch + save FCM token (fires only after login so userIdBigint is present)
+        registerDeviceToken();
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             SessionManager session = new SessionManager(this);
@@ -51,5 +58,45 @@ public class Splash_Activity extends AppCompatActivity {
             }
             finish();
         }, SPLASH_DELAY_MS);
+    }
+
+    /**
+     * Grab the current FCM token and push it to Supabase.
+     * Only does something if a real (non-guest) user is logged in.
+     */
+    private void registerDeviceToken() {
+        SessionManager session = new SessionManager(this);
+        long userIdBigint = session.getUserIdBigint();
+        String accessToken = session.getAccessToken();
+
+        if (userIdBigint <= 0 || accessToken == null || session.isGuest()) {
+            Log.d(TAG, "registerDeviceToken: no logged-in user yet — skipping");
+            return;
+        }
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM token failed", task.getException());
+                        return;
+                    }
+
+                    String token = task.getResult();
+                    Log.d(TAG, "FCM token: " + token);
+
+                    new Thread(() -> {
+                        try {
+                            SupabaseUsers.saveDeviceToken(
+                                    userIdBigint,
+                                    token,
+                                    Build.MANUFACTURER + " " + Build.MODEL,
+                                    accessToken
+                            );
+                            Log.d(TAG, "FCM token saved to device_tokens");
+                        } catch (Exception e) {
+                            Log.e(TAG, "Failed to save FCM token: " + e.getMessage(), e);
+                        }
+                    }).start();
+                });
     }
 }

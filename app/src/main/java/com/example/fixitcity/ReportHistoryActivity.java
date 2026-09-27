@@ -13,8 +13,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fixitcity.data.AppDatabase;
+import com.example.fixitcity.data.ReportEntity;
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
+import com.example.fixitcity.services.SyncScheduler;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -29,6 +33,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
     private RecyclerView rvReports;
     private FaultReportAdapter adapter;
     private TextView tvEmptyState;
+    private MaterialButton btnSyncPending;
 
     private final List<FaultReport> allReports = new ArrayList<>();
     private final List<FaultReport> filteredReports = new ArrayList<>();
@@ -48,6 +53,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         rvReports = findViewById(R.id.rv_reports);
         tvEmptyState = findViewById(R.id.tv_empty_state);
+        btnSyncPending = findViewById(R.id.btn_sync_pending);
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FaultReportAdapter(this, filteredReports);
@@ -56,6 +62,14 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         setupFilterChips();
         setupBottomNav();
+
+        if (btnSyncPending != null) {
+            btnSyncPending.setOnClickListener(v -> {
+                SyncScheduler.scheduleSync(this);
+                btnSyncPending.setEnabled(false);
+                btnSyncPending.setText("Syncing…");
+            });
+        }
 
         View backBtn = findViewById(R.id.back_button);
         if (backBtn != null) backBtn.setOnClickListener(v -> finish());
@@ -132,37 +146,88 @@ public class ReportHistoryActivity extends AppCompatActivity {
             return;
         }
 
-        Log.d(TAG, "Loading reports for citizen_profile_id = " + citizenProfileId);
-
         if (filteredReports.isEmpty()) {
             showEmptyState("Loading reports…");
         }
 
+        // 1) Local pending rows first — always available offline
         new Thread(() -> {
-            try {
-                List<FaultReport> reports = SupabaseReports.getUserReports(citizenProfileId, accessToken);
-                if (reports == null) reports = new ArrayList<>();
+            List<ReportEntity> pending = AppDatabase.getInstance(getApplicationContext())
+                    .reportDao().getPending();
 
-                final List<FaultReport> finalReports = reports;
-                Log.d(TAG, "Loaded " + finalReports.size() + " reports");
-
-                runOnUiThread(() -> {
-                    allReports.clear();
-                    allReports.addAll(finalReports);
-                    applyFilter();
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load reports: " + e.getMessage(), e);
-                runOnUiThread(() ->
-                        showEmptyState("Could not load reports. Check your connection and try again."));
+            List<FaultReport> localAsReports = new ArrayList<>();
+            for (ReportEntity r : pending) {
+                FaultReport f = new FaultReport();
+                f.report_id = -1;
+                f.reference_number = r.reference_number;
+                f.title = r.title;
+                f.description = r.description;
+                f.status = "Pending";
+                f.priority_score = r.priority_score;
+                f.created_at = formatLocalTimestamp(r.created_at_local);
+                f.setPendingSync(true);
+                localAsReports.add(f);
             }
+
+            int pendingCount = localAsReports.size();
+
+            // 2) Then Supabase
+            List<FaultReport> serverReports;
+            try {
+                serverReports = SupabaseReports.getUserReports(citizenProfileId, accessToken);
+                if (serverReports == null) serverReports = new ArrayList<>();
+            } catch (Exception e) {
+                Log.e(TAG, "Server fetch failed: " + e.getMessage(), e);
+                serverReports = new ArrayList<>();
+                if (localAsReports.isEmpty()) {
+                    final String msg = "Could not load reports. Check your connection and try again.";
+                    runOnUiThread(() -> showEmptyState(msg));
+                    return;
+                }
+            }
+
+            final List<FaultReport> serverFinal = serverReports;
+            final int pendingFinal = pendingCount;
+
+            runOnUiThread(() -> {
+                allReports.clear();
+                allReports.addAll(localAsReports);   // pending first
+                allReports.addAll(serverFinal);      // then server rows
+                updateSyncButton(pendingFinal);
+                applyFilter();
+            });
         }).start();
+    }
+
+    private String formatLocalTimestamp(long millis) {
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US);
+        return sdf.format(new java.util.Date(millis));
+    }
+
+    private void updateSyncButton(int pendingCount) {
+        if (btnSyncPending == null) return;
+        if (pendingCount > 0) {
+            btnSyncPending.setVisibility(View.VISIBLE);
+            btnSyncPending.setEnabled(true);
+            btnSyncPending.setText("⟳ Sync pending (" + pendingCount + ")");
+        } else {
+            btnSyncPending.setVisibility(View.GONE);
+        }
     }
 
     private void applyFilter() {
         filteredReports.clear();
 
         for (FaultReport r : allReports) {
+            // Pending-sync rows always show under All and Pending filters
+            if (r.isPendingSync()) {
+                if (currentFilter.equals("All") || currentFilter.equals("Pending")) {
+                    filteredReports.add(r);
+                }
+                continue;
+            }
+
             String status = r.getStatus() != null ? r.getStatus() : "Pending";
             String s = status.toLowerCase(Locale.US);
 
@@ -212,7 +277,13 @@ public class ReportHistoryActivity extends AppCompatActivity {
     }
 
     private void onReportClicked(FaultReport report) {
-        Log.d(TAG, "Opening details for ref = " + report.getReferenceNumber());
+        // Pending-sync rows don't have a real report_id yet — nothing to open
+        if (report.isPendingSync()) {
+            android.widget.Toast.makeText(this,
+                    "This report hasn't synced yet — try Sync pending first.",
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Intent intent = new Intent(this, TrackReportResultActivity.class);
         intent.putExtra("report_id", report.getReportId());

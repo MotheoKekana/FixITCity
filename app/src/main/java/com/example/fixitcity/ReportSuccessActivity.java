@@ -20,6 +20,7 @@ public class ReportSuccessActivity extends AppCompatActivity {
     private TextView tvReference, tvPriority, tvStatus;
     private String referenceNumber;
     private int priorityScore;
+    private boolean isQueued;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +39,13 @@ public class ReportSuccessActivity extends AppCompatActivity {
 
         referenceNumber = getIntent().getStringExtra("reference_number");
         priorityScore = getIntent().getIntExtra("priority_score", 0);
+        isQueued = getIntent().getBooleanExtra("is_queued", false);
 
         if (referenceNumber == null) referenceNumber = "FIX-0000-0000";
 
         tvReference.setText(referenceNumber);
         tvPriority.setText(priorityScore + "/100");
-        tvStatus.setText("Pending");
+        tvStatus.setText(isQueued ? "Queued" : "Pending");
 
         findViewById(R.id.btn_copy_ref).setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -57,7 +59,8 @@ public class ReportSuccessActivity extends AppCompatActivity {
             shareIntent.setType("text/plain");
             String shareText = "FixITCity Report\nReference: " + referenceNumber +
                     "\nPriority: " + priorityScore + "/100" +
-                    "\nStatus: Pending\n\nTrack at: https://fixitcity.gov/track/" + referenceNumber;
+                    "\nStatus: " + (isQueued ? "Queued (will sync when online)" : "Pending") +
+                    "\n\nTrack at: https://fixitcity.gov/track/" + referenceNumber;
             shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
             startActivity(Intent.createChooser(shareIntent, "Share via"));
         });
@@ -67,7 +70,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
             Class<?> target = session.isGuest()
                     ? Guest_Dashboard_Activity.class
                     : Dashboard_Activity.class;
-
             Intent intent = new Intent(this, target);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -94,7 +96,6 @@ public class ReportSuccessActivity extends AppCompatActivity {
         Class<?> target = session.isGuest()
                 ? Guest_Dashboard_Activity.class
                 : Dashboard_Activity.class;
-
         Intent intent = new Intent(this, target);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

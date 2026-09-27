@@ -11,15 +11,13 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class SupabaseReports {
 
     private static final String TAG = "SupabaseReports";
     private static final Gson gson = new Gson();
 
-    // ==========================================
-    // Compute a client-side priority score (0-100).
-    // ==========================================
     public static int computePriorityScore(double severityWeight) {
         int score = (int) Math.round(severityWeight * 10.0);
         if (score < 0) score = 0;
@@ -27,9 +25,16 @@ public class SupabaseReports {
         return score;
     }
 
-    // ==========================================
-    // Haversine distance between two lat/lng in meters.
-    // ==========================================
+    //Builds tracking number in format: FIX-YYYY-XXXXXXXX.
+    //The number is generated before submission so that it is reused on retry.
+
+    public static String generateReferenceNumber() //returns reference number as string
+    {
+        String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)); //Get current year
+        String suffix = UUID.randomUUID().toString().replace("-","").substring(0,8).toUpperCase(); //Takes 8 characters of random UUID
+        return "FIX-" + year + "-" + suffix;
+    }
+
     public static double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
         final double R = 6371000.0;
         double phi1 = Math.toRadians(lat1);
@@ -44,9 +49,6 @@ public class SupabaseReports {
         return R * c;
     }
 
-    // ==========================================
-    // Fetch all "open" reports (Pending / Assigned).
-    // ==========================================
     public static List<FaultReport> getOpenReports(String accessToken) throws IOException {
         String path = "/fault_reports?status=in.(Pending,Assigned)"
                 + "&order=created_at.desc";
@@ -60,7 +62,6 @@ public class SupabaseReports {
         Log.d(TAG, "getOpenReports response: " + response);
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            Log.w(TAG, "getOpenReports: non-array response");
             return new ArrayList<>();
         }
 
@@ -69,11 +70,6 @@ public class SupabaseReports {
         return results != null ? results : new ArrayList<>();
     }
 
-    // ==========================================
-    // Fetch all fault categories
-    // Uses the user's access token when available so RLS-protected
-    // reads succeed. Falls back to the anon key for pre-login screens.
-    // ==========================================
     public static List<FaultCategory> getCategories(String accessToken) throws IOException {
         String path = "/fault_categories?select=*&order=name.asc";
 
@@ -86,7 +82,6 @@ public class SupabaseReports {
         Log.d(TAG, "Categories raw: " + response);
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            Log.e(TAG, "Invalid response: " + response);
             return new ArrayList<>();
         }
 
@@ -114,20 +109,14 @@ public class SupabaseReports {
         }
     }
 
-    // Backwards-compatible overload for any old callers.
     @Deprecated
     public static List<FaultCategory> getCategories() throws IOException {
         return getCategories(null);
     }
 
-    // ==========================================
-    // Look up category_id by name
-    // ==========================================
     public static long getCategoryIdByName(String name) throws IOException {
         String path = "/fault_categories?name=eq." + name + "&select=category_id&limit=1";
         String response = SupabaseClient.get(path);
-        Log.d(TAG, "getCategoryIdByName response: " + response);
-
         if (response == null || !response.trim().startsWith("[")) return -1;
 
         Type listType = new TypeToken<List<CategoryIdDTO>>(){}.getType();
@@ -136,13 +125,16 @@ public class SupabaseReports {
         return results.get(0).category_id;
     }
 
-    // ==========================================
-    // Submit a new fault report
-    // ==========================================
+    /**
+     * Submit a report with a caller-supplied reference number.
+     * The reference MUST come from generateReferenceNumber() so that
+     * offline-queued reports keep the same reference after sync.
+     */
     public static FaultReport submitReport(
             long citizenId,
             long categoryId,
             double severityWeight,
+            String referenceNumber,
             String title,
             String description,
             double latitude,
@@ -150,10 +142,6 @@ public class SupabaseReports {
             String addressLine,
             String accessToken
     ) throws IOException {
-
-        String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
-        String random = String.format("%04d", (int)(Math.random() * 10000));
-        String referenceNumber = "FIX-" + year + "-" + random;
 
         int priorityScore = computePriorityScore(severityWeight);
 
@@ -188,9 +176,26 @@ public class SupabaseReports {
         return created.get(0);
     }
 
-    // ==========================================
-    // Insert a photo record
-    // ==========================================
+    /**
+     * Idempotency helper — returns true if a report with this reference
+     * already exists on the server. Used by SyncWorker before retrying.
+     */
+    public static boolean reportExistsByReference(String referenceNumber, String accessToken) throws IOException {
+        String path = "/fault_reports?reference_number=eq." + referenceNumber
+                + "&select=report_id&limit=1";
+
+        String response;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            response = SupabaseClient.getWithAuth(path, accessToken);
+        } else {
+            response = SupabaseClient.get(path);
+        }
+
+        return response != null
+                && response.trim().startsWith("[")
+                && !response.trim().equals("[]");
+    }
+
     public static void insertPhoto(long reportId,
                                    String publicUrl,
                                    String storagePath,
@@ -211,16 +216,11 @@ public class SupabaseReports {
         Log.d(TAG, "Photo insert response: " + response);
     }
 
-    // ==========================================
-    // Get current user's reports
-    // ==========================================
     public static List<FaultReport> getUserReports(long citizenId, String accessToken) throws IOException {
         String path = "/fault_reports?citizen_id=eq." + citizenId + "&order=created_at.desc";
         String response = SupabaseClient.getWithAuth(path, accessToken);
-        Log.d(TAG, "getUserReports response: " + response);
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            Log.w(TAG, "getUserReports: non-array response");
             return new ArrayList<>();
         }
 
@@ -229,10 +229,6 @@ public class SupabaseReports {
         return results != null ? results : new ArrayList<>();
     }
 
-    // ==========================================
-    // Get a report by reference number
-    // Uses the user's token so RLS-protected reads succeed.
-    // ==========================================
     public static FaultReport getReportByReference(String referenceNumber, String accessToken) throws IOException {
         String path = "/fault_reports?reference_number=eq." + referenceNumber + "&limit=1";
 
@@ -242,8 +238,6 @@ public class SupabaseReports {
         } else {
             response = SupabaseClient.get(path);
         }
-
-        Log.d(TAG, "getReportByReference[" + referenceNumber + "] response: " + response);
 
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
             return null;
@@ -260,10 +254,6 @@ public class SupabaseReports {
         return getReportByReference(referenceNumber, null);
     }
 
-    // ==========================================
-    // Get status history for a report (Phase 6.3)
-    // Returns rows ordered newest-first.
-    // ==========================================
     public static List<StatusHistoryDTO> getStatusHistory(long reportId, String accessToken) throws IOException {
         String path = "/fault_status_history?report_id=eq." + reportId
                 + "&order=changed_at.desc";
@@ -275,10 +265,7 @@ public class SupabaseReports {
             response = SupabaseClient.get(path);
         }
 
-        Log.d(TAG, "getStatusHistory[" + reportId + "] response: " + response);
-
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            Log.w(TAG, "getStatusHistory: non-array response");
             return new ArrayList<>();
         }
 
@@ -287,9 +274,6 @@ public class SupabaseReports {
         return results != null ? results : new ArrayList<>();
     }
 
-    // ==========================================
-    // Helper: Escape JSON strings
-    // ==========================================
     private static String escape(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\")
@@ -298,9 +282,6 @@ public class SupabaseReports {
                 .replace("\r", "\\r");
     }
 
-    // ==========================================
-    // DTOs
-    // ==========================================
     public static class FaultCategoryDTO {
         public long category_id;
         public String name;
