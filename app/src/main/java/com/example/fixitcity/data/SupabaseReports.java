@@ -18,10 +18,13 @@ public class SupabaseReports {
     private static final String TAG = "SupabaseReports";
     private static final Gson gson = new Gson();
 
-    public static int computePriorityScore(double severityWeight) {
-        int score = (int) Math.round(severityWeight * 10.0);
-        if (score < 0) score = 0;
-        if (score > 100) score = 100;
+    // Turns category weight (1-10) into a priority score from 0-100
+    // Clamped so the value remains  valid in the DB CHECK constraint
+    public static int computePriorityScore(double severityWeight) //Returns an integer priority score
+    {
+        int score = (int)Math.round(severityWeight * 10.0);
+        if (score < 0 ) score = 0; //If it ever computes a score lower than zero, force score to be 0.
+        if (score > 100) score = 100; //If it computes score higher than 100, force score to be 100.
         return score;
     }
 
@@ -32,7 +35,7 @@ public class SupabaseReports {
     {
         String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)); //Get current year
         String suffix = UUID.randomUUID().toString().replace("-","").substring(0,8).toUpperCase(); //Takes 8 characters of random UUID
-        return "FIX-" + year + "-" + suffix;
+        return "FIX-" + year + "-" + suffix; //Return formatted ref number in string format
     }
 
     public static double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
