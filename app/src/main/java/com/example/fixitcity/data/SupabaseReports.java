@@ -30,7 +30,6 @@ public class SupabaseReports {
 
     //Builds tracking number in format: FIX-YYYY-XXXXXXXX.
     //The number is generated before submission so that it is reused on retry.
-
     public static String generateReferenceNumber() //returns reference number as string
     {
         String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)); //Get current year
@@ -38,18 +37,29 @@ public class SupabaseReports {
         return "FIX-" + year + "-" + suffix; //Return formatted ref number in string format
     }
 
-    public static double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
-        final double R = 6371000.0;
-        double phi1 = Math.toRadians(lat1);
-        double phi2 = Math.toRadians(lat2);
-        double dPhi = Math.toRadians(lat2 - lat1);
-        double dLambda = Math.toRadians(lon2 - lon1);
+    //Returns distance in metres between two GPS points
+    //Using this instead of normal the normal euclidean formula as we need to account for the earth's curve
 
-        double a = Math.sin(dPhi / 2) * Math.sin(dPhi / 2)
-                + Math.cos(phi1) * Math.cos(phi2)
-                * Math.sin(dLambda / 2) * Math.sin(dLambda / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+    public static double haversineMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+    {
+        final double rad = 6371000.0; //Earth's mean radius (metres)
+        double latRad1 = Math.toRadians(latitude1);
+        double latRad2 = Math.toRadians(latitude2);
+
+        double latDiffRad = Math.toRadians(latitude2 - latitude1); //Difference in latitude in radians
+        double longDiffRad = Math.toRadians(longitude2 - longitude1); //Difference in longitude in radians
+
+        double sinHalfLat = Math.sin(latDiffRad/2);
+        double sinHalfLon = Math.sin(longDiffRad/2);
+
+        double intermediateVal = sinHalfLat * sinHalfLat
+                + Math.cos(latRad1) * Math.cos(latRad2) * sinHalfLon * sinHalfLon;
+
+        double centralAngle = 2 * Math.atan2(Math.sqrt(intermediateVal), Math.sqrt(1-intermediateVal)); //Central angle between the two points
+        double distance = rad * centralAngle; //Arc length along the Earth's surface in metres.
+
+        return distance;
+
     }
 
     public static List<FaultReport> getOpenReports(String accessToken) throws IOException {
