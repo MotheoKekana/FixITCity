@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using FixITCity_Dashboard.Services.Dashboard.Dtos;
 using System.Net.Http.Json;
+using CsvHelper;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Text;
 
 namespace FixITCity_Dashboard.Pages
 {
@@ -117,6 +121,40 @@ namespace FixITCity_Dashboard.Pages
             }
 
             return filtered.ToList();
+        }
+        public async Task<IActionResult> OnGetExportCsvAsync(
+        string? searchTerm,
+        string? statusFilter,
+        string? categoryFilter)
+        {
+            SearchTerm = searchTerm;
+            StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "All" : statusFilter;
+            CategoryFilter = string.IsNullOrWhiteSpace(categoryFilter) ? "All" : categoryFilter;
+
+            var client = _httpClientFactory.CreateClient("Api");
+            var allReports = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports")
+                             ?? new List<ReportListItemDto>();
+
+            var matchingReports = ApplyFilters(allReports);
+
+            var rows = matchingReports.Select(report => new ReportExportRow
+            {
+                ReferenceNumber = report.ReferenceNumber,
+                Title = report.Title,
+                CategoryName = report.CategoryName ?? string.Empty,
+                Status = report.Status,
+                PriorityScore = report.PriorityScore,
+                CreatedAt = report.CreatedAt
+            }).ToList();
+
+            using var writer = new StringWriter(CultureInfo.InvariantCulture);
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(rows);
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(writer.ToString());
+            return File(bytes, "text/csv; charset=utf-8", "FixITCity_Reports.csv");
         }
     }
 }

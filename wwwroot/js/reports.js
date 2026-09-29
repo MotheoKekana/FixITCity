@@ -28,16 +28,3 @@
         }, 300);
 
     });
-
-
-    // =========================================================
-    // EXPORT
-    // =========================================================
-
-    function exportCSV() {
-        alert("CSV Export functionality coming soon!");
-    }
-
-    function exportPDF() {
-        alert("PDF Export functionality coming soon!");
-    }

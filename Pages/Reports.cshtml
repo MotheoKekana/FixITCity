@@ -6,7 +6,6 @@
     Layout = "_SidebarLayout";
 }
 <link rel="stylesheet" href="~/css/Reports.css" />
-<link rel=""
 
 <div class="reports-container">
 
@@ -22,22 +21,14 @@
 
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
 
-            <a href="#"
-               class="btn btn-primary"
-               onclick="exportCSV(); return false;">
-
+            <a asp-page="/Reports"
+               asp-page-handler="ExportCsv"
+               asp-route-searchTerm="@Model.SearchTerm"
+               asp-route-statusFilter="@Model.StatusFilter"
+               asp-route-categoryFilter="@Model.CategoryFilter"
+               class="btn btn-primary">
                 <i class="fas fa-file-csv"></i>
                 Export CSV
-
-            </a>
-
-            <a href="#"
-               class="btn btn-primary"
-               onclick="exportPDF(); return false;">
-
-                <i class="fas fa-file-pdf"></i>
-                Export PDF
-
             </a>
 
         </div>
