@@ -49,7 +49,9 @@ public class Splash_Activity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             SessionManager session = new SessionManager(this);
 
-            if (session.isLoggedIn() && !session.isGuest() && session.getCitizenProfileId() > 0) {
+            if (!session.hasSeenOnboarding()) {
+                startActivity(new Intent(Splash_Activity.this, Onboard_Report_Faults_Activity.class));
+            } else if (session.isLoggedIn() && !session.isGuest() && session.getCitizenProfileId() > 0) {
                 startActivity(new Intent(Splash_Activity.this, Dashboard_Activity.class));
             } else if (session.isLoggedIn() && session.isGuest()) {
                 startActivity(new Intent(Splash_Activity.this, Guest_Dashboard_Activity.class));

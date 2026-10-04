@@ -14,6 +14,7 @@ public class SessionManager {
     private static final String KEY_ROLE = "role";
     private static final String KEY_CITIZEN_PROFILE_ID = "citizen_profile_id";
     private static final String KEY_HAS_CITIZEN_PROFILE = "has_citizen_profile";
+    private static final String KEY_SEEN_ONBOARDING = "seen_onboarding";
     private static final String KEY_FIRST_NAME = "first_name";
     private static final String KEY_LAST_NAME = "last_name";
     private static final String KEY_PHONE = "phone";
@@ -56,6 +57,14 @@ public class SessionManager {
 
     public void setHasCitizenProfile(boolean has) {
         editor.putBoolean(KEY_HAS_CITIZEN_PROFILE, has);
+        editor.apply();
+    }
+    public boolean hasSeenOnboarding() {
+        return prefs.getBoolean(KEY_SEEN_ONBOARDING, false);
+    }
+
+    public void setSeenOnboarding(boolean value) {
+        editor.putBoolean(KEY_SEEN_ONBOARDING, value);
         editor.apply();
     }
 

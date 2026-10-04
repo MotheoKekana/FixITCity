@@ -39,6 +39,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Onboard_Report_Faults_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Onboard_Track_Reports_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Onboard_Community_Impact_Activity"
+            android:exported="false" />
+
         <activity android:name=".Dashboard_Activity" android:exported="false" />
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
         <activity android:name=".TrackReportResultActivity" android:exported="false" />
