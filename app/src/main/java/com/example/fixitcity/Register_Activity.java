@@ -2,14 +2,13 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import android.text.InputType;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,166 +18,515 @@ import com.example.fixitcity.data.SupabaseUsers;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 public class Register_Activity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
 
-    private EditText etFullName, etEmail, etPhone, etPassword, etConfirmPassword;
-    private Button btnRegister, btnSignIn;
+    private EditText etFullName;
+    private EditText etEmail;
+    private EditText etPhone;
+    private EditText etPassword;
+    private EditText etConfirmPassword;
+
+    private Button btnRegister;
+    private Button btnSignIn;
+
     private CheckBox cbTerms;
-    private ImageView ivTogglePassword, ivToggleConfirmPassword;
+
+    private ImageView ivTogglePassword;
+    private ImageView ivToggleConfirmPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        initialiseViews();
+        setupPasswordVisibility();
+        setupButtons();
+    }
+
+    private void initialiseViews() {
         etFullName = findViewById(R.id.etFullName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etPassword = findViewById(R.id.etPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
+
+        etConfirmPassword =
+                findViewById(R.id.etConfirmPassword);
+
         btnRegister = findViewById(R.id.btnRegister);
         btnSignIn = findViewById(R.id.btnSignIn);
+
         cbTerms = findViewById(R.id.cbTerms);
-        ivTogglePassword = findViewById(R.id.ivTogglePassword);
-        ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
 
-        final boolean[] isPasswordVisible = {false};
-        final boolean[] isConfirmVisible = {false};
+        ivTogglePassword =
+                findViewById(R.id.ivTogglePassword);
 
-        ivTogglePassword.setOnClickListener(v -> {
-            if (isPasswordVisible[0]) {
-                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                ivTogglePassword.setImageResource(android.R.drawable.ic_menu_view);
-                isPasswordVisible[0] = false;
-            } else {
-                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                ivTogglePassword.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-                isPasswordVisible[0] = true;
-            }
-            etPassword.setSelection(etPassword.getText().length());
+        ivToggleConfirmPassword =
+                findViewById(
+                        R.id.ivToggleConfirmPassword
+                );
+    }
+
+    private void setupPasswordVisibility() {
+        final boolean[] passwordVisible = {false};
+        final boolean[] confirmVisible = {false};
+
+        ivTogglePassword.setOnClickListener(view -> {
+            passwordVisible[0] =
+                    !passwordVisible[0];
+
+            setPasswordVisibility(
+                    etPassword,
+                    ivTogglePassword,
+                    passwordVisible[0]
+            );
         });
 
-        ivToggleConfirmPassword.setOnClickListener(v -> {
-            if (isConfirmVisible[0]) {
-                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                ivToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_view);
-                isConfirmVisible[0] = false;
-            } else {
-                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                ivToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-                isConfirmVisible[0] = true;
-            }
-            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
-        });
+        ivToggleConfirmPassword.setOnClickListener(
+                view -> {
+                    confirmVisible[0] =
+                            !confirmVisible[0];
 
-        btnRegister.setOnClickListener(v -> attemptRegister());
-        btnSignIn.setOnClickListener(v -> {
-            startActivity(new Intent(this, Login_Activity.class));
+                    setPasswordVisibility(
+                            etConfirmPassword,
+                            ivToggleConfirmPassword,
+                            confirmVisible[0]
+                    );
+                }
+        );
+    }
+
+    private void setPasswordVisibility(
+            EditText editText,
+            ImageView icon,
+            boolean visible
+    ) {
+        if (visible) {
+            editText.setInputType(
+                    InputType.TYPE_CLASS_TEXT
+                            | InputType
+                            .TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            );
+
+            icon.setImageResource(
+                    android.R.drawable
+                            .ic_menu_close_clear_cancel
+            );
+
+        } else {
+            editText.setInputType(
+                    InputType.TYPE_CLASS_TEXT
+                            | InputType
+                            .TYPE_TEXT_VARIATION_PASSWORD
+            );
+
+            icon.setImageResource(
+                    android.R.drawable.ic_menu_view
+            );
+        }
+
+        editText.setSelection(
+                editText.getText().length()
+        );
+    }
+
+    private void setupButtons() {
+        btnRegister.setOnClickListener(
+                view -> attemptRegister()
+        );
+
+        btnSignIn.setOnClickListener(view -> {
+            startActivity(
+                    new Intent(
+                            this,
+                            Login_Activity.class
+                    )
+            );
+
             finish();
         });
     }
 
     private void attemptRegister() {
-        String fullName = etFullName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String confirm = etConfirmPassword.getText().toString().trim();
+        String fullName =
+                etFullName.getText().toString().trim();
+
+        String email =
+                etEmail.getText().toString().trim();
+
+        String phone =
+                etPhone.getText().toString().trim();
+
+        String password =
+                etPassword.getText().toString();
+
+        String confirmPassword =
+                etConfirmPassword
+                        .getText()
+                        .toString();
 
         if (fullName.isEmpty()) {
-            Toast.makeText(this, "Please enter your full name", Toast.LENGTH_SHORT).show();
+            showMessage("Please enter your full name");
             return;
         }
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show();
+
+        if (email.isEmpty()) {
+            showMessage("Please enter your email address");
             return;
         }
-        if (!password.equals(confirm)) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+
+        if (phone.isEmpty()) {
+            showMessage("Please enter your phone number");
             return;
         }
+
+        if (password.isEmpty()) {
+            showMessage("Please enter a password");
+            return;
+        }
+
+        if (password.length() < 6) {
+            showMessage(
+                    "Your password must contain "
+                            + "at least 6 characters"
+            );
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            showMessage("Passwords do not match");
+            return;
+        }
+
         if (!cbTerms.isChecked()) {
-            Toast.makeText(this, "Please accept the terms", Toast.LENGTH_SHORT).show();
+            showMessage(
+                    "Please accept the terms and conditions"
+            );
             return;
         }
 
-        btnRegister.setEnabled(false);
-        btnRegister.setText("Creating account...");
+        NameParts nameParts =
+                splitFullName(fullName);
 
-        // Split full name into first + last
-        String firstName;
-        String lastName = "";
-        int spaceIdx = fullName.indexOf(' ');
-        if (spaceIdx > 0) {
-            firstName = fullName.substring(0, spaceIdx).trim();
-            lastName = fullName.substring(spaceIdx + 1).trim();
-        } else {
-            firstName = fullName;
-        }
-
-        final String fFirstName = firstName;
-        final String fLastName = lastName;
-        final String fPhone = phone;
+        setLoading(true);
 
         new Thread(() -> {
             try {
-                // STEP 1: Register with Supabase Auth
-                String signupResponse = SupabaseAuth.register(email, password);
-                Log.d(TAG, "Signup response: " + signupResponse);
+                String signupResponse =
+                        SupabaseAuth.register(
+                                email,
+                                password,
+                                nameParts.firstName,
+                                nameParts.lastName,
+                                phone
+                        );
 
-                JSONObject signupJson = new JSONObject(signupResponse);
-                String authUuid = signupJson.optString("id", null);
-                if (authUuid == null || authUuid.isEmpty()) {
-                    if (signupJson.has("user")) {
-                        authUuid = signupJson.getJSONObject("user").optString("id", null);
-                    }
+                if (signupResponse == null
+                        || signupResponse.trim().isEmpty()) {
+
+                    throw new IOException(
+                            "The authentication server "
+                                    + "returned an empty response"
+                    );
                 }
-                if (authUuid == null || authUuid.isEmpty()) {
-                    throw new Exception("Could not read auth user id from signup response");
+
+                JSONObject signupJson =
+                        new JSONObject(signupResponse);
+
+                JSONObject userJson =
+                        signupJson.optJSONObject("user");
+
+                // Some Auth responses return the user
+                // directly instead of inside "user".
+                if (userJson == null
+                        && signupJson.has("id")) {
+
+                    userJson = signupJson;
                 }
 
-                // STEP 2: Log in to get an access token (needed for the next inserts)
-                String loginResponse = SupabaseAuth.login(email, password);
-                JSONObject loginJson = new JSONObject(loginResponse);
-                String accessToken = loginJson.getString("access_token");
-                String refreshToken = loginJson.optString("refresh_token", null);
-
-                // STEP 3: Insert into public.users
-                long userId = SupabaseUsers.createUserRecord(authUuid, email, accessToken);
-                Log.d(TAG, "Created user_id = " + userId);
-
-                // STEP 4: Insert into public.citizen_profiles
-                long citizenProfileId = SupabaseUsers.createCitizenProfile(
-                        userId, fFirstName, fLastName, fPhone, accessToken);
-                Log.d(TAG, "Created citizen_profile_id = " + citizenProfileId);
-
-                // STEP 5: Save everything to session
-                SessionManager session = new SessionManager(this);
-                session.saveSession(accessToken, authUuid, email, "citizen");
-                session.saveUserIdBigint(userId);
-                session.saveCitizenProfileId(citizenProfileId);
-                session.saveProfileInfo(fFirstName, fLastName, fPhone);
-                if (refreshToken != null && !refreshToken.isEmpty()) {
-                    session.saveRefreshToken(refreshToken);
-                    Log.d(TAG, "Refresh token saved");
+                if (userJson == null) {
+                    throw new IOException(
+                            "Could not read the new account"
+                    );
                 }
+
+                String authUserId =
+                        userJson.optString("id", null);
+
+                if (authUserId == null
+                        || authUserId.isEmpty()) {
+
+                    throw new IOException(
+                            "Could not read the authentication ID"
+                    );
+                }
+
+                String accessToken =
+                        signupJson.optString(
+                                "access_token",
+                                null
+                        );
+
+                String refreshToken =
+                        signupJson.optString(
+                                "refresh_token",
+                                null
+                        );
+
+                /*
+                 * If email confirmation is enabled,
+                 * signup succeeds but no session is returned.
+                 */
+                if (accessToken == null
+                        || accessToken.isEmpty()) {
+
+                    showEmailConfirmationRequired();
+                    return;
+                }
+
+                loadProfileAndFinishRegistration(
+                        authUserId,
+                        email,
+                        accessToken,
+                        refreshToken
+                );
+
+            } catch (Exception exception) {
+                Log.e(
+                        TAG,
+                        "Registration error: "
+                                + exception.getMessage(),
+                        exception
+                );
 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Account created! Welcome.", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(this, Dashboard_Activity.class));
-                    finishAffinity();
-                });
+                    setLoading(false);
 
-            } catch (Exception e) {
-                Log.e(TAG, "Register error: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    btnRegister.setEnabled(true);
-                    btnRegister.setText("REGISTER");
-                    Toast.makeText(this, "Registration failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                            this,
+                            getReadableError(exception),
+                            Toast.LENGTH_LONG
+                    ).show();
                 });
             }
         }).start();
+    }
+
+    private void loadProfileAndFinishRegistration(
+            String authUserId,
+            String email,
+            String accessToken,
+            String refreshToken
+    ) throws IOException {
+
+        /*
+         * The database trigger should already have created
+         * public.users and citizen_profiles before the
+         * signup request returns.
+         */
+        long userId =
+                SupabaseUsers.findUserIdByAuthUuid(
+                        authUserId,
+                        accessToken
+                );
+
+        if (userId <= 0) {
+            throw new IOException(
+                    "The database user record "
+                            + "was not created"
+            );
+        }
+
+        SupabaseUsers.CitizenProfileDTO profile =
+                SupabaseUsers.findCitizenProfileByUserId(
+                        userId,
+                        accessToken
+                );
+
+        if (profile == null
+                || profile.citizen_profile_id <= 0) {
+
+            throw new IOException(
+                    "The citizen profile was not created"
+            );
+        }
+
+        SessionManager session =
+                new SessionManager(this);
+
+        session.logout();
+
+        session.saveSession(
+                accessToken,
+                authUserId,
+                email,
+                "citizen"
+        );
+
+        if (refreshToken != null
+                && !refreshToken.isEmpty()) {
+
+            session.saveRefreshToken(refreshToken);
+        }
+
+        session.saveUserIdBigint(userId);
+
+        session.saveCitizenProfileId(
+                profile.citizen_profile_id
+        );
+
+        session.saveProfileInfo(
+                profile.first_name,
+                profile.last_name,
+                profile.phone_number
+        );
+
+        session.setHasCitizenProfile(true);
+
+        runOnUiThread(() -> {
+            Toast.makeText(
+                    this,
+                    "Account created successfully",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            startActivity(
+                    new Intent(
+                            this,
+                            Dashboard_Activity.class
+                    )
+            );
+
+            finishAffinity();
+        });
+    }
+
+    private void showEmailConfirmationRequired() {
+        runOnUiThread(() -> {
+            setLoading(false);
+
+            Toast.makeText(
+                    this,
+                    "Account created. Check your email "
+                            + "to confirm your account, "
+                            + "then sign in.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            Intent intent =
+                    new Intent(
+                            this,
+                            Login_Activity.class
+                    );
+
+            intent.putExtra(
+                    "registered_email",
+                    etEmail.getText()
+                            .toString()
+                            .trim()
+            );
+
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    private NameParts splitFullName(String fullName) {
+        String cleanedName =
+                fullName.trim()
+                        .replaceAll("\\s+", " ");
+
+        int firstSpace =
+                cleanedName.indexOf(' ');
+
+        if (firstSpace < 0) {
+            return new NameParts(
+                    cleanedName,
+                    ""
+            );
+        }
+
+        String firstName =
+                cleanedName
+                        .substring(0, firstSpace)
+                        .trim();
+
+        String lastName =
+                cleanedName
+                        .substring(firstSpace + 1)
+                        .trim();
+
+        return new NameParts(
+                firstName,
+                lastName
+        );
+    }
+
+    private void setLoading(boolean loading) {
+        btnRegister.setEnabled(!loading);
+
+        btnRegister.setText(
+                loading
+                        ? "Creating account..."
+                        : "REGISTER"
+        );
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(
+                this,
+                message,
+                Toast.LENGTH_SHORT
+        ).show();
+    }
+
+    private String getReadableError(Exception exception) {
+        String message = exception.getMessage();
+
+        if (message == null || message.trim().isEmpty()) {
+            return "Registration failed. Please try again.";
+        }
+
+        String lower = message.toLowerCase();
+
+        if (lower.contains("already registered")
+                || lower.contains("user already exists")) {
+
+            return "An account already exists "
+                    + "for this email address.";
+        }
+
+        if (lower.contains("password")) {
+            return "The password does not meet "
+                    + "the security requirements.";
+        }
+
+        if (lower.contains("unable to resolve host")
+                || lower.contains("failed to connect")
+                || lower.contains("timeout")) {
+
+            return "Could not connect. Check your "
+                    + "internet connection.";
+        }
+
+        return "Registration failed: " + message;
+    }
+
+    private static class NameParts {
+
+        final String firstName;
+        final String lastName;
+
+        NameParts(
+                String firstName,
+                String lastName
+        ) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
     }
 }

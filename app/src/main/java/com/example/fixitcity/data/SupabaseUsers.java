@@ -15,206 +15,246 @@ public class SupabaseUsers {
     private static final Gson gson = new Gson();
 
     /**
-     * Insert a row into public.users with the Supabase auth UUID and email.
-     * Returns the newly created user_id (bigint).
+     * Finds the public.users row belonging to the authenticated
+     * Supabase Auth account.
      */
-    public static long createUserRecord(String authUuid, String email, String accessToken) throws IOException {
-        String json = "{"
-                + "\"email\":\"" + escape(email) + "\","
-                + "\"supabase_user_id\":\"" + escape(authUuid) + "\","
-                + "\"role\":\"Citizen\","
-                + "\"is_active\":true"
-                + "}";
+    public static long findUserIdByAuthUuid(
+            String authUuid,
+            String accessToken
+    ) throws IOException {
 
-        Log.d(TAG, "createUserRecord payload: " + json);
+        String path = "/users"
+                + "?supabase_user_id=eq." + authUuid
+                + "&select=user_id,email,supabase_user_id,role"
+                + "&limit=1";
 
-        String response = SupabaseClient.postWithAuth("/users", json, accessToken);
-        Log.d(TAG, "createUserRecord response: " + response);
+        String response = SupabaseClient.getWithAuth(
+                path,
+                accessToken
+        );
 
-        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            throw new IOException("Failed to create user record: " + response);
+        Log.d(TAG, "findUserIdByAuthUuid response: " + response);
+
+        if (response == null
+                || response.trim().isEmpty()
+                || !response.trim().startsWith("[")) {
+
+            throw new IOException(
+                    "Could not load the user account: " + response
+            );
         }
 
-        Type listType = new TypeToken<List<UserDTO>>(){}.getType();
-        List<UserDTO> created = gson.fromJson(response, listType);
+        Type listType =
+                new TypeToken<List<UserDTO>>() {}.getType();
 
-        if (created == null || created.isEmpty()) {
-            throw new IOException("Empty response when creating user record");
+        List<UserDTO> users = gson.fromJson(
+                response,
+                listType
+        );
+
+        if (users == null || users.isEmpty()) {
+            return -1;
         }
-        return created.get(0).user_id;
+
+        return users.get(0).user_id;
     }
 
     /**
-     * Insert a row into public.citizen_profiles.
-     * Returns the newly created citizen_profile_id (bigint).
+     * Loads the citizen profile belonging to a public.users row.
      */
-    public static long createCitizenProfile(long userId,
-                                            String firstName,
-                                            String lastName,
-                                            String phone,
-                                            String accessToken) throws IOException {
-        String json = "{"
-                + "\"user_id\":" + userId + ","
-                + "\"first_name\":\"" + escape(firstName) + "\","
-                + "\"last_name\":\"" + escape(lastName) + "\","
-                + "\"phone_number\":\"" + escape(phone) + "\""
-                + "}";
+    public static CitizenProfileDTO findCitizenProfileByUserId(
+            long userId,
+            String accessToken
+    ) throws IOException {
 
-        Log.d(TAG, "createCitizenProfile payload: " + json);
+        String path = "/citizen_profiles"
+                + "?user_id=eq." + userId
+                + "&select=citizen_profile_id,user_id,"
+                + "first_name,last_name,phone_number"
+                + "&limit=1";
 
-        String response = SupabaseClient.postWithAuth("/citizen_profiles", json, accessToken);
-        Log.d(TAG, "createCitizenProfile response: " + response);
+        String response = SupabaseClient.getWithAuth(
+                path,
+                accessToken
+        );
 
-        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            throw new IOException("Failed to create citizen profile: " + response);
+        Log.d(TAG,
+                "findCitizenProfileByUserId response: "
+                        + response
+        );
+
+        if (response == null
+                || response.trim().isEmpty()
+                || !response.trim().startsWith("[")) {
+
+            throw new IOException(
+                    "Could not load the citizen profile: "
+                            + response
+            );
         }
 
-        Type listType = new TypeToken<List<CitizenProfileDTO>>(){}.getType();
-        List<CitizenProfileDTO> created = gson.fromJson(response, listType);
+        Type listType =
+                new TypeToken<List<CitizenProfileDTO>>() {}.getType();
 
-        if (created == null || created.isEmpty()) {
-            throw new IOException("Empty response when creating citizen profile");
+        List<CitizenProfileDTO> profiles = gson.fromJson(
+                response,
+                listType
+        );
+
+        if (profiles == null || profiles.isEmpty()) {
+            return null;
         }
-        return created.get(0).citizen_profile_id;
+
+        return profiles.get(0);
     }
 
     /**
-     * Look up an existing user by Supabase auth UUID.
-     * Returns user_id, or -1 if not found.
+     * Kept for compatibility with existing code.
      */
-    public static long findUserIdByAuthUuid(String authUuid) throws IOException {
-        String path = "/users?supabase_user_id=eq." + authUuid + "&select=user_id&limit=1";
-        String response = SupabaseClient.get(path);
-        Log.d(TAG, "findUserIdByAuthUuid[" + authUuid + "] response: " + response);
+    public static long findCitizenProfileIdByUserId(
+            long userId,
+            String accessToken
+    ) throws IOException {
 
-        if (response == null || !response.trim().startsWith("[")) {
-            Log.w(TAG, "findUserIdByAuthUuid: non-array response");
+        CitizenProfileDTO profile =
+                findCitizenProfileByUserId(
+                        userId,
+                        accessToken
+                );
+
+        if (profile == null) {
             return -1;
         }
 
-        Type listType = new TypeToken<List<UserDTO>>(){}.getType();
-        List<UserDTO> results = gson.fromJson(response, listType);
-        if (results == null || results.isEmpty()) {
-            Log.w(TAG, "findUserIdByAuthUuid: no user found for uuid " + authUuid);
-            return -1;
-        }
-        Log.d(TAG, "findUserIdByAuthUuid: found user_id = " + results.get(0).user_id);
-        return results.get(0).user_id;
+        return profile.citizen_profile_id;
     }
 
     /**
-     * Look up a citizen_profile_id by user_id (bigint).
-     * Returns citizen_profile_id, or -1 if not found.
-     * Tries both authenticated and anonymous reads.
+     * Saves or refreshes an FCM device token.
+     *
+     * The required RLS policies will be added during the RLS phase.
      */
-    public static long findCitizenProfileIdByUserId(long userId, String accessToken) throws IOException {
-        String path = "/citizen_profiles?user_id=eq." + userId + "&select=citizen_profile_id&limit=1";
+    public static void saveDeviceToken(
+            long userId,
+            String token,
+            String deviceName,
+            String accessToken
+    ) throws IOException {
 
-        // 1) Try authenticated read first
-        String response;
-        try {
-            response = SupabaseClient.getWithAuth(path, accessToken);
-            Log.d(TAG, "findCitizenProfileIdByUserId[authenticated] response: " + response);
-        } catch (Exception e) {
-            Log.e(TAG, "Authenticated read failed: " + e.getMessage(), e);
-            response = null;
-        }
-
-        // 2) Fallback to anonymous read
-        if (response == null || !response.trim().startsWith("[") || response.trim().equals("[]")) {
-            Log.d(TAG, "Falling back to anonymous read for citizen_profiles");
-            response = SupabaseClient.get(path);
-            Log.d(TAG, "findCitizenProfileIdByUserId[anon] response: " + response);
-        }
-
-        if (response == null || !response.trim().startsWith("[")) {
-            Log.w(TAG, "findCitizenProfileIdByUserId: non-array response");
-            return -1;
-        }
-
-        Type listType = new TypeToken<List<CitizenProfileDTO>>(){}.getType();
-        List<CitizenProfileDTO> results = gson.fromJson(response, listType);
-        if (results == null || results.isEmpty()) {
-            Log.w(TAG, "findCitizenProfileIdByUserId: no profile found for user_id " + userId);
-            return -1;
-        }
-        Log.d(TAG, "findCitizenProfileIdByUserId: found citizen_profile_id = " + results.get(0).citizen_profile_id);
-        return results.get(0).citizen_profile_id;
-    }
-
-    public static void saveDeviceToken(long userId,
-                                       String token,
-                                       String deviceName,
-                                       String accessToken) throws IOException {
-
-        String lookupPath = "/device_tokens?user_id=eq." + userId
+        String lookupPath = "/device_tokens"
+                + "?user_id=eq." + userId
                 + "&device_token=eq." + escape(token)
-                + "&select=token_id&limit=1";
+                + "&select=token_id"
+                + "&limit=1";
 
-        String lookupResponse = SupabaseClient.getWithAuth(lookupPath, accessToken);
-        Log.d(TAG, "saveDeviceToken lookup: " + lookupResponse);
+        String lookupResponse =
+                SupabaseClient.getWithAuth(
+                        lookupPath,
+                        accessToken
+                );
 
-        boolean exists = lookupResponse != null
-                && lookupResponse.trim().startsWith("[")
-                && !lookupResponse.trim().equals("[]");
+        Log.d(TAG,
+                "saveDeviceToken lookup: "
+                        + lookupResponse
+        );
+
+        boolean exists =
+                lookupResponse != null
+                        && lookupResponse.trim().startsWith("[")
+                        && !lookupResponse.trim().equals("[]");
 
         if (exists) {
             String patchBody = "{"
                     + "\"is_active\":true,"
-                    + "\"last_used_at\":\"" + nowIso() + "\""
+                    + "\"last_used_at\":\""
+                    + nowIso()
+                    + "\""
                     + "}";
-            String patchPath = "/device_tokens?user_id=eq." + userId
-                    + "&device_token=eq." + escape(token);
-            SupabaseClient.patch(patchPath, patchBody);
+
+            String patchPath = "/device_tokens"
+                    + "?user_id=eq." + userId
+                    + "&device_token=eq."
+                    + escape(token);
+
+            SupabaseClient.patchWithAuth(
+                    patchPath,
+                    patchBody,
+                    accessToken
+            );
+
             Log.d(TAG, "Device token refreshed");
+
         } else {
             String json = "{"
                     + "\"user_id\":" + userId + ","
-                    + "\"device_token\":\"" + escape(token) + "\","
-                    + "\"device_name\":\"" + escape(deviceName) + "\","
+                    + "\"device_token\":\""
+                    + escape(token) + "\","
+                    + "\"device_name\":\""
+                    + escape(deviceName) + "\","
                     + "\"is_active\":true"
                     + "}";
-            String response = SupabaseClient.postWithAuth("/device_tokens", json, accessToken);
-            Log.d(TAG, "Device token inserted: " + response);
+
+            String response =
+                    SupabaseClient.postWithAuth(
+                            "/device_tokens",
+                            json,
+                            accessToken
+                    );
+
+            Log.d(TAG,
+                    "Device token inserted: " + response
+            );
         }
     }
 
-    public static void deactivateDeviceToken(long userId, String token, String accessToken) throws IOException {
+    public static void deactivateDeviceToken(
+            long userId,
+            String token,
+            String accessToken
+    ) throws IOException {
+
         String patchBody = "{\"is_active\":false}";
-        String patchPath = "/device_tokens?user_id=eq." + userId
-                + "&device_token=eq." + escape(token);
-        SupabaseClient.patch(patchPath, patchBody);
+
+        String patchPath = "/device_tokens"
+                + "?user_id=eq." + userId
+                + "&device_token=eq."
+                + escape(token);
+
+        SupabaseClient.patchWithAuth(
+                patchPath,
+                patchBody,
+                accessToken
+        );
+
         Log.d(TAG, "Device token deactivated");
     }
 
     private static String nowIso() {
         java.text.SimpleDateFormat sdf =
-                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US);
-        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                new java.text.SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                        java.util.Locale.US
+                );
+
+        sdf.setTimeZone(
+                java.util.TimeZone.getTimeZone("UTC")
+        );
+
         return sdf.format(new java.util.Date());
     }
 
-    /**
-     * Overload for backward compatibility — uses anon read only.
-     */
-    public static long findCitizenProfileIdByUserId(long userId) throws IOException {
-        return findCitizenProfileIdByUserId(userId, null);
-    }
+    private static String escape(String value) {
+        if (value == null) {
+            return "";
+        }
 
-    // ==========================================
-    // Helper: Escape JSON strings
-    // ==========================================
-    private static String escape(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\")
+        return value
+                .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
                 .replace("\r", "\\r");
     }
 
-    // ==========================================
-    // DTOs
-    // ==========================================
     public static class UserDTO {
         public long user_id;
         public String email;

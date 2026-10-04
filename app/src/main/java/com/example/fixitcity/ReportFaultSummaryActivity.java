@@ -208,7 +208,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
     // Decides whether an exception means "network problem"
     // or it is a "real error" so we must show the user. True = network problem.
-
     private boolean isNetworkFailure(Exception e)
     {
         if (e instanceof java.net.UnknownHostException) return true;    //DNS failed, cant find host

@@ -13,14 +13,29 @@ import okhttp3.Response;
 
 public class SupabaseAuth {
 
-    public static String register(String email, String password) throws IOException {
+    public static String register(
+            String email,
+            String password,
+            String firstName,
+            String lastName,
+            String phone
+    ) throws IOException {
+
         JSONObject body = new JSONObject();
+
         try {
             body.put("email", email);
             body.put("password", password);
+
+            JSONObject metadata = new JSONObject();
+            metadata.put("first_name", firstName);
+            metadata.put("last_name", lastName);
+            metadata.put("phone_number", phone);
+
+            body.put("data", metadata);
+
         } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
+            throw new IOException("Could not prepare registration data", e);
         }
 
         RequestBody requestBody = RequestBody.create(
@@ -35,14 +50,20 @@ public class SupabaseAuth {
                 .post(requestBody)
                 .build();
 
-        OkHttpClient client = SupabaseClient.getHttpClient();
-        try (Response response = client.newCall(request).execute()) {
-            if (response.body() == null) return null;
-            String responseStr = response.body().string();
+        try (Response response =
+                     SupabaseClient.getHttpClient().newCall(request).execute()) {
+
+            String responseStr = response.body() != null
+                    ? response.body().string()
+                    : "";
 
             if (!response.isSuccessful()) {
-                throw new IOException("Registration failed: " + responseStr);
+                throw new IOException(
+                        "Registration failed (" + response.code() + "): "
+                                + responseStr
+                );
             }
+
             return responseStr;
         }
     }

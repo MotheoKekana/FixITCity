@@ -39,7 +39,6 @@ public class SupabaseReports {
 
     //Returns distance in metres between two GPS points
     //Using this instead of normal the normal euclidean formula as we need to account for the earth's curve
-
     public static double haversineMeters(double latitude1, double longitude1, double latitude2, double longitude2)
     {
         final double rad = 6371000.0; //Earth's mean radius (metres)
