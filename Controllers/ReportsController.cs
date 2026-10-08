@@ -79,45 +79,45 @@ public class ReportsController : ControllerBase
     }
 
     // POST: api/reports
-    [HttpPost]
-    public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest request)
-    {
-        try
-        {
-            var random = new Random();
-            var referenceNumber = "FIX-" + DateTime.Now.ToString("yyyyMMdd") + "-" + random.Next(1000, 9999);
+    // [HttpPost] this method is commented out because it was not part of the original request, but it can be uncommented and used to create new reports from the Web dashboard.
+    // public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest request)
+    // {
+    //     try
+    //     {
+    //         var random = new Random();
+    //         var referenceNumber = "FIX-" + DateTime.Now.ToString("yyyyMMdd") + "-" + random.Next(1000, 9999);
 
-            var report = new FaultReport
-            {
-                CitizenId = request.CitizenId,
-                CategoryId = request.CategoryId,
-                AreaId = request.AreaId,
-                Title = request.Title,
-                Description = request.Description,
-                Latitude = request.Latitude,
-                Longitude = request.Longitude,
-                Status = "Pending",
-                ReferenceNumber = referenceNumber,
-                IsOffline = request.IsOffline,
-                SyncStatus = request.IsOffline ? "Pending" : "Synced",
-                CreatedAt = DateTime.Now
-            };
+    //         var report = new FaultReport
+    //         {
+    //             CitizenId = request.CitizenId,
+    //             CategoryId = request.CategoryId,
+    //             AreaId = request.AreaId,
+    //             Title = request.Title,
+    //             Description = request.Description,
+    //             Latitude = request.Latitude,
+    //             Longitude = request.Longitude,
+    //             Status = "Pending",
+    //             ReferenceNumber = referenceNumber,
+    //             IsOffline = request.IsOffline,
+    //             SyncStatus = request.IsOffline ? "Pending" : "Synced",
+    //             CreatedAt = DateTime.Now
+    //         };
 
-            _context.FaultReports.Add(report);
-            await _context.SaveChangesAsync();
+    //         _context.FaultReports.Add(report);
+    //         await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                message = "Report submitted successfully",
-                report_id = report.ReportId,
-                reference_number = referenceNumber
-            });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { error = ex.Message });
-        }
-    }
+    //         return Ok(new
+    //         {
+    //             message = "Report submitted successfully",
+    //             report_id = report.ReportId,
+    //             reference_number = referenceNumber
+    //         });
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, new { error = ex.Message });
+    //     }
+    // }
 }
 
 public class CreateReportRequest

@@ -4,10 +4,10 @@ namespace FixITCityAPI.Models;
 
 public partial class FaultReportWithVote
 {
-    public long ReportId { get; set; }
-    public long CitizenId { get; set; }
-    public long CategoryId { get; set; }
-    public long? AreaId { get; set; }
+    public int ReportId { get; set; }
+    public int CitizenId { get; set; }
+    public int CategoryId { get; set; }
+    public int? AreaId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public decimal Latitude { get; set; }

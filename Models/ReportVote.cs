@@ -5,9 +5,9 @@ namespace FixITCityAPI.Models;
 
 public partial class ReportVote
 {
-    public long VoteId { get; set; }
-    public long ReportId { get; set; }
-    public long CitizenId { get; set; }
+    public int VoteId { get; set; }
+    public int ReportId { get; set; }
+    public int CitizenId { get; set; }
     public DateTime VotedAt { get; set; }
 
     public virtual FaultReport Report { get; set; } = null!;
