@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,18 +14,23 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
-import com.example.fixitcity.data.SupabaseClient;
+import com.example.fixitcity.data.SessionRefresher;
 import com.example.fixitcity.data.SupabaseUsers;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class Splash_Activity extends AppCompatActivity {
 
-    private static final String TAG = "SupabaseTest";
-    private static final int SPLASH_DELAY_MS = 2000;
+    private static final String TAG = "SplashActivity";
+    private static final long MIN_SPLASH_TIME_MS = 2000L;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private long splashStartedAt;
+    private boolean navigationScheduled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        splashStartedAt = SystemClock.elapsedRealtime();
         setContentView(R.layout.activity_splash);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
@@ -33,72 +39,114 @@ public class Splash_Activity extends AppCompatActivity {
             return insets;
         });
 
-        // Quick connectivity test to Supabase
-        new Thread(() -> {
-            try {
-                String response = SupabaseClient.get("/fault_categories?select=*");
-                Log.d(TAG, "✅ Supabase connected! Response: " + response);
-            } catch (Exception e) {
-                Log.e(TAG, "❌ Supabase connection failed: " + e.getMessage(), e);
+        new Thread(this::restoreSession, "session-refresh").start();
+    }
+
+    private void restoreSession() {
+        SessionManager session = new SessionManager(getApplicationContext());
+
+        // A user with a saved session must never be forced back through
+        // onboarding, including users affected by older versions that cleared
+        // the onboarding flag during login.
+        if (!session.hasSeenOnboarding() && !session.isLoggedIn()) {
+            navigateAfterMinimumDelay(Onboard_Report_Faults_Activity.class);
+            return;
+        }
+
+        if (!session.isLoggedIn()) {
+            navigateAfterMinimumDelay(Login_Activity.class);
+            return;
+        }
+
+        if (session.isGuest()) {
+            navigateAfterMinimumDelay(Guest_Dashboard_Activity.class);
+            return;
+        }
+
+        SessionRefresher.Result refreshResult = SessionRefresher.refresh(session);
+
+        if (refreshResult == SessionRefresher.Result.INVALID_SESSION) {
+            Log.i(TAG, "Saved session is no longer valid; returning to login");
+            session.logout();
+            navigateAfterMinimumDelay(Login_Activity.class);
+            return;
+        }
+
+        if (session.getCitizenProfileId() <= 0 || session.getUserIdBigint() <= 0) {
+            Log.w(TAG, "Saved session is missing the required account identifiers");
+            session.logout();
+            navigateAfterMinimumDelay(Login_Activity.class);
+            return;
+        }
+
+        if (refreshResult == SessionRefresher.Result.REFRESHED) {
+            // Only contact Supabase/Firebase after the fresh token is stored.
+            registerDeviceToken(session);
+        } else {
+            Log.i(TAG, "Offline at startup; continuing with cached account data");
+        }
+
+        navigateAfterMinimumDelay(Dashboard_Activity.class);
+    }
+
+    private void navigateAfterMinimumDelay(Class<?> destination) {
+        long elapsed = SystemClock.elapsedRealtime() - splashStartedAt;
+        long remaining = Math.max(0L, MIN_SPLASH_TIME_MS - elapsed);
+
+        mainHandler.postDelayed(() -> {
+            if (navigationScheduled || isFinishing() || isDestroyed()) {
+                return;
             }
-        }).start();
-
-        // Fetch + save FCM token (fires only after login so userIdBigint is present)
-        registerDeviceToken();
-
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            SessionManager session = new SessionManager(this);
-
-            if (!session.hasSeenOnboarding()) {
-                startActivity(new Intent(Splash_Activity.this, Onboard_Report_Faults_Activity.class));
-            } else if (session.isLoggedIn() && !session.isGuest() && session.getCitizenProfileId() > 0) {
-                startActivity(new Intent(Splash_Activity.this, Dashboard_Activity.class));
-            } else if (session.isLoggedIn() && session.isGuest()) {
-                startActivity(new Intent(Splash_Activity.this, Guest_Dashboard_Activity.class));
-            } else {
-                startActivity(new Intent(Splash_Activity.this, Login_Activity.class));
-            }
+            navigationScheduled = true;
+            Intent intent = new Intent(Splash_Activity.this, destination);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             finish();
-        }, SPLASH_DELAY_MS);
+        }, remaining);
     }
 
     /**
-     * Grab the current FCM token and push it to Supabase.
-     * Only does something if a real (non-guest) user is logged in.
+     * Save this device's FCM token after the Supabase session has been refreshed.
      */
-    private void registerDeviceToken() {
-        SessionManager session = new SessionManager(this);
-        long userIdBigint = session.getUserIdBigint();
+    private void registerDeviceToken(SessionManager session) {
+        long userId = session.getUserIdBigint();
         String accessToken = session.getAccessToken();
 
-        if (userIdBigint <= 0 || accessToken == null || session.isGuest()) {
-            Log.d(TAG, "registerDeviceToken: no logged-in user yet — skipping");
+        if (userId <= 0 || accessToken == null || accessToken.trim().isEmpty()) {
             return;
         }
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
-                        Log.w(TAG, "Fetching FCM token failed", task.getException());
+                        Log.w(TAG, "Could not obtain the FCM token", task.getException());
                         return;
                     }
 
-                    String token = task.getResult();
-                    Log.d(TAG, "FCM token: " + token);
+                    String deviceToken = task.getResult();
+                    if (deviceToken == null || deviceToken.trim().isEmpty()) {
+                        return;
+                    }
 
                     new Thread(() -> {
                         try {
                             SupabaseUsers.saveDeviceToken(
-                                    userIdBigint,
-                                    token,
+                                    userId,
+                                    deviceToken,
                                     Build.MANUFACTURER + " " + Build.MODEL,
                                     accessToken
                             );
-                            Log.d(TAG, "FCM token saved to device_tokens");
+                            Log.d(TAG, "FCM token registered");
                         } catch (Exception e) {
-                            Log.e(TAG, "Failed to save FCM token: " + e.getMessage(), e);
+                            Log.w(TAG, "Could not register the FCM token: " + e.getMessage());
                         }
-                    }).start();
+                    }, "fcm-token-save").start();
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        mainHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 }
