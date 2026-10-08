@@ -12,11 +12,9 @@ import com.example.fixitcity.data.AppDatabase;
 import com.example.fixitcity.data.ReportDao;
 import com.example.fixitcity.data.ReportEntity;
 import com.example.fixitcity.data.SessionManager;
-import com.example.fixitcity.data.SupabaseAuth;
+import com.example.fixitcity.data.SessionRefresher;
 import com.example.fixitcity.data.SupabaseClient;
 import com.example.fixitcity.data.SupabaseReports;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,31 +41,20 @@ public class SyncWorker extends Worker {
             return Result.success();
         }
 
-        // 1) Refresh token once at the start of every sync
-        String accessToken = session.getAccessToken();
-        String refreshToken = session.getRefreshToken();
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            try {
-                String refreshResponse = SupabaseAuth.refreshToken(refreshToken);
-                if (refreshResponse != null) {
-                    JSONObject json = new JSONObject(refreshResponse);
-                    String newAccess = json.optString("access_token", null);
-                    String newRefresh = json.optString("refresh_token", null);
-                    if (newAccess != null) {
-                        session.saveAccessToken(newAccess);
-                        accessToken = newAccess;
-                        Log.d(TAG, "Access token refreshed");
-                    }
-                    if (newRefresh != null) {
-                        session.saveRefreshToken(newRefresh);
-                    }
-                }
-            } catch (Exception e) {
-                Log.w(TAG, "Token refresh failed: " + e.getMessage());
-                // Continue with old token — might still work
-            }
+        // 1) Refresh before touching queued rows. This prevents an expired JWT
+        // from turning a temporary sync problem into a permanent failed report.
+        SessionRefresher.Result refreshResult = SessionRefresher.refresh(session);
+        if (refreshResult == SessionRefresher.Result.OFFLINE) {
+            Log.d(TAG, "Cannot refresh while offline — retrying later");
+            return Result.retry();
+        }
+        if (refreshResult == SessionRefresher.Result.INVALID_SESSION) {
+            Log.w(TAG, "Saved session is invalid — user must sign in again");
+            session.logout();
+            return Result.success();
         }
 
+        String accessToken = session.getAccessToken();
         if (accessToken == null) {
             Log.w(TAG, "No access token — aborting");
             return Result.success();

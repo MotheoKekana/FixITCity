@@ -45,6 +45,22 @@ public class SessionManager {
         editor.apply();
     }
 
+    /**
+     * Save a refreshed Supabase token pair in one preferences transaction.
+     * Supabase can rotate the refresh token, so both values must be persisted
+     * together before another authenticated request starts.
+     */
+    public void saveAuthTokens(String accessToken, String refreshToken) {
+        SharedPreferences.Editor tokenEditor = prefs.edit()
+                .putString(KEY_ACCESS_TOKEN, accessToken);
+
+        if (refreshToken != null && !refreshToken.trim().isEmpty()) {
+            tokenEditor.putString(KEY_REFRESH_TOKEN, refreshToken);
+        }
+
+        tokenEditor.apply();
+    }
+
     public void saveUserIdBigint(long userIdBigint) {
         editor.putLong(KEY_USER_ID_BIGINT, userIdBigint);
         editor.apply();
@@ -59,6 +75,7 @@ public class SessionManager {
         editor.putBoolean(KEY_HAS_CITIZEN_PROFILE, has);
         editor.apply();
     }
+
     public boolean hasSeenOnboarding() {
         return prefs.getBoolean(KEY_SEEN_ONBOARDING, false);
     }
@@ -124,11 +141,17 @@ public class SessionManager {
     }
 
     public boolean isLoggedIn() {
-        return getAccessToken() != null;
+        String accessToken = getAccessToken();
+        return accessToken != null && !accessToken.trim().isEmpty();
     }
 
     public void logout() {
+        // Onboarding is an app-level preference, not account data. Preserve it
+        // when clearing a signed-in or guest session so logout/login does not
+        // send the user through onboarding again.
+        boolean seenOnboarding = hasSeenOnboarding();
         editor.clear();
+        editor.putBoolean(KEY_SEEN_ONBOARDING, seenOnboarding);
         editor.apply();
     }
 }
