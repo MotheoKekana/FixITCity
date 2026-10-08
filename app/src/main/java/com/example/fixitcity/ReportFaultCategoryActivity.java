@@ -76,7 +76,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
                 Toast.makeText(this, "This category is missing an ID. Please pick another.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            reportData.setCategory(selected.getTitle());
+            reportData.setCategory(selected.getName());
             reportData.setCategoryId(realId);
             reportData.setCategoryDescription(selected.getDescription());
             reportData.setCategorySeverityWeight(selected.getSeverityWeight());
@@ -157,7 +157,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         } else {
             String lowerQuery = query.toLowerCase();
             for (FaultCategory cat : fullCategoryList) {
-                if (cat.getTitle().toLowerCase().contains(lowerQuery) ||
+                if (cat.getName().toLowerCase().contains(lowerQuery) ||
                         cat.getDescription().toLowerCase().contains(lowerQuery)) {
                     filteredList.add(cat);
                 }

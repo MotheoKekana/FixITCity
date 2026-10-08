@@ -38,7 +38,7 @@ public class FaultCategory {
 
     // Existing getters
     public int getId() { return id; }
-    public String getTitle() { return title; }
+    public String getName() { return title; }
     public String getDescription() { return description; }
     public int getSeverity() { return severity; }
     public int getIconResId() { return iconResId; }
