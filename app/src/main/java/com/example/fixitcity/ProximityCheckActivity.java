@@ -57,15 +57,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
         tvAddress = findViewById(R.id.tv_location_address);
-        etAddressSearch = findViewById(R.id.et_address_search);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (checkLocationPermission()) {
-            getCurrentLocation();
-        } else {
-            requestLocationPermission();
-        }
 
         etAddressSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
@@ -78,10 +70,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
             return false;
         });
 
-        findViewById(R.id.btn_adjust_pin).setOnClickListener(v -> {
-            String address = tvAddress.getText().toString();
-            openMapPicker(address);
-        });
+
 
         findViewById(R.id.btn_next).setOnClickListener(v -> {
             if (reportData.getLocationAddress() == null || reportData.getLocationAddress().isEmpty()) {
