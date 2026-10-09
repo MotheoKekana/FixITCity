@@ -15,7 +15,8 @@
         android:background="@color/white"
         android:elevation="1dp"
         android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/cardview_light_background">>
 
         <ImageView
             android:id="@+id/iv_logo"
@@ -61,6 +62,7 @@
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <LinearLayout
+
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -260,7 +262,8 @@
                 android:textStyle="bold"
                 app:backgroundTint="@null" />
 
-        </LinearLayout>
+        </LinearLayout
+>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -54,7 +54,7 @@ public class FaultCategoryAdapter extends BaseAdapter {
 
         FaultCategory category = categories.get(position);
         holder.icon.setImageResource(category.getIconResId());
-        holder.title.setText(category.getTitle());
+        holder.title.setText(category.getName());
         holder.description.setText(category.getDescription());
 
         // Hide the severity badge (user should not see it)
