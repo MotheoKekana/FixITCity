@@ -34,6 +34,8 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             return insets;
         });
 
+        hideNavForGuests();
+
         etReference = findViewById(R.id.et_reference);
         btnTrack = findViewById(R.id.btn_track);
 
@@ -52,7 +54,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             });
         }
 
-        // Bottom navigation
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -92,6 +93,15 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             ivNotif.setOnClickListener(v ->
                     startActivity(new Intent(this, Notifications_Activity.class)));
         }
+    }
+
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     private void attemptTrack() {

@@ -35,8 +35,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.view.View;
-import com.example.fixitcity.data.SessionManager;
 
 public class ReportFaultPhotoActivity extends AppCompatActivity {
 

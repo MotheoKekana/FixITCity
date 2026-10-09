@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +19,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.fixitcity.data.SessionManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +48,8 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        hideNavForGuests();
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
         tvAddress = findViewById(R.id.tv_location_address);
@@ -81,6 +86,15 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 startActivity(new Intent(this, TrackReportSearchActivity.class)));
         findViewById(R.id.navSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileSettingsActivity.class)));
+    }
+
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     private boolean checkLocationPermission() {
@@ -120,7 +134,6 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
     }
 
     private void reverseGeocode(double lat, double lng) {
-        // A valid GPS fix must remain usable even when the address service fails.
         String coordinates = String.format(Locale.US, "%.6f, %.6f", lat, lng);
         reportData.setLatitude(lat);
         reportData.setLongitude(lng);
@@ -139,7 +152,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 }
             }
         } catch (IOException e) {
-            // The GPS coordinates above are enough to submit the report.
+            // Coordinates are enough to submit.
         }
     }
 

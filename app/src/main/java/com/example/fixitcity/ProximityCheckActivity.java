@@ -5,47 +5,63 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 public class ProximityCheckActivity extends AppCompatActivity {
 
-    private static final int LOCATION_PERMISSION_REQUEST = 1;
-    private TextView tvAddress;
-    private TextInputEditText etAddressSearch;
-    private ReportData reportData;
+    private static final String TAG = "ProximityCheck";
+    private static final int LOCATION_PERMISSION_REQUEST = 100;
+    private static final double RADIUS_METERS = 2000.0;
+
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
+
+    private RecyclerView rvReports;
+    private NearbyReportAdapter adapter;
+    private List<NearbyReport> reportList = new ArrayList<>();
+
+    private TextView tvStatus, tvReportsCount;
+    private LinearProgressIndicator progressIndicator;
+    private MaterialButton btnNewIssue;
+
+    private ReportData reportData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report_fault_gps);
+        setContentView(R.layout.activity_proximity_check);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -56,43 +72,30 @@ public class ProximityCheckActivity extends AppCompatActivity {
         hideNavForGuests();
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
-        tvAddress = findViewById(R.id.tv_location_address);
 
+        initViews();
+        setupBottomNavigation();
 
-        etAddressSearch.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-                String query = etAddressSearch.getText().toString().trim();
-                if (!query.isEmpty()) {
-                    validateAndSetAddress(query);
-                }
-                return true;
-            }
-            return false;
-        });
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-
-
-        findViewById(R.id.btn_next).setOnClickListener(v -> {
-            if (reportData.getLocationAddress() == null || reportData.getLocationAddress().isEmpty()) {
-                Toast.makeText(this, "Please confirm your location", Toast.LENGTH_SHORT).show();
+        if (reportData.getLatitude() != 0 && reportData.getLongitude() != 0) {
+            queryNearbyReports(reportData.getLatitude(), reportData.getLongitude());
+        } else if (reportData.getLocationAddress() != null) {
+            geocodeAddress(reportData.getLocationAddress());
+        } else {
+            if (checkLocationPermission()) {
+                getCurrentLocation();
             } else {
-                if (reportData.getLatitude() == 0 && reportData.getLongitude() == 0) {
-                    geocodeAddressForLocation(reportData.getLocationAddress());
-                } else {
-                    startNextActivity(ProximityCheckActivity.class);
-                }
+                requestLocationPermission();
             }
-        });
+        }
 
-        findViewById(R.id.navHome).setOnClickListener(v -> finish());
-        findViewById(R.id.navReport).setOnClickListener(v -> {
-            startActivity(new Intent(this, ReportFaultCategoryActivity.class));
-            finish();
-        });
-        findViewById(R.id.navTrack).setOnClickListener(v ->
-                startActivity(new Intent(this, TrackReportSearchActivity.class)));
-        findViewById(R.id.navSettings).setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileSettingsActivity.class)));
+        if (btnNewIssue != null) {
+            btnNewIssue.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportFaultPhotoActivity.class));
+                finish();
+            });
+        }
     }
 
     private void hideNavForGuests() {
@@ -102,6 +105,44 @@ public class ProximityCheckActivity extends AppCompatActivity {
         View bottomNav = findViewById(R.id.bottom_nav);
         if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) bottomNav.setVisibility(View.GONE);
+    }
+
+    private void initViews() {
+        rvReports = findViewById(R.id.rv_nearby_reports);
+        tvStatus = findViewById(R.id.tv_status);
+        tvReportsCount = findViewById(R.id.tv_reports_count);
+        progressIndicator = findViewById(R.id.progress_indicator);
+        btnNewIssue = findViewById(R.id.btn_new_issue);
+
+        rvReports.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new NearbyReportAdapter(this, reportList, this::onReportTapped);
+        rvReports.setAdapter(adapter);
+    }
+
+    private void setupBottomNavigation() {
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) navHome.setOnClickListener(v -> finish());
+
+        View navReport = findViewById(R.id.navReport);
+        if (navReport != null) {
+            navReport.setOnClickListener(v ->
+                    startActivity(new Intent(this, ReportFaultCategoryActivity.class)));
+        }
+
+        View navTrack = findViewById(R.id.navTrack);
+        if (navTrack != null) {
+            navTrack.setOnClickListener(v ->
+                    Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+        }
+
+        View navSettings = findViewById(R.id.navSettings);
+        if (navSettings != null) {
+            navSettings.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileSettingsActivity.class)));
+        }
+
+        View backBtn = findViewById(R.id.back_button);
+        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
     private boolean checkLocationPermission() {
@@ -126,11 +167,12 @@ public class ProximityCheckActivity extends AppCompatActivity {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 if (locationResult == null) return;
-                android.location.Location location = locationResult.getLastLocation();
+                Location location = locationResult.getLastLocation();
                 if (location != null) {
-                    reverseGeocode(location.getLatitude(), location.getLongitude());
+                    queryNearbyReports(location.getLatitude(), location.getLongitude());
                 } else {
-                    Toast.makeText(ProximityCheckActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
+                    tvStatus.setText("Unable to get location");
+                    progressIndicator.setIndeterminate(false);
                 }
                 fusedLocationClient.removeLocationUpdates(this);
             }
@@ -139,24 +181,100 @@ public class ProximityCheckActivity extends AppCompatActivity {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
-    private void reverseGeocode(double lat, double lng) {
+    private void geocodeAddress(String address) {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            List<Address> addresses = geocoder.getFromLocationName(address, 1);
             if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                String fullAddress = address.getAddressLine(0);
-                tvAddress.setText(fullAddress);
-                reportData.setLocationAddress(fullAddress);
-                reportData.setLatitude(lat);
-                reportData.setLongitude(lng);
+                Address addr = addresses.get(0);
+                reportData.setLatitude(addr.getLatitude());
+                reportData.setLongitude(addr.getLongitude());
+                queryNearbyReports(addr.getLatitude(), addr.getLongitude());
             } else {
-                tvAddress.setText("Unknown location");
+                tvStatus.setText("Could not locate address");
+                progressIndicator.setIndeterminate(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            tvAddress.setText("Reverse geocoding failed");
+            tvStatus.setText("Geocoding error");
+            progressIndicator.setIndeterminate(false);
         }
+    }
+
+    private void queryNearbyReports(double lat, double lng) {
+        tvStatus.setText("Searching for nearby reports...");
+        progressIndicator.setIndeterminate(true);
+
+        SessionManager session = new SessionManager(this);
+        String accessToken = session.getAccessToken();
+
+        new Thread(() -> {
+            try {
+                List<FaultReport> allOpen = SupabaseReports.getOpenReports(accessToken);
+
+                List<NearbyReport> withinRadius = new ArrayList<>();
+
+                for (FaultReport r : allOpen) {
+                    double d = SupabaseReports.haversineMeters(
+                            lat, lng, r.getLatitude(), r.getLongitude());
+                    if (d <= RADIUS_METERS) {
+                        String ref = r.getReferenceNumber() != null ? r.getReferenceNumber() : "";
+                        String title = r.getTitle() != null ? r.getTitle() : "Report";
+                        String status = r.getStatus() != null ? r.getStatus() : "Pending";
+                        int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
+
+                        withinRadius.add(new NearbyReport(
+                                r.getReportId(),
+                                ref,
+                                title,
+                                title,
+                                status,
+                                score,
+                                0,
+                                d
+                        ));
+                    }
+                }
+
+                Collections.sort(withinRadius, (a, b) ->
+                        Double.compare(a.getDistance(), b.getDistance()));
+
+                runOnUiThread(() -> updateUI(withinRadius));
+
+            } catch (Exception e) {
+                Log.e(TAG, "Nearby query failed: " + e.getMessage(), e);
+                runOnUiThread(() -> {
+                    progressIndicator.setIndeterminate(false);
+                    tvStatus.setText("Could not load nearby reports");
+                    tvReportsCount.setText("0 reports found");
+                    reportList.clear();
+                    adapter.notifyDataSetChanged();
+                    if (btnNewIssue != null) btnNewIssue.setEnabled(true);
+                });
+            }
+        }).start();
+    }
+
+    private void updateUI(List<NearbyReport> withinRadius) {
+        progressIndicator.setIndeterminate(false);
+        reportList.clear();
+        reportList.addAll(withinRadius);
+        adapter.notifyDataSetChanged();
+
+        if (withinRadius.isEmpty()) {
+            tvStatus.setText("No nearby reports found within " + (int)(RADIUS_METERS) + "m");
+            tvReportsCount.setText("0 reports found");
+        } else {
+            tvStatus.setText("Nearby reports found:");
+            tvReportsCount.setText(withinRadius.size() + " report(s) found within "
+                    + (int)(RADIUS_METERS) + "m");
+        }
+    }
+
+    private void onReportTapped(NearbyReport report, int position) {
+        Toast.makeText(this,
+                "Upvoting coming soon for: " + report.getTitle(),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -168,90 +286,10 @@ public class ProximityCheckActivity extends AppCompatActivity {
                 getCurrentLocation();
             } else {
                 Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show();
+                tvStatus.setText("Location permission denied");
+                progressIndicator.setIndeterminate(false);
             }
         }
-    }
-
-    private void validateAndSetAddress(String query) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(query, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                String fullAddress = address.getAddressLine(0);
-                tvAddress.setText(fullAddress);
-                reportData.setLocationAddress(fullAddress);
-                reportData.setLatitude(address.getLatitude());
-                reportData.setLongitude(address.getLongitude());
-                Toast.makeText(this, "Address validated", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Address not found", Toast.LENGTH_SHORT).show();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Geocoding service failed", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void geocodeAddressForLocation(String address) {
-        if (address == null || address.isEmpty()) {
-            Toast.makeText(this, "Address is empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(address, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address addr = addresses.get(0);
-                reportData.setLatitude(addr.getLatitude());
-                reportData.setLongitude(addr.getLongitude());
-                startNextActivity(ProximityCheckActivity.class);
-            } else {
-                Toast.makeText(this, "Could not get coordinates, but continuing", Toast.LENGTH_SHORT).show();
-                startNextActivity(ProximityCheckActivity.class);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Geocoding error, but continuing", Toast.LENGTH_SHORT).show();
-            startNextActivity(ProximityCheckActivity.class);
-        }
-    }
-
-    private void openMapPicker(String address) {
-        if (address == null || address.isEmpty()) {
-            Toast.makeText(this, "Please enter an address first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String encodedAddress = Uri.encode(address);
-        Uri geoUri = Uri.parse("geo:0,0?q=" + encodedAddress);
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, geoUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-
-        if (mapIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(mapIntent);
-            return;
-        }
-
-        String webUri = "https://www.google.com/maps/search/?api=1&query=" + encodedAddress;
-        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUri));
-        try {
-            startActivity(webIntent);
-        } catch (Exception e) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Confirm Location")
-                    .setMessage("Location: " + address + "\n\nNo map app found. Continue?")
-                    .setPositiveButton("Continue", (dialog, which) -> {
-                        reportData.setLocationAddress(address);
-                        tvAddress.setText(address);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        }
-    }
-
-    private void startNextActivity(Class<?> cls) {
-        startActivity(new Intent(this, cls));
     }
 
     @Override

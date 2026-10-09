@@ -11,6 +11,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.fixitcity.data.SessionManager;
+
 public class TrackReportResultActivity extends AppCompatActivity {
 
     @Override
@@ -24,7 +26,8 @@ public class TrackReportResultActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Read extras
+        hideNavForGuests();
+
         long reportId       = getIntent().getLongExtra("report_id", -1);
         String reference    = getIntent().getStringExtra("reference_number");
         String title        = getIntent().getStringExtra("title");
@@ -34,14 +37,12 @@ public class TrackReportResultActivity extends AppCompatActivity {
         int priorityScore   = getIntent().getIntExtra("priority_score", 0);
         String createdAt    = getIntent().getStringExtra("created_at");
 
-        // Populate views (matching your XML IDs)
         setTextSafe(R.id.tv_report_title, title != null && !title.isEmpty() ? title : "Report");
         setTextSafe(R.id.tv_report_location, "📍 " + (addressLine != null && !addressLine.isEmpty() ? addressLine : "Unknown location"));
         setTextSafe(R.id.tv_report_date, "📅 Reported: " + (createdAt != null ? createdAt : "—"));
         setTextSafe(R.id.tv_report_priority, "❗ Priority Score: " + priorityScore + "/100");
         setTextSafe(R.id.tv_report_status, status != null && !status.isEmpty() ? status : "Pending");
 
-        // Description is hidden by default; show it only if there's text
         TextView tvDesc = findViewById(R.id.tv_report_description);
         if (tvDesc != null) {
             if (description != null && !description.isEmpty()) {
@@ -52,7 +53,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             }
         }
 
-        // Share button — share the current status as text
         View btnShare = findViewById(R.id.btn_share_status);
         if (btnShare != null) {
             final String shareRef = reference;
@@ -70,21 +70,22 @@ public class TrackReportResultActivity extends AppCompatActivity {
             });
         }
 
-        // Notify me — placeholder for now (would subscribe to push notifications)
         View btnNotify = findViewById(R.id.btn_notify_me);
         if (btnNotify != null) {
             btnNotify.setOnClickListener(v ->
                     Toast.makeText(this, "You'll be notified of status changes", Toast.LENGTH_SHORT).show());
         }
 
-        // Status history placeholder
         setTextSafe(R.id.tv_history_empty, "No status history yet.");
 
-        // Bottom nav
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
-                Intent intent = new Intent(this, Guest_Dashboard_Activity.class);
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                Intent intent = new Intent(this, target);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
@@ -109,12 +110,20 @@ public class TrackReportResultActivity extends AppCompatActivity {
                     startActivity(new Intent(this, ProfileSettingsActivity.class)));
         }
 
-        // Notification bell (in header)
         View ivNotif = findViewById(R.id.ivNotifications);
         if (ivNotif != null) {
             ivNotif.setOnClickListener(v ->
                     startActivity(new Intent(this, Notifications_Activity.class)));
         }
+    }
+
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     private void setTextSafe(int viewId, String text) {

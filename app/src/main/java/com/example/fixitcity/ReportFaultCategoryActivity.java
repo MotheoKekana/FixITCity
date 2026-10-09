@@ -18,8 +18,6 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
 
 public class ReportFaultCategoryActivity extends AppCompatActivity {
