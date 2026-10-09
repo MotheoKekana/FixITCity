@@ -38,8 +38,10 @@ public class Splash_Activity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        new Thread(this::restoreSession, "session-refresh").start();
+        startActivity(new Intent(this, Onboard_Report_Faults_Activity.class));
+        finish();
+        return;
+        //new Thread(this::restoreSession, "session-refresh").start();
     }
 
     private void restoreSession() {
