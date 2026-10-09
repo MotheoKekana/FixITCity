@@ -22,7 +22,6 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.UUID;
 
 public class ReportFaultSummaryActivity extends AppCompatActivity {
@@ -44,6 +43,8 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        hideNavForGuests();
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
@@ -95,12 +96,20 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
         }
     }
 
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
+    }
+
     private void submitReport() {
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
         long citizenProfileId = session.getCitizenProfileId();
 
-        // --- Validation (never queued) ---
         if (accessToken == null || session.isGuest()) {
             Toast.makeText(this, "Please log in to submit a report", Toast.LENGTH_LONG).show();
             return;
@@ -117,7 +126,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             return;
         }
 
-        // --- Generate reference NOW so it's stable through queue ---
         final String referenceNumber = SupabaseReports.generateReferenceNumber();
         Log.d(TAG, "Generated reference: " + referenceNumber);
 
@@ -126,7 +134,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                // Attempt Supabase
                 FaultReport created = SupabaseReports.submitReport(
                         citizenProfileId,
                         categoryId,
@@ -142,7 +149,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
                 Log.d(TAG, "Online submit success: " + created.getReferenceNumber());
 
-                // Photo upload (best-effort — failure doesn't lose report)
                 byte[] photoBytes = reportData.getPhotoBytes();
                 if (photoBytes != null && photoBytes.length > 0) {
                     try {
@@ -186,7 +192,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                 });
 
             } catch (Exception e) {
-                // Distinguish network failure from real errors
                 boolean isNetworkFailure = isNetworkFailure(e);
 
                 if (isNetworkFailure) {
@@ -205,21 +210,17 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
         }).start();
     }
 
+    private boolean isNetworkFailure(Exception e) {
+        if (e instanceof java.net.UnknownHostException) return true;
+        if (e instanceof java.net.SocketTimeoutException) return true;
+        if (e instanceof java.net.ConnectException) return true;
+        if (e instanceof java.net.NoRouteToHostException) return true;
 
-    // Decides whether an exception means "network problem"
-    // or it is a "real error" so we must show the user. True = network problem.
-    private boolean isNetworkFailure(Exception e)
-    {
-        if (e instanceof java.net.UnknownHostException) return true;    //DNS failed, cant find host
-        if (e instanceof java.net.SocketTimeoutException) return true;  //Connection took too long
-        if (e instanceof java.net.ConnectException) return true; //Connection refused
-        if (e instanceof java.net.NoRouteToHostException) return true; //The network cannot be reached
+        String message = e.getMessage();
+        if (message == null) return false;
+        String lower = message.toLowerCase();
 
-        String message = e.getMessage(); //Pulls message
-        if (message == null) return false; //If no message, nothing to search
-        String lower = message.toLowerCase(); //Converts message to lowercase for case-insensitivity
-
-        return lower.contains("failed to connect")      //Searching for potential network phrases
+        return lower.contains("failed to connect")
                 || lower.contains("unable to resolve host")
                 || lower.contains("network is unreachable")
                 || lower.contains("timeout")
@@ -231,7 +232,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
         try {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
-            // 1) Save photo bytes to disk
             String photoFilename = null;
             String photoMime = null;
             byte[] photoBytes = reportData.getPhotoBytes();
@@ -251,7 +251,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                         + " (" + photoBytes.length + " bytes)");
             }
 
-            // 2) Insert Room outbox row
             ReportEntity row = new ReportEntity();
             row.offline_id = UUID.randomUUID().toString();
             row.citizen_id = citizenProfileId;
@@ -274,10 +273,8 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             db.reportDao().insert(row);
             Log.d(TAG, "Queued offline report: " + referenceNumber);
 
-            // 3) Schedule sync
             SyncScheduler.scheduleSync(getApplicationContext());
 
-            // 4) Show queued success screen
             final int finalPriority = row.priority_score;
             runOnUiThread(() -> {
                 Intent intent = new Intent(this, ReportSuccessActivity.class);

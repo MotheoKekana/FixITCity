@@ -2,7 +2,6 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,24 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.fixitcity.data.SessionManager;
-import com.example.fixitcity.data.SupabaseReports;
-import com.google.android.material.button.MaterialButton;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrackReportResultActivity extends AppCompatActivity {
-
-    private static final String TAG = "TrackResult";
-
-    private RecyclerView rvStatusHistory;
-    private TextView tvHistoryEmpty;
-    private StatusHistoryAdapter historyAdapter;
-    private final List<StatusHistoryItem> historyItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,121 +24,83 @@ public class TrackReportResultActivity extends AppCompatActivity {
             return insets;
         });
 
-        // ---- Read extras ----
-        long reportId = getIntent().getLongExtra("report_id", -1);
-        String ref = getIntent().getStringExtra("reference_number");
-        String title = getIntent().getStringExtra("title");
-        String description = getIntent().getStringExtra("description");
-        String address = getIntent().getStringExtra("address_line");
-        String status = getIntent().getStringExtra("status");
-        int priority = getIntent().getIntExtra("priority_score", 0);
-        String createdAt = getIntent().getStringExtra("created_at");
+        // Read extras
+        long reportId       = getIntent().getLongExtra("report_id", -1);
+        String reference    = getIntent().getStringExtra("reference_number");
+        String title        = getIntent().getStringExtra("title");
+        String description  = getIntent().getStringExtra("description");
+        String addressLine  = getIntent().getStringExtra("address_line");
+        String status       = getIntent().getStringExtra("status");
+        int priorityScore   = getIntent().getIntExtra("priority_score", 0);
+        String createdAt    = getIntent().getStringExtra("created_at");
 
-        if (ref == null) ref = "#----";
-        if (title == null) title = "Report";
-        if (status == null) status = "Pending";
-        if (address == null || address.isEmpty()) address = "Location unavailable";
+        // Populate views (matching your XML IDs)
+        setTextSafe(R.id.tv_report_title, title != null && !title.isEmpty() ? title : "Report");
+        setTextSafe(R.id.tv_report_location, "📍 " + (addressLine != null && !addressLine.isEmpty() ? addressLine : "Unknown location"));
+        setTextSafe(R.id.tv_report_date, "📅 Reported: " + (createdAt != null ? createdAt : "—"));
+        setTextSafe(R.id.tv_report_priority, "❗ Priority Score: " + priorityScore + "/100");
+        setTextSafe(R.id.tv_report_status, status != null && !status.isEmpty() ? status : "Pending");
 
-        String dateStr = "—";
-        if (createdAt != null && createdAt.length() >= 10) {
-            dateStr = createdAt.substring(0, 10);
+        // Description is hidden by default; show it only if there's text
+        TextView tvDesc = findViewById(R.id.tv_report_description);
+        if (tvDesc != null) {
+            if (description != null && !description.isEmpty()) {
+                tvDesc.setText(description);
+                tvDesc.setVisibility(View.VISIBLE);
+            } else {
+                tvDesc.setVisibility(View.GONE);
+            }
         }
 
-        // ---- Bind header ----
-        TextView tvHeader = findViewById(R.id.tv_report_status_header);
-        if (tvHeader != null) {
-            tvHeader.setText("Report Status: " + ref);
-        }
-
-        TextView tvTitle = findViewById(R.id.tv_report_title);
-        if (tvTitle != null) tvTitle.setText(title);
-
-        TextView tvLocation = findViewById(R.id.tv_report_location);
-        if (tvLocation != null) tvLocation.setText("📍 " + address);
-
-        TextView tvDate = findViewById(R.id.tv_report_date);
-        if (tvDate != null) tvDate.setText("📅 Reported: " + dateStr);
-
-        TextView tvPriority = findViewById(R.id.tv_report_priority);
-        if (tvPriority != null) tvPriority.setText("❗ Priority Score: " + priority + "/100");
-
-        TextView tvStatus = findViewById(R.id.tv_report_status);
-        if (tvStatus != null) tvStatus.setText(status);
-
-        TextView tvDescription = findViewById(R.id.tv_report_description);
-        if (tvDescription != null && description != null && !description.isEmpty()) {
-            tvDescription.setText(description);
-            tvDescription.setVisibility(TextView.VISIBLE);
-        }
-
-        // ---- Share ----
-        final String fRef = ref;
-        final String fStatus = status;
-        final String fAddress = address;
-
-        MaterialButton btnShare = findViewById(R.id.btn_share_status);
+        // Share button — share the current status as text
+        View btnShare = findViewById(R.id.btn_share_status);
         if (btnShare != null) {
+            final String shareRef = reference;
+            final String shareStatus = status;
+            final String shareTitle = title;
             btnShare.setOnClickListener(v -> {
-                Intent share = new Intent(Intent.ACTION_SEND);
-                share.setType("text/plain");
-                share.putExtra(Intent.EXTRA_TEXT,
-                        "FixITCity Report " + fRef + "\nStatus: " + fStatus +
-                                "\nLocation: " + fAddress);
-                startActivity(Intent.createChooser(share, "Share via"));
+                String msg = "FixITCity Report\n"
+                        + "Reference: " + (shareRef != null ? shareRef : "—") + "\n"
+                        + "Title: " + (shareTitle != null ? shareTitle : "Report") + "\n"
+                        + "Status: " + (shareStatus != null ? shareStatus : "Pending");
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
+                startActivity(Intent.createChooser(shareIntent, "Share report status"));
             });
         }
 
-        MaterialButton btnNotify = findViewById(R.id.btn_notify_me);
+        // Notify me — placeholder for now (would subscribe to push notifications)
+        View btnNotify = findViewById(R.id.btn_notify_me);
         if (btnNotify != null) {
             btnNotify.setOnClickListener(v ->
-                    Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show());
+                    Toast.makeText(this, "You'll be notified of status changes", Toast.LENGTH_SHORT).show());
         }
 
-        // ---- Status history (Phase 6.3) ----
-        rvStatusHistory = findViewById(R.id.rv_status_history);
-        tvHistoryEmpty = findViewById(R.id.tv_history_empty);
+        // Status history placeholder
+        setTextSafe(R.id.tv_history_empty, "No status history yet.");
 
-        if (rvStatusHistory != null) {
-            rvStatusHistory.setLayoutManager(new LinearLayoutManager(this));
-            historyAdapter = new StatusHistoryAdapter(historyItems);
-            rvStatusHistory.setAdapter(historyAdapter);
-        }
-
-        if (reportId > 0) {
-            loadStatusHistory(reportId);
-        } else {
-            // Fallback: look up report_id by reference if the caller didn't pass it
-            Log.w(TAG, "No report_id passed — attempting lookup by reference: " + fRef);
-            lookupReportIdAndLoadHistory(fRef);
-        }
-
-        // ---- Bottom navigation ----
+        // Bottom nav
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
-                SessionManager session = new SessionManager(this);
-                Class<?> target = session.isGuest()
-                        ? Guest_Dashboard_Activity.class
-                        : Dashboard_Activity.class;
-                startActivity(new Intent(this, target));
+                Intent intent = new Intent(this, Guest_Dashboard_Activity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 finish();
             });
         }
 
         View navReport = findViewById(R.id.navReport);
         if (navReport != null) {
-            navReport.setOnClickListener(v -> {
-                startActivity(new Intent(this, ReportFaultCategoryActivity.class));
-                finish();
-            });
+            navReport.setOnClickListener(v ->
+                    startActivity(new Intent(this, ReportFaultCategoryActivity.class)));
         }
 
         View navTrack = findViewById(R.id.navTrack);
         if (navTrack != null) {
-            navTrack.setOnClickListener(v -> {
-                startActivity(new Intent(this, TrackReportSearchActivity.class));
-                finish();
-            });
+            navTrack.setOnClickListener(v ->
+                    Toast.makeText(this, "You're on Track", Toast.LENGTH_SHORT).show());
         }
 
         View navSettings = findViewById(R.id.navSettings);
@@ -164,6 +109,7 @@ public class TrackReportResultActivity extends AppCompatActivity {
                     startActivity(new Intent(this, ProfileSettingsActivity.class)));
         }
 
+        // Notification bell (in header)
         View ivNotif = findViewById(R.id.ivNotifications);
         if (ivNotif != null) {
             ivNotif.setOnClickListener(v ->
@@ -171,99 +117,8 @@ public class TrackReportResultActivity extends AppCompatActivity {
         }
     }
 
-    private void loadStatusHistory(long reportId) {
-        SessionManager session = new SessionManager(this);
-        String accessToken = session.getAccessToken();
-
-        if (tvHistoryEmpty != null) {
-            tvHistoryEmpty.setText("Loading history…");
-            tvHistoryEmpty.setVisibility(View.VISIBLE);
-        }
-        if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
-
-        new Thread(() -> {
-            try {
-                List<SupabaseReports.StatusHistoryDTO> history =
-                        SupabaseReports.getStatusHistory(reportId, accessToken);
-
-                Log.d(TAG, "Loaded " + history.size() + " history rows for report " + reportId);
-
-                List<StatusHistoryItem> uiItems = new ArrayList<>();
-                for (SupabaseReports.StatusHistoryDTO dto : history) {
-                    uiItems.add(new StatusHistoryItem(
-                            dto.old_status,
-                            dto.new_status,
-                            dto.changed_at,
-                            dto.notes
-                    ));
-                }
-
-                runOnUiThread(() -> renderHistory(uiItems));
-
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load status history: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    if (tvHistoryEmpty != null) {
-                        tvHistoryEmpty.setText("Could not load status history.");
-                        tvHistoryEmpty.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void lookupReportIdAndLoadHistory(String referenceNumber) {
-        if (tvHistoryEmpty != null) {
-            tvHistoryEmpty.setText("Loading history…");
-            tvHistoryEmpty.setVisibility(View.VISIBLE);
-        }
-        if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
-
-        SessionManager session = new SessionManager(this);
-        String accessToken = session.getAccessToken();
-
-        new Thread(() -> {
-            try {
-                FaultReport report = SupabaseReports.getReportByReference(referenceNumber, accessToken);
-                if (report == null) {
-                    runOnUiThread(() -> {
-                        if (tvHistoryEmpty != null) {
-                            tvHistoryEmpty.setText("Status history unavailable.");
-                            tvHistoryEmpty.setVisibility(View.VISIBLE);
-                        }
-                    });
-                    return;
-                }
-                runOnUiThread(() -> loadStatusHistory(report.getReportId()));
-            } catch (Exception e) {
-                Log.e(TAG, "Lookup failed: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    if (tvHistoryEmpty != null) {
-                        tvHistoryEmpty.setText("Could not load status history.");
-                        tvHistoryEmpty.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void renderHistory(List<StatusHistoryItem> items) {
-        historyItems.clear();
-        historyItems.addAll(items);
-
-        if (historyAdapter != null) {
-            historyAdapter.notifyDataSetChanged();
-        }
-
-        if (items.isEmpty()) {
-            if (tvHistoryEmpty != null) {
-                tvHistoryEmpty.setText("No status changes yet. Your report is in the queue.");
-                tvHistoryEmpty.setVisibility(View.VISIBLE);
-            }
-            if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
-        } else {
-            if (tvHistoryEmpty != null) tvHistoryEmpty.setVisibility(View.GONE);
-            if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.VISIBLE);
-        }
+    private void setTextSafe(int viewId, String text) {
+        TextView tv = findViewById(viewId);
+        if (tv != null) tv.setText(text);
     }
 }

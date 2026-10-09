@@ -39,6 +39,7 @@
             </intent-filter>
         </activity>
 
+        <!-- Onboarding -->
         <activity
             android:name=".Onboard_Report_Faults_Activity"
             android:exported="false" />
@@ -49,7 +50,16 @@
             android:name=".Onboard_Community_Impact_Activity"
             android:exported="false" />
 
+        <!-- Guest Mode (shown after Continue as Guest) -->
+        <activity
+            android:name=".Guest_Mode_Activity"
+            android:exported="false" />
+
+        <!-- Main dashboards -->
         <activity android:name=".Dashboard_Activity" android:exported="false" />
+        <activity android:name=".Guest_Dashboard_Activity" android:exported="false" />
+
+        <!-- Track / History -->
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
         <activity android:name=".TrackReportResultActivity" android:exported="false" />
         <activity android:name=".ReportHistoryActivity" android:exported="false" />
@@ -61,11 +71,6 @@
         <activity
             android:name=".Register_Activity"
             android:windowSoftInputMode="adjustResize" />
-
-        <!-- Guest Dashboard -->
-        <activity
-            android:name=".Guest_Dashboard_Activity"
-            android:exported="false" />
 
         <!-- Report flow -->
         <activity android:name=".Notifications_Activity" android:exported="false" />

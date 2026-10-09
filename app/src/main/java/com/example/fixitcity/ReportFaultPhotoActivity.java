@@ -35,6 +35,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.view.View;
+import com.example.fixitcity.data.SessionManager;
+
 public class ReportFaultPhotoActivity extends AppCompatActivity {
 
     private static final String TAG = "ReportFaultPhoto";
@@ -58,6 +61,7 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        hideNavForGuests();
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
@@ -288,6 +292,14 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     private void startNextActivity(Class<?> cls) {

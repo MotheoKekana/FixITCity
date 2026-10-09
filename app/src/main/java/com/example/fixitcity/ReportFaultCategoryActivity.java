@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import com.example.fixitcity.data.SessionManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,9 +41,10 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             return insets;
         });
 
+        hideNavForGuests();
+
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
-        // Clear any stale selection so the user must pick fresh
         reportData.setCategory(null);
         reportData.setCategoryId(-1);
         reportData.setCategoryDescription(null);
@@ -53,7 +56,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
         loadCategoriesFromSupabase();
 
-        // Search filter
         TextInputEditText etSearch = findViewById(R.id.et_search);
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -68,7 +70,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Row tap → store category + categoryId + severity_weight
         listView.setOnItemClickListener((parent, view, position, id) -> {
             FaultCategory selected = filteredList.get(position);
             long realId = selected.getCategoryId();
@@ -83,7 +84,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             startActivity(new Intent(this, ReportFaultGPSActivity.class));
         });
 
-        // Next button → require a category to already be selected
         findViewById(R.id.btn_next).setOnClickListener(v -> {
             if (reportData.getCategory() == null || reportData.getCategoryId() <= 0) {
                 Toast.makeText(this, "Please select a category first", Toast.LENGTH_SHORT).show();
@@ -92,7 +92,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             }
         });
 
-        // ===== Bottom navigation =====
+        // Bottom navigation
         findViewById(R.id.navHome).setOnClickListener(v -> finish());
 
         findViewById(R.id.navReport).setOnClickListener(v ->
@@ -103,12 +103,20 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
         findViewById(R.id.navSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileSettingsActivity.class)));
+
+        View backBtn = findViewById(R.id.back_button);
+        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
-    /**
-     * Fallback list — matches the real Supabase fault_categories table exactly.
-     * Only used if the Supabase query fails or returns empty.
-     */
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
+    }
+
     private void loadFallbackCategories() {
         fullCategoryList.clear();
 
@@ -167,8 +175,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromSupabase() {
-        // Use the logged-in user's token when available so RLS-protected
-        // reads of fault_categories succeed.
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
 

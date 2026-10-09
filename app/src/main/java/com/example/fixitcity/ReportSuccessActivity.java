@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ public class ReportSuccessActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        hideNavForGuests();
 
         tvReference = findViewById(R.id.tv_reference_number);
         tvPriority = findViewById(R.id.tv_priority_score);
@@ -88,6 +91,15 @@ public class ReportSuccessActivity extends AppCompatActivity {
             intent.putExtra("prefill_reference", referenceNumber);
             startActivity(intent);
         });
+    }
+
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     @Override

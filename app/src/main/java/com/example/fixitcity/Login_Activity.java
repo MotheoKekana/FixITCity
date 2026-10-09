@@ -71,14 +71,10 @@ public class Login_Activity extends AppCompatActivity {
 
         btnSignIn = findViewById(R.id.btnSignIn);
         btnGuest = findViewById(R.id.btnGuest);
-        btnRegisterLink =
-                findViewById(R.id.btnRegisterLink);
+        btnRegisterLink = findViewById(R.id.btnRegisterLink);
 
-        tvForgotPassword =
-                findViewById(R.id.tvForgotPassword);
-
-        ivTogglePassword =
-                findViewById(R.id.ivTogglePassword);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
     }
 
     private void setupPasswordVisibility() {
@@ -88,8 +84,7 @@ public class Login_Activity extends AppCompatActivity {
             if (isPasswordVisible[0]) {
                 etPassword.setInputType(
                         InputType.TYPE_CLASS_TEXT
-                                | InputType
-                                .TYPE_TEXT_VARIATION_PASSWORD
+                                | InputType.TYPE_TEXT_VARIATION_PASSWORD
                 );
 
                 ivTogglePassword.setImageResource(
@@ -101,61 +96,37 @@ public class Login_Activity extends AppCompatActivity {
             } else {
                 etPassword.setInputType(
                         InputType.TYPE_CLASS_TEXT
-                                | InputType
-                                .TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                                | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 );
 
                 ivTogglePassword.setImageResource(
-                        android.R.drawable
-                                .ic_menu_close_clear_cancel
+                        android.R.drawable.ic_menu_close_clear_cancel
                 );
 
                 isPasswordVisible[0] = true;
             }
 
-            etPassword.setSelection(
-                    etPassword.getText().length()
-            );
+            etPassword.setSelection(etPassword.getText().length());
         });
     }
 
     private void setupButtons() {
-        btnSignIn.setOnClickListener(
-                view -> attemptLogin()
-        );
+        btnSignIn.setOnClickListener(view -> attemptLogin());
 
         btnGuest.setOnClickListener(view -> {
-            SessionManager guestSession =
-                    new SessionManager(this);
+            SessionManager guestSession = new SessionManager(this);
 
             guestSession.logout();
-
-            guestSession.saveSession(
-                    "guest",
-                    "guest",
-                    "guest@local",
-                    "guest"
-            );
-
+            guestSession.saveSession("guest", "guest", "guest@local", "guest");
             guestSession.setHasCitizenProfile(false);
 
-            startActivity(
-                    new Intent(
-                            this,
-                            Guest_Dashboard_Activity.class
-                    )
-            );
-
+            // ↓ CHANGED: go to Guest_Mode_Activity first (was Guest_Dashboard_Activity)
+            startActivity(new Intent(this, Guest_Mode_Activity.class));
             finish();
         });
 
         btnRegisterLink.setOnClickListener(view ->
-                startActivity(
-                        new Intent(
-                                this,
-                                Register_Activity.class
-                        )
-                )
+                startActivity(new Intent(this, Register_Activity.class))
         );
 
         tvForgotPassword.setOnClickListener(view ->
@@ -168,11 +139,8 @@ public class Login_Activity extends AppCompatActivity {
     }
 
     private void attemptLogin() {
-        String email =
-                etEmail.getText().toString().trim();
-
-        String password =
-                etPassword.getText().toString();
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(
@@ -188,109 +156,55 @@ public class Login_Activity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                String response =
-                        SupabaseAuth.login(
-                                email,
-                                password
-                        );
+                String response = SupabaseAuth.login(email, password);
 
-                if (response == null
-                        || response.trim().isEmpty()) {
-
+                if (response == null || response.trim().isEmpty()) {
                     throw new IOException(
-                            "The authentication server "
-                                    + "returned an empty response"
+                            "The authentication server returned an empty response"
                     );
                 }
 
-                JSONObject json =
-                        new JSONObject(response);
+                JSONObject json = new JSONObject(response);
 
-                String accessToken =
-                        json.getString("access_token");
+                String accessToken = json.getString("access_token");
+                String refreshToken = json.optString("refresh_token", null);
 
-                String refreshToken =
-                        json.optString(
-                                "refresh_token",
-                                null
-                        );
+                JSONObject userJson = json.getJSONObject("user");
+                String authUserId = userJson.getString("id");
+                String userEmail = userJson.optString("email", email);
 
-                JSONObject userJson =
-                        json.getJSONObject("user");
-
-                String authUserId =
-                        userJson.getString("id");
-
-                String userEmail =
-                        userJson.optString(
-                                "email",
-                                email
-                        );
-
-                long userId =
-                        SupabaseUsers
-                                .findUserIdByAuthUuid(
-                                        authUserId,
-                                        accessToken
-                                );
+                long userId = SupabaseUsers.findUserIdByAuthUuid(authUserId, accessToken);
 
                 if (userId <= 0) {
                     throw new IOException(
-                            "Your FixITCity user record "
-                                    + "could not be found"
+                            "Your FixITCity user record could not be found"
                     );
                 }
 
                 SupabaseUsers.CitizenProfileDTO profile =
-                        SupabaseUsers
-                                .findCitizenProfileByUserId(
-                                        userId,
-                                        accessToken
-                                );
+                        SupabaseUsers.findCitizenProfileByUserId(userId, accessToken);
 
-                if (profile == null
-                        || profile.citizen_profile_id <= 0) {
-
+                if (profile == null || profile.citizen_profile_id <= 0) {
                     throw new IOException(
-                            "Your citizen profile "
-                                    + "could not be found"
+                            "Your citizen profile could not be found"
                     );
                 }
 
-                saveSession(
-                        accessToken,
-                        refreshToken,
-                        authUserId,
-                        userEmail,
-                        userId,
-                        profile
-                );
+                saveSession(accessToken, refreshToken, authUserId, userEmail, userId, profile);
 
                 runOnUiThread(() -> {
                     Toast.makeText(
                             this,
-                            "Welcome back, "
-                                    + profile.first_name,
+                            "Welcome back, " + profile.first_name,
                             Toast.LENGTH_SHORT
                     ).show();
 
-                    startActivity(
-                            new Intent(
-                                    this,
-                                    Dashboard_Activity.class
-                            )
-                    );
-
+                    startActivity(new Intent(this, Dashboard_Activity.class));
                     finish();
                 });
 
             } catch (Exception exception) {
-                Log.e(
-                        TAG,
-                        "Login error: "
-                                + exception.getMessage(),
-                        exception
-                );
+                Log.e(TAG, "Login error: " + exception.getMessage(), exception);
 
                 runOnUiThread(() -> {
                     setLoading(false);
@@ -313,30 +227,19 @@ public class Login_Activity extends AppCompatActivity {
             long userId,
             SupabaseUsers.CitizenProfileDTO profile
     ) {
-        SessionManager session =
-                new SessionManager(this);
+        SessionManager session = new SessionManager(this);
 
         // Remove data belonging to a previous account.
         session.logout();
 
-        session.saveSession(
-                accessToken,
-                authUserId,
-                email,
-                "citizen"
-        );
+        session.saveSession(accessToken, authUserId, email, "citizen");
 
-        if (refreshToken != null
-                && !refreshToken.isEmpty()) {
-
+        if (refreshToken != null && !refreshToken.isEmpty()) {
             session.saveRefreshToken(refreshToken);
         }
 
         session.saveUserIdBigint(userId);
-
-        session.saveCitizenProfileId(
-                profile.citizen_profile_id
-        );
+        session.saveCitizenProfileId(profile.citizen_profile_id);
 
         session.saveProfileInfo(
                 profile.first_name,
@@ -377,7 +280,6 @@ public class Login_Activity extends AppCompatActivity {
         if (lower.contains("unable to resolve host")
                 || lower.contains("failed to connect")
                 || lower.contains("timeout")) {
-
             return "Could not connect. Check your internet connection.";
         }
 

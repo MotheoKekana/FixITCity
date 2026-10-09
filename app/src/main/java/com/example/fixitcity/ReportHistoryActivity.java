@@ -51,6 +51,8 @@ public class ReportHistoryActivity extends AppCompatActivity {
             return insets;
         });
 
+        hideNavForGuests();
+
         rvReports = findViewById(R.id.rv_reports);
         tvEmptyState = findViewById(R.id.tv_empty_state);
         btnSyncPending = findViewById(R.id.btn_sync_pending);
@@ -73,6 +75,15 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         View backBtn = findViewById(R.id.back_button);
         if (backBtn != null) backBtn.setOnClickListener(v -> finish());
+    }
+
+    private void hideNavForGuests() {
+        SessionManager session = new SessionManager(this);
+        if (!session.isGuest()) return;
+
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
     private void setupFilterChips() {
@@ -100,7 +111,11 @@ public class ReportHistoryActivity extends AppCompatActivity {
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
-                startActivity(new Intent(this, Dashboard_Activity.class));
+                SessionManager session = new SessionManager(this);
+                Class<?> target = session.isGuest()
+                        ? Guest_Dashboard_Activity.class
+                        : Dashboard_Activity.class;
+                startActivity(new Intent(this, target));
                 finish();
             });
         }
@@ -220,7 +235,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
         filteredReports.clear();
 
         for (FaultReport r : allReports) {
-            // Pending-sync rows always show under All and Pending filters
             if (r.isPendingSync()) {
                 if (currentFilter.equals("All") || currentFilter.equals("Pending")) {
                     filteredReports.add(r);
@@ -277,7 +291,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
     }
 
     private void onReportClicked(FaultReport report) {
-        // Pending-sync rows don't have a real report_id yet — nothing to open
         if (report.isPendingSync()) {
             android.widget.Toast.makeText(this,
                     "This report hasn't synced yet — try Sync pending first.",
