@@ -37,6 +37,9 @@ html {
     font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+/* ═══════════════════════════════════════════════════════ */
+/* HEADER                                                  */
+/* ═══════════════════════════════════════════════════════ */
 .dashboard-header {
     display: flex;
     align-items: flex-start;
@@ -80,22 +83,22 @@ html {
     text-align: right;
 }
 
-.last-updated span,
-.last-updated strong {
-    display: block;
-}
+    .last-updated span,
+    .last-updated strong {
+        display: block;
+    }
 
-.last-updated span {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
+    .last-updated span {
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
 
-.last-updated strong {
-    margin-top: 3px;
-    font-size: 12px;
-}
+    .last-updated strong {
+        margin-top: 3px;
+        font-size: 12px;
+    }
 
 .refresh-button {
     border: 1px solid #d8dee4;
@@ -113,11 +116,14 @@ html {
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
-.refresh-button:hover {
-    border-color: #c5ccd3;
-    background: #fbfcfd;
-}
+    .refresh-button:hover {
+        border-color: #c5ccd3;
+        background: #fbfcfd;
+    }
 
+/* ═══════════════════════════════════════════════════════ */
+/* ALERTS                                                  */
+/* ═══════════════════════════════════════════════════════ */
 .alert-strip {
     display: grid;
     gap: 8px;
@@ -150,22 +156,25 @@ html {
     background: #fffaf2;
 }
 
-.dashboard-alert--warning .alert-indicator {
-    background: var(--amber);
-}
+    .dashboard-alert--warning .alert-indicator {
+        background: var(--amber);
+    }
 
 .dashboard-alert--danger {
     border-color: #edcaca;
     background: #fff7f7;
 }
 
-.dashboard-alert--danger .alert-indicator {
-    background: var(--red);
-}
+    .dashboard-alert--danger .alert-indicator {
+        background: var(--red);
+    }
 
+/* ═══════════════════════════════════════════════════════ */
+/* STATS GRID (now 3 columns)                              */
+/* ═══════════════════════════════════════════════════════ */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     margin-bottom: 18px;
 }
@@ -183,15 +192,9 @@ html {
     border-radius: 12px;
 }
 
-.stat-card--emergency {
-    border-top: 3px solid var(--red);
-    padding-top: 16px;
-}
-
 .stat-card-top,
 .panel-heading,
-.category-copy,
-.emergency-row-copy {
+.category-copy {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -229,11 +232,6 @@ html {
     background: var(--navy-soft);
 }
 
-.stat-icon--danger {
-    color: var(--red);
-    background: var(--red-soft);
-}
-
 .stat-value {
     display: block;
     margin-top: 16px;
@@ -249,7 +247,6 @@ html {
     line-height: 1.45;
 }
 
-
 .stat-card-link {
     display: block;
     color: inherit;
@@ -257,14 +254,14 @@ html {
     transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
-.stat-card-link:hover,
-.stat-card-link:focus-visible {
-    color: inherit;
-    text-decoration: none;
-    transform: translateY(-2px);
-    border-color: #cfd6dc;
-    box-shadow: 0 10px 26px rgba(20, 34, 48, 0.09);
-}
+    .stat-card-link:hover,
+    .stat-card-link:focus-visible {
+        color: inherit;
+        text-decoration: none;
+        transform: translateY(-2px);
+        border-color: #cfd6dc;
+        box-shadow: 0 10px 26px rgba(20, 34, 48, 0.09);
+    }
 
 .panel-action {
     margin-top: auto;
@@ -280,30 +277,16 @@ html {
     font-weight: 700;
 }
 
-.panel-action:hover {
-    background: var(--surface-soft);
-    color: var(--navy);
-}
+    .panel-action:hover {
+        background: var(--surface-soft);
+        color: var(--navy);
+    }
 
-.panel-action--danger {
-    margin-top: 20px;
-    border-color: #e5bcbc;
-    color: var(--red);
-}
-
-.panel-action--danger:hover {
-    background: var(--red-soft);
-    color: var(--red);
-}
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+/* ═══════════════════════════════════════════════════════ */
+/* MAP SECTION (full width)                                */
+/* ═══════════════════════════════════════════════════════ */
+.dashboard-map-section {
     margin-bottom: 18px;
-}
-
-.dashboard-grid--wide {
-    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.8fr);
 }
 
 .panel {
@@ -317,15 +300,11 @@ html {
     margin-bottom: 18px;
 }
 
-.panel-heading h2 {
-    margin: 0;
-    font-size: 17px;
-    letter-spacing: -0.02em;
-}
-
-.panel-kicker--danger {
-    color: var(--red);
-}
+    .panel-heading h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: -0.02em;
+    }
 
 .panel-meta {
     padding-top: 2px;
@@ -335,16 +314,16 @@ html {
 
 .issues-map {
     position: relative;
-    height: 390px;
+    height: 420px;
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: #e9eef1;
 }
 
-.issues-map .leaflet-control-attribution {
-    font-size: 9px;
-}
+    .issues-map .leaflet-control-attribution {
+        font-size: 9px;
+    }
 
 .map-fallback {
     height: 100%;
@@ -353,20 +332,18 @@ html {
     gap: 6px;
     text-align: center;
     color: var(--muted);
-    background:
-        linear-gradient(rgba(255, 255, 255, .6), rgba(255, 255, 255, .6)),
-        repeating-linear-gradient(45deg, #e7ecef, #e7ecef 10px, #edf1f3 10px, #edf1f3 20px);
+    background: linear-gradient(rgba(255, 255, 255, .6), rgba(255, 255, 255, .6)), repeating-linear-gradient(45deg, #e7ecef, #e7ecef 10px, #edf1f3 10px, #edf1f3 20px);
 }
 
-.map-fallback strong {
-    color: var(--text);
-    font-size: 14px;
-}
+    .map-fallback strong {
+        color: var(--text);
+        font-size: 14px;
+    }
 
-.map-fallback span {
-    max-width: 270px;
-    font-size: 11px;
-}
+    .map-fallback span {
+        max-width: 270px;
+        font-size: 11px;
+    }
 
 .map-legend {
     display: flex;
@@ -376,11 +353,11 @@ html {
     font-size: 10px;
 }
 
-.map-legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
+    .map-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
 
 .legend-dot {
     width: 8px;
@@ -393,51 +370,35 @@ html {
     background: var(--navy);
 }
 
-.legend-dot--emergency {
-    background: var(--red);
-}
-
-.emergency-panel {
-    display: flex;
-    flex-direction: column;
-}
-
-.emergency-total {
-    min-width: 42px;
-    height: 42px;
-    padding: 0 10px;
+/* ═══════════════════════════════════════════════════════ */
+/* ANALYTICS GRID                                          */
+/* ═══════════════════════════════════════════════════════ */
+.dashboard-grid {
     display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: var(--red-soft);
-    color: var(--red);
-    font-size: 18px;
-    font-weight: 800;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 18px;
 }
 
-.emergency-list,
 .category-list {
     display: grid;
     gap: 18px;
 }
 
-.emergency-row-copy,
 .category-copy {
     margin-bottom: 7px;
     font-size: 12px;
 }
 
-.emergency-row-copy span,
-.category-copy span {
-    color: #414b55;
-    font-weight: 600;
-}
+    .category-copy span {
+        color: #414b55;
+        font-weight: 600;
+    }
 
-.emergency-row-copy strong,
-.category-copy strong {
-    color: var(--text);
-    font-size: 12px;
-}
+    .category-copy strong {
+        color: var(--text);
+        font-size: 12px;
+    }
 
 .progress-track {
     position: relative;
@@ -455,10 +416,9 @@ html {
     background: #355f7d;
 }
 
-.progress-fill--danger {
-    background: var(--red);
-}
-
+/* ═══════════════════════════════════════════════════════ */
+/* ACTIVITY CHART                                          */
+/* ═══════════════════════════════════════════════════════ */
 .activity-chart {
     min-height: 250px;
     padding-top: 12px;
@@ -509,6 +469,9 @@ html {
     white-space: nowrap;
 }
 
+/* ═══════════════════════════════════════════════════════ */
+/* EMPTY STATES                                            */
+/* ═══════════════════════════════════════════════════════ */
 .empty-state {
     min-height: 200px;
     padding: 24px;
@@ -518,21 +481,17 @@ html {
     color: var(--muted);
 }
 
-.empty-state.compact {
-    min-height: 240px;
-}
+    .empty-state strong {
+        color: var(--text);
+        font-size: 13px;
+    }
 
-.empty-state strong {
-    color: var(--text);
-    font-size: 13px;
-}
-
-.empty-state p {
-    max-width: 280px;
-    margin: 6px auto 0;
-    font-size: 11px;
-    line-height: 1.5;
-}
+    .empty-state p {
+        max-width: 280px;
+        margin: 6px auto 0;
+        font-size: 11px;
+        line-height: 1.5;
+    }
 
 .empty-icon {
     width: 34px;
@@ -555,6 +514,9 @@ html {
     font-size: 10px;
 }
 
+/* ═══════════════════════════════════════════════════════ */
+/* LEAFLET POPUP & MARKERS                                 */
+/* ═══════════════════════════════════════════════════════ */
 .leaflet-popup-content-wrapper {
     border-radius: 9px;
     box-shadow: 0 10px 28px rgba(20, 34, 48, .12);
@@ -582,22 +544,16 @@ html {
     box-shadow: 0 2px 7px rgba(15, 23, 42, .26);
 }
 
-.custom-map-marker.emergency {
-    background: var(--red);
-}
-
+/* ═══════════════════════════════════════════════════════ */
+/* RESPONSIVE                                              */
+/* ═══════════════════════════════════════════════════════ */
 @media (max-width: 1180px) {
     .stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .dashboard-grid--wide {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 860px) {
-
     .dashboard-header,
     .header-actions {
         align-items: flex-start;
@@ -609,7 +565,6 @@ html {
 }
 
 @media (max-width: 620px) {
-
     .dashboard-header {
         flex-direction: column;
     }
@@ -632,7 +587,7 @@ html {
     }
 
     .issues-map {
-        height: 310px;
+        height: 320px;
     }
 
     .activity-chart {

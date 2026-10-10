@@ -9,7 +9,6 @@
     var stats = Model.DashboardData.Statistics;
     var categories = Model.DashboardData.Categories.ReportsByCategory;
     var activity = Model.DashboardData.Activity.ReportsByDay;
-    var emergencies = Model.DashboardData.Emergencies;
     var alerts = Model.DashboardData.Alerts;
     var map = Model.DashboardData.Map;
 
@@ -22,7 +21,6 @@
         longitude = point.Longitude,
         title = point.Title,
         description = point.Description,
-        isEmergency = point.IsEmergency
     }));
 }
 
@@ -34,10 +32,9 @@
     <main class="dashboard-main">
         <header class="dashboard-header" id="overview">
             <div>
-                <p class="eyebrow">Operations overview</p>            
-                 <h1>Good day, @(ViewContext.HttpContext.Session.GetString("Username") ?? "Admin")</h1>
-                <p class="header-copy">Monitor service reports, approvals and urgent issues across the city.</p>
-            </div>
+                <p class="eyebrow">Operations overview</p>
+                <h1>Good day, @(ViewContext.HttpContext.Session.GetString("Username") ?? "Admin")</h1>
+                  </div>
 
             <div class="header-actions">
                 <div class="last-updated">
@@ -66,6 +63,9 @@
             </section>
         }
 
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- STAT CARDS (now 3 columns, not 4)               -->
+        <!-- ═══════════════════════════════════════════════ -->
         <section class="stats-grid" aria-label="Report statistics">
             <a class="stat-card stat-card-link" href="/Reports?status=Approved">
                 <div class="stat-card-top">
@@ -73,7 +73,7 @@
                     <span class="stat-icon stat-icon--success" aria-hidden="true">✓</span>
                 </div>
                 <strong class="stat-value">@stats.ApprovedCount.ToString("N0")</strong>
-                <p>Reports accepted for municipal action</p>
+                
             </a>
 
             <a class="stat-card stat-card-link" href="/Reports?status=PendingApproval">
@@ -82,7 +82,7 @@
                     <span class="stat-icon stat-icon--pending" aria-hidden="true">⌛</span>
                 </div>
                 <strong class="stat-value">@stats.PendingApprovalCount.ToString("N0")</strong>
-                <p>Reports waiting to be reviewed</p>
+                
             </a>
 
             <a class="stat-card stat-card-link" href="/Reports?status=Unresolved">
@@ -91,19 +91,14 @@
                     <span class="stat-icon stat-icon--neutral" aria-hidden="true">○</span>
                 </div>
                 <strong class="stat-value">@stats.UnresolvedCount.ToString("N0")</strong>
-                <p>Open issues still requiring action</p>
-
-            <a class="stat-card stat-card--emergency stat-card-link" href="/Reports?priority=Emergency">
-                <div class="stat-card-top">
-                    <span class="stat-label">Emergency reports</span>
-                    <span class="stat-icon stat-icon--danger" aria-hidden="true">!</span>
-                </div>
-                <strong class="stat-value">@stats.EmergencyCount.ToString("N0")</strong>
-                <p>Urgent reports requiring attention</p>
+               
             </a>
         </section>
 
-        <section class="dashboard-grid dashboard-grid--wide">
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- MAP (now full width, no emergency panel)        -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <section class="dashboard-map-section">
             <article class="panel map-panel" id="map-section">
                 <div class="panel-heading">
                     <div>
@@ -111,67 +106,26 @@
                         <h2>Reported issues map</h2>
                     </div>
                     <div class="map-legend" aria-label="Map legend">
-                        <span><i class="legend-dot legend-dot--standard"></i>Standard</span>
-                        <span><i class="legend-dot legend-dot--emergency"></i>Emergency</span>
+                        <span><i class="legend-dot legend-dot--standard"></i>Reported issue</span>
                     </div>
                 </div>
 
-                <div
-                    id="issuesMap"
-                    class="issues-map"
-                    data-center-lat="@map.CenterLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                    data-center-lng="@map.CenterLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                    data-points="@mapPointsJson">
+                <div id="issuesMap"
+                     class="issues-map"
+                     data-center-lat="@map.CenterLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-center-lng="@map.CenterLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-points="@mapPointsJson">
                     <div class="map-fallback">
                         <strong>Issue map</strong>
                         <span>Map data will appear here when the map service is available.</span>
                     </div>
                 </div>
             </article>
-
-            <article class="panel emergency-panel" id="emergency-section">
-                <div class="panel-heading">
-                    <div>
-                        <p class="panel-kicker panel-kicker--danger">Priority queue</p>
-                        <h2>Emergency summary</h2>
-                    </div>
-                    <span class="emergency-total">@emergencies.TotalEmergencies</span>
-                </div>
-
-                @if (emergencies.EmergenciesByCategory.Any())
-                {
-                    <div class="emergency-list">
-                        @foreach (var item in emergencies.EmergenciesByCategory.OrderByDescending(x => x.Value))
-                        {
-                            var emergencyPercent = emergencies.TotalEmergencies > 0
-                                ? Math.Min(100, (int)Math.Round(item.Value * 100.0 / emergencies.TotalEmergencies))
-                                : 0;
-
-                            <div class="emergency-row">
-                                <div class="emergency-row-copy">
-                                    <span>@item.Key</span>
-                                    <strong>@item.Value</strong>
-                                </div>
-                                <div class="progress-track" aria-hidden="true">
-                                    <span class="progress-fill progress-fill--danger" style="width: @emergencyPercent%"></span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="empty-state compact">
-                        <span class="empty-icon">✓</span>
-                        <strong>No emergency reports</strong>
-                        <p>There are no emergency items in the current dataset.</p>
-                    </div>
-                }
-
-                <a class="panel-action panel-action--danger" href="/Reports?priority=Emergency">View emergency reports</a>
-            </article>
         </section>
 
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- ANALYTICS GRID                                  -->
+        <!-- ═══════════════════════════════════════════════ -->
         <section class="dashboard-grid" aria-label="Dashboard analytics">
             <article class="panel" id="categories-section">
                 <div class="panel-heading">
