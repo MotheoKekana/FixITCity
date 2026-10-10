@@ -260,7 +260,18 @@
 
 
                             <td>
-                                @(string.IsNullOrWhiteSpace(report.AreaName) ? "—" : report.AreaName)
+                                @if (!string.IsNullOrWhiteSpace(report.AreaName))
+                                {
+                                    @report.AreaName
+                                }
+                                else if (report.Latitude != 0 || report.Longitude != 0)
+                                {
+                                    @($"{report.Latitude.ToString("F5", System.Globalization.CultureInfo.InvariantCulture)}, {report.Longitude.ToString("F5", System.Globalization.CultureInfo.InvariantCulture)}")
+                                }
+                                else
+                                {
+                                    @("—")
+                                }
                             </td>
 
 

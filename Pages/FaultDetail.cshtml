@@ -24,7 +24,8 @@
         margin-bottom: 1rem;
     }
 
-    .fault-photo img {
+    .fault-media img,
+    .fault-media video {
         max-width: 100%;
         border-radius: 8px;
         margin-bottom: 1rem;
@@ -36,17 +37,18 @@
         border: 1px solid #ddd;
         border-radius: 8px;
         overflow: hidden;
+        height: 300px;
     }
 
     .priority-breakdown {
         margin-top: 1rem;
     }
 
-        .priority-breakdown h4 {
-            color: #009688;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
+    .priority-breakdown h4 {
+        color: #009688;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
 
     .priority-total {
         margin-top: 0.75rem;
@@ -65,84 +67,94 @@
         margin-top: 2rem;
     }
 
-        .audit-log h4 {
-            color: #009688;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
+    .audit-log h4 {
+        color: #009688;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
 
-        .audit-log table {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+    .audit-log table {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
 
-        .audit-log th {
-            background: #f4f6f9;
-            font-weight: 600;
-        }
+    .audit-log th {
+        background: #f4f6f9;
+        font-weight: 600;
+    }
 
-    /* Back button */
     .btn-secondary {
         background-color: #6c757d;
         border: none;
     }
 
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-    /* Responsive tweaks */
-    .fault-map {
-        height: 200px;
-    }
-
-    .fault-actions {
-        flex-direction: column;
-    }
-
+    .btn-secondary:hover {
+        background-color: #5a6268;
     }
 </style>
 
 <div class="fault-detail-container">
+
     <!-- Header -->
     <div class="fault-header">
         <h2>Fault Report Detail</h2>
         <p class="text-muted">View and manage the full details of this fault</p>
     </div>
 
-    <!-- Report Content -->
-    <div class="fault-content">
-        <!-- Submitted Photo -->
-        <div class="fault-photo">
-            <img src="@Model.PhotoUrl" alt="Submitted Photo" class="fault-image" />
-        </div>
+    <!-- Meta Info -->
+    <div class="mb-3">
+        <span class="badge bg-info text-dark">@Model.FaultCategory</span>
+        <span class="badge bg-secondary">@Model.FaultStatus</span>
+        <small class="text-muted ms-2">
+            Reported: @Model.ReportedAt.ToString("dd MMM yyyy HH:mm")
+        </small>
+    </div>
 
-        <!-- GPS Location -->
-        <div class="fault-map">
-            <div id="fault-map" style="height:300px; width:100%;"></div>
-        </div>
+    <p><strong>Description:</strong> @Model.FaultDescription</p>
 
-        <!-- Priority Breakdown -->
-        <div class="priority-breakdown">
-            <h4>Priority Score Breakdown</h4>
-            <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between">
-                    Proximity to essential services <span>35%</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    Vote count <span>20%</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    Category severity <span>25%</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    Elapsed time <span>20%</span>
-                </li>
-            </ul>
-            <div class="priority-total">
-                <strong>Total Score:</strong> @Model.PriorityScore
-            </div>
+    <!-- Submitted Media (image OR video) -->
+    <div class="fault-media">
+        @if (!string.IsNullOrEmpty(Model.PhotoUrl))
+        {
+            if (Model.MediaContentType == "video")
+            {
+                <video controls preload="metadata">
+                    <source src="@Model.PhotoUrl" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            }
+            else
+            {
+                <img src="@Model.PhotoUrl" alt="Submitted Media" />
+            }
+        }
+    </div>
+
+    <!-- GPS Location Map -->
+    <div class="fault-map">
+        <div id="fault-map" style="height:300px; width:100%;"></div>
+    </div>
+
+    <!-- Priority Breakdown -->
+    <div class="priority-breakdown">
+        <h4>Priority Score Breakdown</h4>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between">
+                Proximity to essential services <span>35%</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                Vote count <span>20%</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                Category severity <span>25%</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                Elapsed time <span>20%</span>
+            </li>
+        </ul>
+        <div class="priority-total">
+            <strong>Total Score:</strong> @Model.PriorityScore
         </div>
     </div>
 
@@ -152,15 +164,21 @@
             <button type="submit" asp-page-handler="Verify" class="btn btn-success">
                 <i class="fas fa-check"></i> Verify Report
             </button>
+
             <button type="submit" asp-page-handler="Reject" class="btn btn-danger">
                 <i class="fas fa-times"></i> Reject Report
             </button>
-            <select name="statusUpdate" class="form-select d-inline-block w-auto">
+
+            <!-- simple reason input for reject action -->
+            <input type="text" name="reason" placeholder="Reason for rejection (optional)" class="form-control d-inline-block w-auto ms-2" />
+
+            <select name="statusUpdate" class="form-select d-inline-block w-auto ms-2">
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Resolved">Resolved</option>
             </select>
-            <button type="submit" asp-page-handler="UpdateStatus" class="btn btn-primary">
+
+            <button type="submit" asp-page-handler="UpdateStatus" class="btn btn-primary ms-2">
                 <i class="fas fa-sync"></i> Update Status
             </button>
         </form>
@@ -179,13 +197,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var log in Model.AuditLogs)
+                @if (Model.AuditLogs.Any())
+                {
+                    @foreach (var log in Model.AuditLogs)
+                    {
+                        <tr>
+                            <td>@log.Action</td>
+                            <td>@log.AdminName</td>
+                            <td>@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                            <td>@log.Reason</td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@log.Action</td>
-                        <td>@log.AdminName</td>
-                        <td>@log.Timestamp.ToString("dd MMM yyyy HH:mm")</td>
-                        <td>@log.Reason</td>
+                        <td colspan="4" class="text-center text-muted">No audit logs yet</td>
                     </tr>
                 }
             </tbody>
@@ -201,14 +228,24 @@
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        var map = L.map('fault-map').setView([@Model.Latitude, @Model.Longitude], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        L.marker([@Model.Latitude, @Model.Longitude]).addTo(map)
-            .bindPopup("Fault Location")
-            .openPopup();
+        // Only render the map if we have valid coordinates
+        var lat = parseFloat('@Model.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)');
+        var lng = parseFloat('@Model.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)');
+
+        if (isFinite(lat) && isFinite(lng) && !(lat === 0 && lng === 0)) {
+            var map = L.map('fault-map').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup("Fault Location")
+                .openPopup();
+        } else {
+            document.getElementById('fault-map').innerHTML =
+                '<p class="text-center text-muted mt-5">No GPS coordinates available for this report</p>';
+        }
     </script>
 }
