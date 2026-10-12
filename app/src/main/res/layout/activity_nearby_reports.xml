@@ -82,40 +82,23 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp" />
 
-            <!-- Filter chips -->
-            <HorizontalScrollView
+            <!-- ============ Filter dropdown ============ -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCategoryFilter"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:scrollbars="none">
+                android:hint="Filter by category">
 
-                <com.google.android.material.chip.ChipGroup
-                    android:layout_width="wrap_content"
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/actCategoryFilter"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true">
+                    android:inputType="none"
+                    tools:ignore="LabelFor" />
 
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="All Reports"
-                        android:textColor="@color/white"
-                        app:chipBackgroundColor="@color/secondary_blue" />
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Burst Pipe" />
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pothole" />
-
-                </com.google.android.material.chip.ChipGroup>
-            </HorizontalScrollView>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- ========== RecyclerView ========== -->
             <androidx.recyclerview.widget.RecyclerView
@@ -128,6 +111,19 @@
                 android:overScrollMode="never"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_nearby_report" />
+
+            <!-- Empty state -->
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="No reports match this filter."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <!-- Priority legend -->
             <com.google.android.material.card.MaterialCardView
@@ -226,7 +222,6 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Home (selected) -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -260,7 +255,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -286,7 +280,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -312,7 +305,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

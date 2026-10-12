@@ -228,6 +228,32 @@ public class SupabaseReports {
         Log.d(TAG, "Photo insert response: " + response);
     }
 
+    public static void insertStatusHistory(long reportId,
+                                           String oldStatus,
+                                           String newStatus,
+                                           String notes,
+                                           String accessToken) throws IOException {
+
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"report_id\":").append(reportId).append(",");
+        if (oldStatus == null) {
+            json.append("\"old_status\":null,");
+        } else {
+            json.append("\"old_status\":\"").append(escape(oldStatus)).append("\",");
+        }
+        json.append("\"new_status\":\"").append(escape(newStatus)).append("\",");
+        if (notes == null) {
+            json.append("\"notes\":null");
+        } else {
+            json.append("\"notes\":\"").append(escape(notes)).append("\"");
+        }
+        json.append("}");
+
+        Log.d(TAG, "insertStatusHistory: " + json);
+        SupabaseClient.postWithAuth("/fault_status_history", json.toString(), accessToken);
+    }
+
     public static List<FaultReport> getUserReports(long citizenId, String accessToken) throws IOException {
         String path = "/fault_reports?citizen_id=eq." + citizenId + "&order=created_at.desc";
         String response = SupabaseClient.getWithAuth(path, accessToken);

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Locale;
 
 public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdapter.ViewHolder> {
 
@@ -30,40 +31,31 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StatusHistoryItem item = items.get(position);
 
-        // "Pending → Assigned" or just "Pending" for the very first entry
-        String label;
-        if (item.oldStatus == null || item.oldStatus.isEmpty()) {
-            label = item.newStatus != null ? item.newStatus : "—";
-        } else {
-            label = item.oldStatus + " → " + item.newStatus;
-        }
-        holder.tvStatus.setText(label);
+        // ----- Date (left column) -----
+        holder.tvDate.setText(formatDate(item.changedAt));
 
-        // Format the timestamp nicely
-        String date = item.changedAt;
-        if (date != null && date.length() >= 16) {
-            try {
-                String d = date.substring(0, 10);       // "2026-04-15"
-                String t = date.substring(11, 16);      // "14:32"
-                String[] parts = d.split("-");
-                String[] months = {"Jan","Feb","Mar","Apr","May","Jun",
-                        "Jul","Aug","Sep","Oct","Nov","Dec"};
-                int monthIdx = Integer.parseInt(parts[1]) - 1;
-                date = Integer.parseInt(parts[2]) + " " + months[monthIdx] + " " +
-                        parts[0] + " · " + t;
-            } catch (Exception ignored) {
-                // Fall back to the raw string if parsing fails
-            }
-        }
-        holder.tvDate.setText(date != null ? date : "—");
+        // ----- Description (right column) -----
+        holder.tvDescription.setText(buildDescription(item));
 
-        // Optional notes line
-        if (item.notes != null && !item.notes.isEmpty()) {
-            holder.tvNotes.setText(item.notes);
-            holder.tvNotes.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvNotes.setVisibility(View.GONE);
-        }
+        // ----- Timeline rail cosmetics -----
+        boolean isFirst = position == 0;
+        boolean isLast  = position == getItemCount() - 1;
+
+        // Hide line above the first dot and below the last dot so it doesn't
+        // extend past the ends of the list.
+        ViewGroup.MarginLayoutParams lineLp =
+                (ViewGroup.MarginLayoutParams) holder.vLine.getLayoutParams();
+        lineLp.topMargin    = isFirst ? dpToPx(holder.itemView, 23) : 0;
+        lineLp.bottomMargin = isLast  ? dpToPx(holder.itemView, 9999) : 0;
+        holder.vLine.setLayoutParams(lineLp);
+
+        // Emphasise the newest event (position 0) with a slightly bigger dot.
+        float dotSizeDp = isFirst ? 18f : 14f;
+        int   dotSizePx = dpToPx(holder.itemView, (int) dotSizeDp);
+        ViewGroup.LayoutParams dotLp = holder.vDot.getLayoutParams();
+        dotLp.width  = dotSizePx;
+        dotLp.height = dotSizePx;
+        holder.vDot.setLayoutParams(dotLp);
     }
 
     @Override
@@ -71,14 +63,80 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
         return items.size();
     }
 
+    /**
+     * "Pending" for the very first event, otherwise "Old → New".
+     * If notes are present, they're appended on a new line.
+     */
+    private String buildDescription(StatusHistoryItem item) {
+        StringBuilder sb = new StringBuilder();
+
+        if (item.oldStatus == null || item.oldStatus.isEmpty()) {
+            sb.append(item.newStatus != null ? item.newStatus : "—");
+        } else {
+            sb.append(item.oldStatus)
+                    .append(" → ")
+                    .append(item.newStatus != null ? item.newStatus : "—");
+        }
+
+        if (item.notes != null && !item.notes.trim().isEmpty()) {
+            sb.append("\n").append(item.notes.trim());
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Accepts Supabase timestamps in a few common shapes and returns
+     * a friendly "16 Sep 2026\n15:37" string. Falls back to the raw value.
+     */
+    private String formatDate(String raw) {
+        if (raw == null || raw.length() < 16) return raw != null ? raw : "—";
+
+        try {
+            // Expect "YYYY-MM-DDTHH:MM..." or "YYYY-MM-DD HH:MM..."
+            String datePart = raw.substring(0, 10);
+            String timePart = raw.substring(11, 16);
+
+            String[] ymd = datePart.split("-");
+            int year  = Integer.parseInt(ymd[0]);
+            int month = Integer.parseInt(ymd[1]);
+            int day   = Integer.parseInt(ymd[2]);
+
+            String[] months = {
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            };
+
+            String monthName = (month >= 1 && month <= 12)
+                    ? months[month - 1]
+                    : String.format(Locale.ROOT, "%02d", month);
+
+            return day + " " + monthName + " " + year + "\n" + timePart;
+
+        } catch (Exception e) {
+            return raw;
+        }
+    }
+
+    private static int dpToPx(View v, int dp) {
+        float density = v.getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
+    // ------------------------------------------------------------------
+
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStatus, tvDate, tvNotes;
+        TextView tvDate;
+        TextView tvDescription;
+        View     vDot;
+        View     vLine;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvStatus = itemView.findViewById(R.id.tv_status);
-            tvDate = itemView.findViewById(R.id.tv_date);
-            tvNotes = itemView.findViewById(R.id.tv_notes);
+            tvDate        = itemView.findViewById(R.id.tv_history_date);
+            tvDescription = itemView.findViewById(R.id.tv_history_description);
+            vDot          = itemView.findViewById(R.id.v_timeline_dot);
+            vLine         = itemView.findViewById(R.id.v_timeline_line);
         }
     }
 }
