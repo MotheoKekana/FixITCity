@@ -41,12 +41,14 @@ public class Dashboard_Activity extends AppCompatActivity {
     private static final double DEFAULT_LAT = -33.9608;
     private static final double DEFAULT_LNG = 25.6022;
     private static final double PROXIMITY_RADIUS_M = 200;
+    private static final int NEARBY_PREVIEW_LIMIT = 5;
 
-    private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius;
+    private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
     private RecyclerView rvRecentReports, rvNearbyReports;
     private FaultReportAdapter adapter;
     private NearbyReportAdapter nearbyAdapter;
     private List<FaultReport> recentReports = new ArrayList<>();
+
     private final List<NearbyReport> nearbyList = new ArrayList<>();
 
     private double userLat = DEFAULT_LAT;
@@ -83,6 +85,7 @@ public class Dashboard_Activity extends AppCompatActivity {
         tvSubtitle = findViewById(R.id.tvSubtitle);
         tvReportCount = findViewById(R.id.tvReportCount);
         tvNearbyRadius = findViewById(R.id.tvNearbyRadius);
+        tvSeeMoreNearby = findViewById(R.id.tvSeeMoreNearby);
         rvRecentReports = findViewById(R.id.rvRecentReports);
         rvNearbyReports = findViewById(R.id.rvNearbyReports);
 
@@ -103,7 +106,13 @@ public class Dashboard_Activity extends AppCompatActivity {
         rvNearbyReports.setAdapter(nearbyAdapter);
 
         // Nearby radius label
-        tvNearbyRadius.setText("Reports within a 200 m radius of your current location");
+        tvNearbyRadius.setText("Reports within a 2km radius of your current location");
+
+        // See all nearby reports link
+        if (tvSeeMoreNearby != null) {
+            tvSeeMoreNearby.setOnClickListener(v ->
+                    startActivity(new Intent(this, NearbyReportsActivity.class)));
+        }
 
         // Notifications bell
         ImageView ivNotif = findViewById(R.id.ivNotifications);
@@ -296,12 +305,27 @@ public class Dashboard_Activity extends AppCompatActivity {
                         ));
                     }
                 }
+
+                // Sort nearest first
+                fresh.sort((a, b) -> Double.compare(a.getDistance(), b.getDistance()));
+
                 Log.d(TAG, "Filtered to " + fresh.size() + " reports within " + PROXIMITY_RADIUS_M + "m");
+
+                final int totalCount = fresh.size();
 
                 runOnUiThread(() -> {
                     nearbyList.clear();
-                    nearbyList.addAll(fresh);
+
+                    // Show at most 5 on the dashboard
+                    int limit = Math.min(totalCount, NEARBY_PREVIEW_LIMIT);
+                    nearbyList.addAll(fresh.subList(0, limit));
                     nearbyAdapter.notifyDataSetChanged();
+
+                    // Show "See all" only when there are more than 5
+                    if (tvSeeMoreNearby != null) {
+                        tvSeeMoreNearby.setVisibility(
+                                totalCount > NEARBY_PREVIEW_LIMIT ? View.VISIBLE : View.GONE);
+                    }
                 });
 
             } catch (IOException e) {

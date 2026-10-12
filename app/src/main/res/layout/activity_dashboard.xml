@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -13,8 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/cardview_light_background">
+        android:background="@color/cardview_light_background"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/iv_logo"
@@ -56,6 +57,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/header">
 
@@ -71,8 +73,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Loading..."
-                android:textSize="24sp"
                 android:textColor="@color/secondary_blue"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
             <!-- Subtitle -->
@@ -84,60 +86,19 @@
                 android:text="View your recent reports, track progress, and see nearby issues"
                 android:textColor="@color/text_secondary" />
 
-            <!-- Stats Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="My Recent Reports"
-                            android:textColor="@color/secondary_blue"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvReportCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Loading..."
-                            android:textColor="@color/text_secondary" />
-
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Quick Actions -->
+            <!-- ===== Stats + Track Report (SIDE BY SIDE) ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
+                <!-- My Recent Reports -->
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardTrackReport"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
+                    android:layout_height="140dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp">
 
@@ -145,7 +106,47 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="My Recent Reports"
+                            android:textColor="@color/secondary_blue"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvReportCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="Loading..."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Track Report -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTrackReport"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
                         <ImageView
                             android:layout_width="40dp"
@@ -158,8 +159,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:gravity="center"
                             android:text="Track Report"
                             android:textColor="@color/secondary_blue"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -181,10 +184,10 @@
                 android:id="@+id/rvRecentReports"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false" />
 
-            <!-- Nearby Issues Map Section -->
+            <!-- Nearby Issues Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -199,11 +202,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Reports within a 200 m radius of your current location"
+                android:text="@string/within_radius"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
-
-            <!-- Map Card -->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvNearbyReports"
@@ -212,10 +213,23 @@
                 android:layout_marginTop="12dp"
                 android:nestedScrollingEnabled="false" />
 
+            <TextView
+                android:id="@+id/tvSeeMoreNearby"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_gravity="end"
+                android:paddingVertical="4dp"
+                android:text="See all nearby reports →"
+                android:textColor="@color/secondary_blue"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (unchanged) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
@@ -224,12 +238,10 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Home (selected) -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
@@ -245,9 +257,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_home_24"
-                app:tint="#111827"
-                android:contentDescription="@null" />
+                app:tint="#111827" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -259,12 +271,10 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
@@ -273,9 +283,9 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_report_24"
-                app:tint="#6B7280"
-                android:contentDescription="@null" />
+                app:tint="#6B7280" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -286,12 +296,10 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
@@ -300,9 +308,9 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_track_24"
-                app:tint="#6B7280"
-                android:contentDescription="@null" />
+                app:tint="#6B7280" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -313,12 +321,10 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -327,9 +333,9 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280"
-                android:contentDescription="@null" />
+                app:tint="#6B7280" />
 
             <TextView
                 android:layout_width="wrap_content"

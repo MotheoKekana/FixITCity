@@ -58,6 +58,9 @@
         <!-- Main dashboards -->
         <activity android:name=".Dashboard_Activity" android:exported="false" />
         <activity android:name=".Guest_Dashboard_Activity" android:exported="false" />
+        <activity android:name=".NearbyReportsActivity" android:exported="false" />
+
+
 
         <!-- Track / History -->
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
