@@ -36,10 +36,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
     /** Radius in meters — 2 km. */
     private static final double RADIUS_METERS = 2000.0;
 
-    /** Fallback coordinates if the device location can't be obtained. */
-    private static final double DEFAULT_LAT = -33.9608;
-    private static final double DEFAULT_LNG = 25.6022;
-
     /** Dropdown options. */
     private static final String FILTER_ALL   = "All Reports";
     private static final String FILTER_OTHER = "Other";
@@ -76,8 +72,8 @@ public class NearbyReportsActivity extends AppCompatActivity {
     private String currentFilter = FILTER_ALL;
 
     private FusedLocationProviderClient fusedClient;
-    private double userLat = DEFAULT_LAT;
-    private double userLng = DEFAULT_LNG;
+    private double userLat;
+    private double userLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,18 +139,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
             }
         });
 
-        actCategoryFilter.setAdapter(filterAdapter);
-        actCategoryFilter.setText(FILTER_ALL, false);
-
-        actCategoryFilter.setOnItemClickListener((parent, view, position, id) -> {
-            Object sel = parent.getItemAtPosition(position);
-            if (sel != null) {
-                currentFilter = sel.toString();
-                android.util.Log.d(TAG, "dropdown selected: " + currentFilter);
-                applyFilter();
-            }
-        });
-
         // ---------- Location ----------
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -171,7 +155,7 @@ public class NearbyReportsActivity extends AppCompatActivity {
     private void fetchLocationThenLoad() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            loadAllNearbyReports();
+            showLocationUnavailable("Enable location to see reports within 2 km.");
             return;
         }
 
@@ -180,16 +164,14 @@ public class NearbyReportsActivity extends AppCompatActivity {
                     if (loc != null) {
                         userLat = loc.getLatitude();
                         userLng = loc.getLongitude();
-                        android.util.Log.d(TAG, "Using device location: "
-                                + userLat + ", " + userLng);
+                        loadAllNearbyReports();
                     } else {
-                        android.util.Log.d(TAG, "No location available, using defaults");
+                        showLocationUnavailable("Could not get your location. Try again later.");
                     }
-                    loadAllNearbyReports();
                 })
                 .addOnFailureListener(e -> {
-                    android.util.Log.e(TAG, "Location failed, using defaults", e);
-                    loadAllNearbyReports();
+                    android.util.Log.e(TAG, "Location failed", e);
+                    showLocationUnavailable("Could not get your location. Try again later.");
                 });
     }
 
@@ -204,22 +186,35 @@ public class NearbyReportsActivity extends AppCompatActivity {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 fetchLocationThenLoad();
             } else {
-                android.util.Log.d(TAG, "Location permission denied, using defaults");
-                loadAllNearbyReports();
+                showLocationUnavailable("Enable location to see reports within 2 km.");
             }
         }
     }
 
-    /** Fetch open reports from Supabase and keep those within RADIUS_METERS. */
+    private void showLocationUnavailable(String message) {
+        allWithinRadius.clear();
+        nearbyList.clear();
+        adapter.notifyDataSetChanged();
+        tvEmptyState.setText(message);
+        tvEmptyState.setVisibility(View.VISIBLE);
+    }
+
+    /** Fetch open reports within 2 km from the database RPC. */
     private void loadAllNearbyReports() {
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
 
+        if (accessToken == null || accessToken.trim().isEmpty()) {
+            showLocationUnavailable("Sign in to see nearby reports.");
+            return;
+        }
+
         new Thread(() -> {
             try {
-                List<FaultReport> allOpen = SupabaseReports.getOpenReports(accessToken);
+                List<FaultReport> allOpen = SupabaseReports.getNearbyReports(
+                        userLat, userLng, accessToken);
 
-                android.util.Log.d(TAG, "getOpenReports returned "
+                android.util.Log.d(TAG, "getNearbyReports returned "
                         + (allOpen == null ? "NULL" : allOpen.size() + " items"));
 
                 List<NearbyReport> fresh = new ArrayList<>();
@@ -248,21 +243,23 @@ public class NearbyReportsActivity extends AppCompatActivity {
                         + " within " + RADIUS_METERS + "m of ("
                         + userLat + ", " + userLng + ")");
 
-                // Temporary diagnostics — tells you what titles are in the list
-                for (NearbyReport n : fresh) {
-                    android.util.Log.d(TAG, "  report title=\"" + n.getTitle() + "\"");
-                }
-
                 runOnUiThread(() -> {
                     allWithinRadius.clear();
                     allWithinRadius.addAll(fresh);
                     applyFilter();
+                    if (fresh.isEmpty()) {
+                        tvEmptyState.setText("No open reports found within 2 km.");
+                    } else {
+                        tvEmptyState.setText("No reports match this filter.");
+                    }
                 });
 
             } catch (IOException e) {
                 android.util.Log.e(TAG, "Failed to load nearby reports", e);
+                runOnUiThread(() -> showLocationUnavailable("Could not load nearby reports. Try again later."));
             } catch (Exception e) {
                 android.util.Log.e(TAG, "Unexpected error loading reports", e);
+                runOnUiThread(() -> showLocationUnavailable("Could not load nearby reports. Try again later."));
             }
         }).start();
     }

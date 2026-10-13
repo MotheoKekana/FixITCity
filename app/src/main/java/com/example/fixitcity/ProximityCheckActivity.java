@@ -208,9 +208,18 @@ public class ProximityCheckActivity extends AppCompatActivity {
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
 
+        if (accessToken == null || accessToken.trim().isEmpty() || session.isGuest()) {
+            progressIndicator.setIndeterminate(false);
+            tvStatus.setText("Sign in to see nearby reports");
+            tvReportsCount.setText("Nearby check unavailable in guest mode");
+            if (btnNewIssue != null) btnNewIssue.setEnabled(true);
+            return;
+        }
+
         new Thread(() -> {
             try {
-                List<FaultReport> allOpen = SupabaseReports.getOpenReports(accessToken);
+                List<FaultReport> allOpen = SupabaseReports.getNearbyReports(
+                        lat, lng, accessToken);
 
                 List<NearbyReport> withinRadius = new ArrayList<>();
 
@@ -266,8 +275,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
             tvReportsCount.setText("0 reports found");
         } else {
             tvStatus.setText("Nearby reports found:");
-            tvReportsCount.setText(withinRadius.size() + " report(s) found within "
-                    + (int)(RADIUS_METERS) + "m");
+            tvReportsCount.setText(withinRadius.size() + " report(s) found within 2 km");
         }
     }
 

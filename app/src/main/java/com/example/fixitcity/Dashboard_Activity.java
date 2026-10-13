@@ -25,6 +25,7 @@ import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,8 +39,6 @@ public class Dashboard_Activity extends AppCompatActivity {
     private static final int REQUEST_NOTIF_PERMISSION = 200;
     private static final int REQUEST_LOCATION_PERMISSION = 201;
 
-    private static final double DEFAULT_LAT = -33.9608;
-    private static final double DEFAULT_LNG = 25.6022;
     private static final double PROXIMITY_RADIUS_M = 2000;
     private static final int NEARBY_PREVIEW_LIMIT = 5;
 
@@ -51,8 +50,8 @@ public class Dashboard_Activity extends AppCompatActivity {
 
     private final List<NearbyReport> nearbyList = new ArrayList<>();
 
-    private double userLat = DEFAULT_LAT;
-    private double userLng = DEFAULT_LNG;
+    private double userLat;
+    private double userLng;
 
     private SessionManager session;
     private FusedLocationProviderClient fusedLocationClient;
@@ -166,7 +165,7 @@ public class Dashboard_Activity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestCurrentLocation();
             } else {
-                loadReportsFromSupabase();
+                showNearbyUnavailable("Enable location to see reports within 2 km");
             }
         }
     }
@@ -245,25 +244,31 @@ public class Dashboard_Activity extends AppCompatActivity {
 
     private void requestCurrentLocation() {
         try {
-            fusedLocationClient.getLastLocation()
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
                     .addOnSuccessListener(location -> {
                         if (location != null) {
                             userLat = location.getLatitude();
                             userLng = location.getLongitude();
-                            Log.d(TAG, "Using cached location: " + userLat + ", " + userLng);
+                            loadReportsFromSupabase();
                         } else {
-                            Log.d(TAG, "No cached location — using default");
+                            showNearbyUnavailable("Could not get your location. Try again later.");
                         }
-                        loadReportsFromSupabase();
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "getLastLocation failed", e);
-                        loadReportsFromSupabase();
+                        Log.e(TAG, "getCurrentLocation failed", e);
+                        showNearbyUnavailable("Could not get your location. Try again later.");
                     });
         } catch (SecurityException e) {
             Log.e(TAG, "Permission revoked mid-flight", e);
-            loadReportsFromSupabase();
+            showNearbyUnavailable("Enable location to see reports within 2 km");
         }
+    }
+
+    private void showNearbyUnavailable(String message) {
+        tvNearbyRadius.setText(message);
+        nearbyList.clear();
+        nearbyAdapter.notifyDataSetChanged();
+        if (tvSeeMoreNearby != null) tvSeeMoreNearby.setVisibility(View.GONE);
     }
 
     private void loadReportsFromSupabase() {
@@ -279,11 +284,12 @@ public class Dashboard_Activity extends AppCompatActivity {
                     categoryNames.put(c.getCategoryId(), c.getName());
                 }
 
-                // Open reports
-                List<FaultReport> openReports = SupabaseReports.getOpenReports(accessToken);
-                Log.d(TAG, "Fetched " + openReports.size() + " open reports");
+                // The database RPC restricts results to open reports within 2 km.
+                List<FaultReport> openReports = SupabaseReports.getNearbyReports(
+                        userLat, userLng, accessToken);
+                Log.d(TAG, "Fetched " + openReports.size() + " nearby reports");
 
-                // Filter by distance
+                // Retain a local distance check for display and rounding at the boundary.
                 List<NearbyReport> fresh = new ArrayList<>();
                 for (FaultReport r : openReports) {
                     double distance = SupabaseReports.haversineMeters(
@@ -314,6 +320,7 @@ public class Dashboard_Activity extends AppCompatActivity {
                 final int totalCount = fresh.size();
 
                 runOnUiThread(() -> {
+                    tvNearbyRadius.setText("Reports within 2 km of your current location");
                     nearbyList.clear();
 
                     // Show at most 5 on the dashboard

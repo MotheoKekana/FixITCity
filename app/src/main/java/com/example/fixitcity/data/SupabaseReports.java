@@ -51,25 +51,28 @@ public class SupabaseReports {
 
     }
 
-    public static List<FaultReport> getOpenReports(String accessToken) throws IOException {
-        String path = "/fault_reports?status=in.(Pending,Assigned)"
-                + "&order=created_at.desc";
-
-        String response;
-        if (accessToken != null && !accessToken.isEmpty()) {
-            response = SupabaseClient.getWithAuth(path, accessToken);
-        } else {
-            response = SupabaseClient.get(path);
+    /** Open reports within 2 km, including reports owned by other citizens. */
+    public static List<FaultReport> getNearbyReports(
+            double latitude, double longitude, String accessToken) throws IOException {
+        if (Double.isNaN(latitude) || Double.isInfinite(latitude)
+                || Double.isNaN(longitude) || Double.isInfinite(longitude)
+                || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+            throw new IOException("Invalid location for nearby reports");
         }
-        Log.d(TAG, "getOpenReports response: " + response);
-
-        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            return new ArrayList<>();
+        if (accessToken == null || accessToken.trim().isEmpty()) {
+            throw new IOException("Sign in to view nearby reports");
         }
 
-        Type listType = new TypeToken<List<FaultReport>>(){}.getType();
-        List<FaultReport> results = gson.fromJson(response, listType);
-        return results != null ? results : new ArrayList<>();
+        String body = "{\"lat\":" + latitude + ",\"lng\":" + longitude + "}";
+        String response = SupabaseClient.postWithAuth(
+                "/rpc/nearby_reports", body, accessToken);
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Invalid nearby reports response");
+        }
+
+        Type listType = new TypeToken<List<FaultReport>>() {}.getType();
+        List<FaultReport> reports = gson.fromJson(response, listType);
+        return reports != null ? reports : new ArrayList<>();
     }
 
     public static List<FaultCategory> getCategories(String accessToken) throws IOException {
