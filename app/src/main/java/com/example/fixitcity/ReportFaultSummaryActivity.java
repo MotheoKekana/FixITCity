@@ -137,7 +137,6 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                 FaultReport created = SupabaseReports.submitReport(
                         citizenProfileId,
                         categoryId,
-                        reportData.getCategorySeverityWeight(),
                         referenceNumber,
                         reportData.getCategory(),
                         reportData.getAdditionalDetails(),
@@ -176,15 +175,13 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                     }
                 }
 
-                final int finalPriority = created.getPriorityScore() != null
-                        ? created.getPriorityScore()
-                        : SupabaseReports.computePriorityScore(reportData.getCategorySeverityWeight());
-
                 final FaultReport reportFinal = created;
                 runOnUiThread(() -> {
                     Intent intent = new Intent(this, ReportSuccessActivity.class);
                     intent.putExtra("reference_number", reportFinal.getReferenceNumber());
-                    intent.putExtra("priority_score", finalPriority);
+                    if (reportFinal.getPriorityScore() != null) {
+                        intent.putExtra("priority_score", reportFinal.getPriorityScore().intValue());
+                    }
                     intent.putExtra("is_queued", false);
                     startActivity(intent);
                     ((FixITCityApp) getApplication()).clearReportData();
@@ -263,8 +260,9 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             row.longitude = reportData.getLongitude();
             row.address_line = reportData.getLocationAddress();
             row.reference_number = referenceNumber;
-            row.priority_score = SupabaseReports.computePriorityScore(
-                    reportData.getCategorySeverityWeight());
+            // The database calculates priority after this report syncs.
+            // Keep the Room column for existing installs, but do not invent a score.
+            row.priority_score = 0;
             row.photo_filename = photoFilename;
             row.photo_mime_type = photoMime;
             row.sync_status = "Pending";
@@ -275,11 +273,9 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
 
             SyncScheduler.scheduleSync(getApplicationContext());
 
-            final int finalPriority = row.priority_score;
             runOnUiThread(() -> {
                 Intent intent = new Intent(this, ReportSuccessActivity.class);
                 intent.putExtra("reference_number", referenceNumber);
-                intent.putExtra("priority_score", finalPriority);
                 intent.putExtra("is_queued", true);
                 startActivity(intent);
                 ((FixITCityApp) getApplication()).clearReportData();

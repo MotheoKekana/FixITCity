@@ -18,16 +18,6 @@ public class SupabaseReports {
     private static final String TAG = "SupabaseReports";
     private static final Gson gson = new Gson();
 
-    // Turns category weight (1-10) into a priority score from 0-100
-    // Clamped so the value remains  valid in the DB CHECK constraint
-    public static int computePriorityScore(double severityWeight) //Returns an integer priority score
-    {
-        int score = (int)Math.round(severityWeight * 10.0);
-        if (score < 0 ) score = 0; //If it ever computes a score lower than zero, force score to be 0.
-        if (score > 100) score = 100; //If it computes score higher than 100, force score to be 100.
-        return score;
-    }
-
     //Builds tracking number in format: FIX-YYYY-XXXXXXXX.
     //The number is generated before submission so that it is reused on retry.
     public static String generateReferenceNumber() //returns reference number as string
@@ -145,7 +135,6 @@ public class SupabaseReports {
     public static FaultReport submitReport(
             long citizenId,
             long categoryId,
-            double severityWeight,
             String referenceNumber,
             String title,
             String description,
@@ -154,8 +143,6 @@ public class SupabaseReports {
             String addressLine,
             String accessToken
     ) throws IOException {
-
-        int priorityScore = computePriorityScore(severityWeight);
 
         StringBuilder json = new StringBuilder();
         json.append("{");
@@ -168,7 +155,6 @@ public class SupabaseReports {
         json.append("\"address_line\":\"").append(escape(addressLine)).append("\",");
         json.append("\"status\":\"Pending\",");
         json.append("\"reference_number\":\"").append(referenceNumber).append("\",");
-        json.append("\"priority_score\":").append(priorityScore).append(",");
         json.append("\"is_offline\":false,");
         json.append("\"sync_status\":\"Synced\",");
         json.append("\"is_duplicate\":false");
@@ -184,6 +170,18 @@ public class SupabaseReports {
 
         if (created == null || created.isEmpty()) {
             throw new IOException("Failed to create report");
+        }
+
+        // An AFTER INSERT database trigger calculates priority. INSERT's returned
+        // representation may still contain the pre-trigger value, so read the
+        // saved row once to display the authoritative score.
+        try {
+            FaultReport saved = getReportByReference(referenceNumber, accessToken);
+            if (saved != null) return saved;
+        } catch (IOException e) {
+            // The insert succeeded. Do not treat a failed follow-up read as a
+            // failed submission or queue a second copy of the same report.
+            Log.w(TAG, "Created report, but could not reload its priority", e);
         }
         return created.get(0);
     }
@@ -226,32 +224,6 @@ public class SupabaseReports {
         Log.d(TAG, "Inserting photo: " + json);
         String response = SupabaseClient.postWithAuth("/report_photos", json, accessToken);
         Log.d(TAG, "Photo insert response: " + response);
-    }
-
-    public static void insertStatusHistory(long reportId,
-                                           String oldStatus,
-                                           String newStatus,
-                                           String notes,
-                                           String accessToken) throws IOException {
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"report_id\":").append(reportId).append(",");
-        if (oldStatus == null) {
-            json.append("\"old_status\":null,");
-        } else {
-            json.append("\"old_status\":\"").append(escape(oldStatus)).append("\",");
-        }
-        json.append("\"new_status\":\"").append(escape(newStatus)).append("\",");
-        if (notes == null) {
-            json.append("\"notes\":null");
-        } else {
-            json.append("\"notes\":\"").append(escape(notes)).append("\"");
-        }
-        json.append("}");
-
-        Log.d(TAG, "insertStatusHistory: " + json);
-        SupabaseClient.postWithAuth("/fault_status_history", json.toString(), accessToken);
     }
 
     public static List<FaultReport> getUserReports(long citizenId, String accessToken) throws IOException {

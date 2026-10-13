@@ -120,7 +120,6 @@ public class SyncWorker extends Worker {
             created = SupabaseReports.submitReport(
                     row.citizen_id,
                     row.category_id,
-                    row.severity_weight,
                     row.reference_number,
                     row.title,
                     row.description,

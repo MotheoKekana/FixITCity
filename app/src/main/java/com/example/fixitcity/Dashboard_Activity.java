@@ -40,7 +40,7 @@ public class Dashboard_Activity extends AppCompatActivity {
 
     private static final double DEFAULT_LAT = -33.9608;
     private static final double DEFAULT_LNG = 25.6022;
-    private static final double PROXIMITY_RADIUS_M = 200;
+    private static final double PROXIMITY_RADIUS_M = 2000;
     private static final int NEARBY_PREVIEW_LIMIT = 5;
 
     private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
@@ -106,7 +106,7 @@ public class Dashboard_Activity extends AppCompatActivity {
         rvNearbyReports.setAdapter(nearbyAdapter);
 
         // Nearby radius label
-        tvNearbyRadius.setText("Reports within a 2km radius of your current location");
+        tvNearbyRadius.setText("Reports within 2 km of your current location");
 
         // See all nearby reports link
         if (tvSeeMoreNearby != null) {

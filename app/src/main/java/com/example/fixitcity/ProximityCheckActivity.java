@@ -262,7 +262,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         if (withinRadius.isEmpty()) {
-            tvStatus.setText("No nearby reports found within " + (int)(RADIUS_METERS) + "m");
+            tvStatus.setText("No nearby reports found within 2 km");
             tvReportsCount.setText("0 reports found");
         } else {
             tvStatus.setText("Nearby reports found:");

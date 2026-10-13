@@ -22,6 +22,7 @@ public class ReportSuccessActivity extends AppCompatActivity {
     private String referenceNumber;
     private int priorityScore;
     private boolean isQueued;
+    private boolean hasPriorityScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +44,19 @@ public class ReportSuccessActivity extends AppCompatActivity {
         referenceNumber = getIntent().getStringExtra("reference_number");
         priorityScore = getIntent().getIntExtra("priority_score", 0);
         isQueued = getIntent().getBooleanExtra("is_queued", false);
+        hasPriorityScore = !isQueued && getIntent().hasExtra("priority_score");
 
         if (referenceNumber == null) referenceNumber = "FIX-0000-0000";
 
         tvReference.setText(referenceNumber);
-        tvPriority.setText(priorityScore + "/100");
+        tvPriority.setText(isQueued ? "After sync"
+                : hasPriorityScore ? priorityScore + "/100" : "Calculating");
         tvStatus.setText(isQueued ? "Queued" : "Pending");
+        ((TextView) findViewById(R.id.tv_success_title)).setText(
+                isQueued ? "Report saved on this phone" : "Report submitted!");
+        ((TextView) findViewById(R.id.tv_success_message)).setText(isQueued
+                ? "It will be sent when you're online. Keep this reference number to track it later."
+                : "Your report has been sent. Keep this reference number to track its progress.");
 
         findViewById(R.id.btn_copy_ref).setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -60,10 +68,9 @@ public class ReportSuccessActivity extends AppCompatActivity {
         findViewById(R.id.btn_share).setOnClickListener(v -> {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
-            String shareText = "FixITCity Report\nReference: " + referenceNumber +
-                    "\nPriority: " + priorityScore + "/100" +
-                    "\nStatus: " + (isQueued ? "Queued (will sync when online)" : "Pending") +
-                    "\n\nTrack at: https://fixitcity.gov/track/" + referenceNumber;
+            String shareText = "FixITCity Report\nReference: " + referenceNumber
+                    + (hasPriorityScore ? "\nPriority: " + priorityScore + "/100" : "")
+                    + "\nStatus: " + (isQueued ? "Queued (will sync when online)" : "Pending");
             shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
             startActivity(Intent.createChooser(shareIntent, "Share via"));
         });
@@ -87,6 +94,10 @@ public class ReportSuccessActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btn_track_report).setOnClickListener(v -> {
+            if (isQueued) {
+                Toast.makeText(this, "You can track this report after it syncs", Toast.LENGTH_LONG).show();
+                return;
+            }
             Intent intent = new Intent(this, TrackReportSearchActivity.class);
             intent.putExtra("prefill_reference", referenceNumber);
             startActivity(intent);

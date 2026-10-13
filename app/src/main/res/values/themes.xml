@@ -5,6 +5,14 @@
         <item name="colorSecondary">@color/secondary_blue</item>
         <item name="android:windowBackground">@color/background_light</item>
         <item name="android:statusBarColor">@color/primary_green</item>
+        <item name="android:windowAnimationStyle">@style/FixITCityActivityAnimation</item>
+    </style>
+
+    <style name="FixITCityActivityAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_fade_out</item>
     </style>
 
     <style name="Theme.FixITCity.NoActionBar">
