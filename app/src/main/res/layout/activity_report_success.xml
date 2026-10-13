@@ -29,7 +29,7 @@
                 android:layout_height="80dp"
                 android:background="@drawable/bg_circle_green"
                 android:padding="16dp"
-                android:src="@android:drawable/checkbox_on_background"
+                android:src="@drawable/ic_check_success"
                 app:tint="@color/white" />
 
             <TextView

@@ -110,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="📍 Location"
+                        android:text="Location: "
                         android:textColor="@color/text_secondary" />
 
                     <TextView
@@ -118,7 +118,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="📅 Reported: —"
+                        android:text="Reported: —"
                         android:textColor="@color/text_secondary" />
 
                     <TextView
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="❗ Priority Score: 0/100"
+                        android:text="Priority Score: 0/100"
                         android:textColor="@color/text_secondary" />
 
                     <TextView

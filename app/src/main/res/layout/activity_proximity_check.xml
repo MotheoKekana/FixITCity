@@ -97,7 +97,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📋 Is this already reported?"
+                android:text="Is this already reported?"
                 android:textColor="@color/secondary_blue"
                 android:textSize="20sp"
                 android:textStyle="bold" />
