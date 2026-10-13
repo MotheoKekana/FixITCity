@@ -2,8 +2,10 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +58,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         }
         if (tvPhone != null) {
             String phone = session.getPhone();
-            tvPhone.setText(phone != null && !phone.isEmpty() ? phone : "—");
+            tvPhone.setText(phone != null && !phone.isEmpty() ? phone : "No phone number saved");
         }
 
         // ===== Load real report count =====
@@ -81,6 +83,22 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 tvReportsCount.setText("—");
             }
         }
+
+        bindSettingsRow(R.id.settingsReportHistory, R.drawable.ic_report_24,
+                "Report history", "View your submitted and pending reports",
+                v -> startActivity(new Intent(this, ReportHistoryActivity.class)));
+
+        bindSettingsRow(R.id.settingsTrackReport, R.drawable.ic_track_24,
+                "Track a report", "Look up a report by its reference number",
+                v -> startActivity(new Intent(this, TrackReportSearchActivity.class)));
+
+        bindSettingsRow(R.id.settingsNotifications, R.drawable.ic_bell_outline_24,
+                "Phone notifications", "Manage FixITCity notification permission",
+                v -> {
+                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                    startActivity(intent);
+                });
 
         // ===== Logout button =====
         View logoutBtn = findViewById(R.id.btnLogout);
@@ -131,11 +149,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     Toast.makeText(this, "You're already in Settings", Toast.LENGTH_SHORT).show());
         }
 
-        // ===== Notification bell =====
-        View ivNotif = findViewById(R.id.ivNotifications);
-        if (ivNotif != null) {
-            ivNotif.setOnClickListener(v ->
-                    startActivity(new Intent(this, Notifications_Activity.class)));
-        }
+    }
+
+    private void bindSettingsRow(int rowId, int iconRes, String title,
+                                 String subtitle, View.OnClickListener action) {
+        View row = findViewById(rowId);
+        ((ImageView) row.findViewById(R.id.iv_icon)).setImageResource(iconRes);
+        ((TextView) row.findViewById(R.id.tv_title)).setText(title);
+        ((TextView) row.findViewById(R.id.tv_subtitle)).setText(subtitle);
+        row.setContentDescription(title + ". " + subtitle);
+        row.setOnClickListener(action);
     }
 }
