@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+﻿@page "{id:long}"
 @model FixITCity_Dashboard.Pages.FaultDetailModel
 @{
     ViewData["Title"] = "Fault Detail";
@@ -156,8 +156,11 @@
                 </button>
                 <select name="statusUpdate" class="form-select d-inline-block w-auto">
                     <option value="Pending">Pending</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Accepted">Accepted</option>
                     <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
+                    <option value="Fixed">Fixed</option>
+                    <option value="Rejected">Rejected</option>
                 </select>
                 <button type="submit" asp-page-handler="UpdateStatus" class="btn btn-primary">
                     <i class="fas fa-sync"></i> Update Status
@@ -200,14 +203,48 @@
     </div>
 
     @section Scripts {
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <script>
-            var map = L.map('fault-map').setView([@Model.Latitude, @Model.Longitude], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-            L.marker([@Model.Latitude, @Model.Longitude]).addTo(map)
-                .bindPopup("Fault Location")
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const latitudeText = '@(Model.Latitude?.ToString(
+            System.Globalization.CultureInfo.InvariantCulture) ?? "")';
+
+        const longitudeText = '@(Model.Longitude?.ToString(
+            System.Globalization.CultureInfo.InvariantCulture) ?? "")';
+
+        const latitude = Number.parseFloat(latitudeText);
+        const longitude = Number.parseFloat(longitudeText);
+
+        const mapContainer = document.getElementById('fault-map');
+
+        if (Number.isFinite(latitude) &&
+            Number.isFinite(longitude) &&
+            !(latitude === 0 && longitude === 0)) {
+
+            const map = L.map('fault-map')
+                .setView([latitude, longitude], 15);
+
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }
+            ).addTo(map);
+
+            L.marker([latitude, longitude])
+                .addTo(map)
+                .bindPopup('Fault location')
                 .openPopup();
-        </script>
-    }
+        }
+        else {
+            mapContainer.innerHTML =
+                '<p class="text-center text-muted mt-5">' +
+                'No GPS coordinates are available for this report.' +
+                '</p>';
+        }
+    </script>
+}
