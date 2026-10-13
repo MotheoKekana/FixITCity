@@ -1,68 +1,146 @@
+using FixITCityAPI.Models;
+using FixITCityAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using FixITCityAPI.Models; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add CORS
-builder.Services.AddCors(options =>
+// -------------------------------------------------
+// Database
+// -------------------------------------------------
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
 {
-    options.AddPolicy("AllowAll",
-        policy =>
+    throw new InvalidOperationException(
+        "The DefaultConnection connection string is missing.");
+}
+
+builder.Services.AddDbContext<FixITCityDbContext>(options =>
+{
+    options.UseNpgsql(
+        connectionString,
+        npgsqlOptions =>
         {
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorCodesToAdd: null);
+
+            npgsqlOptions.CommandTimeout(60);
         });
 });
 
-// Register DbContext
-builder.Services.AddDbContext<FixITCityAPI.Models.FixITCityDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// -------------------------------------------------
+// CORS
+// -------------------------------------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowDashboard", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:5011",
+                "https://localhost:5011")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
+// -------------------------------------------------
+// Controllers and Swagger
+// -------------------------------------------------
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var jwtKey = builder.Configuration["Jwt:Key"]!;
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
-var jwtAudience = builder.Configuration["Jwt:Audience"]!;
+// -------------------------------------------------
+// JWT configuration
+// -------------------------------------------------
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
 
-builder.Services.AddScoped<FixITCityAPI.Services.JwtTokenService>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException(
+        "Jwt:Key is missing from appsettings.json.");
+}
+
+if (string.IsNullOrWhiteSpace(jwtIssuer))
+{
+    throw new InvalidOperationException(
+        "Jwt:Issuer is missing from appsettings.json.");
+}
+
+if (string.IsNullOrWhiteSpace(jwtAudience))
+{
+    throw new InvalidOperationException(
+        "Jwt:Audience is missing from appsettings.json.");
+}
+
+builder.Services.AddScoped<JwtTokenService>();
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+
+        options.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-        };
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtIssuer,
+
+                ValidateAudience = true,
+                ValidAudience = jwtAudience,
+
+                ValidateLifetime = true,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtKey)),
+
+                ClockSkew = TimeSpan.Zero
+            };
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<FixITCityAPI.Services.JwtTokenService>();
 
+// -------------------------------------------------
+// Build application
+// -------------------------------------------------
 var app = builder.Build();
 
+// -------------------------------------------------
+// HTTP request pipeline
+// -------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseCors("AllowAll");
-app.UseAuthorization();
+// You can comment this out while only using HTTP locally.
+// app.UseHttpsRedirection();
+
+app.UseCors("AllowDashboard");
+
+// Authentication must come before authorization.
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
+app.MapControllers();
 
 app.Run();

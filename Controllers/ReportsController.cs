@@ -15,7 +15,9 @@ public class ReportsController : ControllerBase
         _context = context;
     }
 
+    // -----------------------------------------------------
     // GET: api/reports
+    // -----------------------------------------------------
     [HttpGet]
     public async Task<IActionResult> GetAllReports()
     {
@@ -53,7 +55,9 @@ public class ReportsController : ControllerBase
         }
     }
 
+    // -----------------------------------------------------
     // GET: api/reports/{id}
+    // -----------------------------------------------------
     [HttpGet("{id}")]
     public async Task<IActionResult> GetReport(int id)
     {
@@ -70,7 +74,37 @@ public class ReportsController : ControllerBase
             if (report == null)
                 return NotFound(new { message = "Report not found" });
 
-            return Ok(report);
+            return Ok(new
+            {
+                reportId = report.ReportId,
+                referenceNumber = report.ReferenceNumber,
+                title = report.Title,
+                description = report.Description,
+                status = report.Status,
+                addressLine = report.AddressLine,
+                categoryName = report.Category != null ? report.Category.Name : null,
+                latitude = report.Latitude,
+                longitude = report.Longitude,
+                priorityScore = report.PriorityScore,
+                reportedAt = report.CreatedAt,
+
+                reportPhotos = report.ReportPhotos.Select(p => new
+                {
+                    photoId = p.PhotoId,
+                    photoUrl = p.PhotoUrl,
+                    supabaseStoragePath = p.SupabaseStoragePath,
+                    isPrimary = p.IsPrimary,
+                    uploadedAt = p.UploadedAt
+                }),
+
+                auditLogs = report.FaultStatusHistories.Select(h => new
+                {
+                    action = h.NewStatus,
+                    adminName = "System",
+                    timestamp = h.ChangedAt,
+                    reason = h.Notes
+                })
+            });
         }
         catch (Exception ex)
         {
@@ -78,56 +112,61 @@ public class ReportsController : ControllerBase
         }
     }
 
-    // POST: api/reports
-    // [HttpPost] this method is commented out because it was not part of the original request, but it can be uncommented and used to create new reports from the Web dashboard.
-    // public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest request)
-    // {
-    //     try
-    //     {
-    //         var random = new Random();
-    //         var referenceNumber = "FIX-" + DateTime.Now.ToString("yyyyMMdd") + "-" + random.Next(1000, 9999);
+    // -----------------------------------------------------
+    // PUT: api/reports/{id}
+    // -----------------------------------------------------
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateReport(int id, [FromBody] UpdateReportRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.Status))
+            return BadRequest(new { error = "Status is required." });
 
-    //         var report = new FaultReport
-    //         {
-    //             CitizenId = request.CitizenId,
-    //             CategoryId = request.CategoryId,
-    //             AreaId = request.AreaId,
-    //             Title = request.Title,
-    //             Description = request.Description,
-    //             Latitude = request.Latitude,
-    //             Longitude = request.Longitude,
-    //             Status = "Pending",
-    //             ReferenceNumber = referenceNumber,
-    //             IsOffline = request.IsOffline,
-    //             SyncStatus = request.IsOffline ? "Pending" : "Synced",
-    //             CreatedAt = DateTime.Now
-    //         };
+        try
+        {
+            var report = await _context.FaultReports
+                .FirstOrDefaultAsync(r => r.ReportId == id);
 
-    //         _context.FaultReports.Add(report);
-    //         await _context.SaveChangesAsync();
+            if (report == null)
+                return NotFound(new { error = $"Report {id} not found." });
 
-    //         return Ok(new
-    //         {
-    //             message = "Report submitted successfully",
-    //             report_id = report.ReportId,
-    //             reference_number = referenceNumber
-    //         });
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, new { error = ex.Message });
-    //     }
-    // }
+            string oldStatus = report.Status ?? "Unknown";
+
+            report.Status = request.Status;
+            report.UpdatedAt = DateTime.UtcNow;
+
+            var historyEntry = new FaultStatusHistory
+            {
+                ReportId = id,
+                OldStatus = oldStatus,
+                NewStatus = request.Status,
+                ChangedAt = DateTime.UtcNow,
+                Notes = request.Reason ?? $"Status changed from {oldStatus} to {request.Status}."
+            };
+            _context.FaultStatusHistories.Add(historyEntry);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                success = true,
+                reportId = id,
+                oldStatus = oldStatus,
+                newStatus = request.Status,
+                message = $"Status updated to {request.Status}."
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
 }
 
-public class CreateReportRequest
+// -----------------------------------------------------
+// DTO for the PUT request body
+// -----------------------------------------------------
+public class UpdateReportRequest
 {
-    public int CitizenId { get; set; }
-    public int CategoryId { get; set; }
-    public int? AreaId { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public decimal Latitude { get; set; }
-    public decimal Longitude { get; set; }
-    public bool IsOffline { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string? Reason { get; set; }
 }
