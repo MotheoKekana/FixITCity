@@ -1,8 +1,10 @@
 package com.example.fixitcity;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,39 +12,80 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class RecentReportAdapter extends RecyclerView.Adapter<RecentReportAdapter.ViewHolder> {
+public class RecentReportAdapter
+        extends RecyclerView.Adapter<RecentReportAdapter.ViewHolder> {
 
-    private List<RecentReport> reports;
+    public interface OnItemClickListener {
+        void onItemClick(FaultReport report);
+    }
 
-    public RecentReportAdapter(List<RecentReport> reports) {
-        this.reports = reports;
+    private final List<FaultReport> items;
+    private final OnItemClickListener listener;
+
+    public RecentReportAdapter(List<FaultReport> items, OnItemClickListener listener) {
+        this.items = items;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
-        return new ViewHolder(view);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_recent_report, parent, false);
+        return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RecentReport report = reports.get(position);
-        holder.text1.setText(report.getTitle());
-        holder.text2.setText(report.getStatus() + " · " + report.getDate());
+        FaultReport r = items.get(position);
+
+        holder.tvTitle.setText(r.getTitle() != null ? r.getTitle() : "Report");
+        holder.tvReference.setText(
+                r.getReferenceNumber() != null ? r.getReferenceNumber() : "—");
+        holder.tvDate.setText( (r.getCreatedAt() != null ? r.getCreatedAt() : "—"));
+
+        int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
+        holder.tvPriority.setText("Score " + score + "/100");
+
+        String status = r.getStatus() != null ? r.getStatus() : "Pending";
+        holder.tvStatus.setText(status);
+        holder.tvStatus.setBackgroundTintList(
+                ColorStateList.valueOf(colorForStatus(status)));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(r);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return reports.size();
+        return items.size();
+    }
+
+    private int colorForStatus(String status) {
+        switch (status) {
+            case "Pending":      return 0xFFFFA500;
+            case "Under Review": return 0xFF2196F3;
+            case "Accepted":     return 0xFF4CAF50;
+            case "Rejected":     return 0xFFF44336;
+            case "In Progress":  return 0xFF9C27B0;
+            case "Fixed":        return 0xFF4CAF50;
+            default:             return 0xFF9E9E9E;
+        }
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView text1, text2;
-        ViewHolder(View itemView) {
+        ImageView ivIcon;
+        TextView tvTitle, tvStatus, tvReference, tvDate, tvPriority;
+
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-            text1 = itemView.findViewById(android.R.id.text1);
-            text2 = itemView.findViewById(android.R.id.text2);
+            ivIcon      = itemView.findViewById(R.id.iv_icon);
+            tvTitle     = itemView.findViewById(R.id.tv_title);
+            tvStatus    = itemView.findViewById(R.id.tv_status);
+            tvReference = itemView.findViewById(R.id.tv_reference);
+            tvDate      = itemView.findViewById(R.id.tv_date);
+            tvPriority  = itemView.findViewById(R.id.tv_priority);
         }
     }
 }

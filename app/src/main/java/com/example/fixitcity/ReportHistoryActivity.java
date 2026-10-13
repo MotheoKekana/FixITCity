@@ -31,7 +31,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
     private static final String TAG = "ReportHistory";
 
     private RecyclerView rvReports;
-    private FaultReportAdapter adapter;
+    private TrackHistoryAdapter adapter;              // ← was FaultReportAdapter
     private TextView tvEmptyState;
     private MaterialButton btnSyncPending;
 
@@ -58,8 +58,9 @@ public class ReportHistoryActivity extends AppCompatActivity {
         btnSyncPending = findViewById(R.id.btn_sync_pending);
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FaultReportAdapter(this, filteredReports);
-        adapter.setOnItemClickListener(this::onReportClicked);
+
+        // Card-based adapter — each report becomes its own MaterialCardView row
+        adapter = new TrackHistoryAdapter(filteredReports, this::onReportClicked);
         rvReports.setAdapter(adapter);
 
         setupFilterChips();
@@ -72,9 +73,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
                 btnSyncPending.setText("Syncing…");
             });
         }
-
-        View backBtn = findViewById(R.id.back_button);
-        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
     private void hideNavForGuests() {
@@ -88,20 +86,15 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
     private void setupFilterChips() {
         ChipGroup group = findViewById(R.id.chip_group_filter);
-        Chip all = findViewById(R.id.chip_all);
-        Chip pending = findViewById(R.id.chip_pending);
-        Chip inProgress = findViewById(R.id.chip_in_progress);
-        Chip resolved = findViewById(R.id.chip_resolved);
-
         if (group == null) return;
 
         group.setOnCheckedStateChangeListener((g, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
             int id = checkedIds.get(0);
-            if (id == R.id.chip_pending) currentFilter = "Pending";
+            if (id == R.id.chip_pending)          currentFilter = "Pending";
             else if (id == R.id.chip_in_progress) currentFilter = "In Progress";
-            else if (id == R.id.chip_resolved) currentFilter = "Resolved";
-            else currentFilter = "All";
+            else if (id == R.id.chip_resolved)    currentFilter = "Resolved";
+            else                                  currentFilter = "All";
 
             applyFilter();
         });

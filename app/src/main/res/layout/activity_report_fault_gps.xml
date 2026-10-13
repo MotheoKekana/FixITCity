@@ -67,14 +67,14 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:textStyle="bold"
-            tools:text="Step 1 of 4" />
+            tools:text="Step 2 of 4" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_indicator"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginTop="8dp"
-            android:progress="25"
+            android:progress="50"
             app:trackColor="#E1F5FE"
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />

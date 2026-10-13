@@ -57,14 +57,14 @@ public class TrackReportResultActivity extends AppCompatActivity {
                 title != null && !title.isEmpty() ? title : "Report");
 
         setTextSafe(R.id.tv_report_location,
-                "📍 " + (addressLine != null && !addressLine.isEmpty()
+                 (addressLine != null && !addressLine.isEmpty()
                         ? addressLine : "Unknown location"));
 
         setTextSafe(R.id.tv_report_date,
-                "📅 Reported: " + (createdAt != null ? createdAt : "—"));
+                "Reported: " + (createdAt != null ? createdAt : "—"));
 
         setTextSafe(R.id.tv_report_priority,
-                "❗ Priority Score: " + priorityScore + "/100");
+                "Priority Score: " + priorityScore + "/100");
 
         TextView tvDesc = findViewById(R.id.tv_report_description);
         if (tvDesc != null) {
@@ -194,7 +194,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
                         ));
                     }
                 }
-
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load status history", e);
             }

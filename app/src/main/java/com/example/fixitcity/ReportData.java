@@ -1,10 +1,11 @@
 package com.example.fixitcity;
 
 public class ReportData {
+
     private String category;
     private long categoryId = -1;
     private String categoryDescription;
-    private double categorySeverityWeight = 0.0;   // NEW — from fault_categories.severity_weight
+    private double categorySeverityWeight = 0.0;
     private String locationAddress;
     private double latitude;
     private double longitude;
@@ -12,9 +13,9 @@ public class ReportData {
     private String additionalDetails;
 
     // Photo (local)
-    private String photoUri;        // local content:// path
-    private byte[] photoBytes;      // raw bytes for upload
-    private String photoMimeType;   // e.g. image/jpeg
+    private String photoUri;
+    private byte[] photoBytes;
+    private String photoMimeType;
 
     // Upvote tracking
     private int upvotedReportId = -1;
@@ -23,13 +24,15 @@ public class ReportData {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
+    /** Alias — callers can use either getCategory() or getCategoryName(). */
+    public String getCategoryName() { return category; }
+
     public long getCategoryId() { return categoryId; }
     public void setCategoryId(long categoryId) { this.categoryId = categoryId; }
 
     public String getCategoryDescription() { return categoryDescription; }
     public void setCategoryDescription(String categoryDescription) { this.categoryDescription = categoryDescription; }
 
-    // NEW
     public double getCategorySeverityWeight() { return categorySeverityWeight; }
     public void setCategorySeverityWeight(double categorySeverityWeight) { this.categorySeverityWeight = categorySeverityWeight; }
 

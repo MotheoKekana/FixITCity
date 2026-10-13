@@ -82,7 +82,9 @@
         <activity android:name=".ReportFaultGPSActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ProximityCheckActivity" />
-        <activity android:name=".ThankYouActivity" />
+        <activity
+            android:name=".ThankYouActivity"
+            android:exported="false" />
         <activity android:name=".ReportFaultPhotoActivity" />
         <activity android:name=".ReportFaultSummaryActivity"
             android:windowSoftInputMode="adjustResize" />

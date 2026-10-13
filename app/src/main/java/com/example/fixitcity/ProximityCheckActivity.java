@@ -35,9 +35,10 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ProximityCheckActivity extends AppCompatActivity {
 
@@ -50,13 +51,18 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private RecyclerView rvReports;
     private NearbyReportAdapter adapter;
-    private List<NearbyReport> reportList = new ArrayList<>();
+    private final List<NearbyReport> reportList = new ArrayList<>();
 
     private TextView tvStatus, tvReportsCount;
     private LinearProgressIndicator progressIndicator;
     private MaterialButton btnNewIssue;
 
     private ReportData reportData;
+
+    /** My own citizen id — used to exclude own reports and block self-upvote. */
+    private long myCitizenId = -1;
+
+    private final Set<Long> votedReportIds = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +78,11 @@ public class ProximityCheckActivity extends AppCompatActivity {
         hideNavForGuests();
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
+
+        // Cache the citizen id once
+        SessionManager session = new SessionManager(this);
+        myCitizenId = session.getCitizenProfileId();
+        Log.d(TAG, "myCitizenId=" + myCitizenId);
 
         initViews();
         setupBottomNavigation();
@@ -101,7 +112,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
     private void hideNavForGuests() {
         SessionManager session = new SessionManager(this);
         if (!session.isGuest()) return;
-
         View bottomNav = findViewById(R.id.bottom_nav);
         if (bottomNav == null) bottomNav = findViewById(R.id.bottomNav);
         if (bottomNav != null) bottomNav.setVisibility(View.GONE);
@@ -114,9 +124,11 @@ public class ProximityCheckActivity extends AppCompatActivity {
         progressIndicator = findViewById(R.id.progress_indicator);
         btnNewIssue = findViewById(R.id.btn_new_issue);
 
-        rvReports.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NearbyReportAdapter(this, reportList, this::onReportTapped);
-        rvReports.setAdapter(adapter);
+        if (rvReports != null) {
+            rvReports.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new NearbyReportAdapter(this, reportList, this::onReportTapped);
+            rvReports.setAdapter(adapter);
+        }
     }
 
     private void setupBottomNavigation() {
@@ -132,7 +144,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
         View navTrack = findViewById(R.id.navTrack);
         if (navTrack != null) {
             navTrack.setOnClickListener(v ->
-                    Toast.makeText(this, "Track screen coming soon", Toast.LENGTH_SHORT).show());
+                    startActivity(new Intent(this, TrackReportSearchActivity.class)));
         }
 
         View navSettings = findViewById(R.id.navSettings);
@@ -140,9 +152,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
             navSettings.setOnClickListener(v ->
                     startActivity(new Intent(this, ProfileSettingsActivity.class)));
         }
-
-        View backBtn = findViewById(R.id.back_button);
-        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
     private boolean checkLocationPermission() {
@@ -171,8 +180,8 @@ public class ProximityCheckActivity extends AppCompatActivity {
                 if (location != null) {
                     queryNearbyReports(location.getLatitude(), location.getLongitude());
                 } else {
-                    tvStatus.setText("Unable to get location");
-                    progressIndicator.setIndeterminate(false);
+                    if (tvStatus != null) tvStatus.setText("Unable to get location");
+                    if (progressIndicator != null) progressIndicator.setIndeterminate(false);
                 }
                 fusedLocationClient.removeLocationUpdates(this);
             }
@@ -191,98 +200,141 @@ public class ProximityCheckActivity extends AppCompatActivity {
                 reportData.setLongitude(addr.getLongitude());
                 queryNearbyReports(addr.getLatitude(), addr.getLongitude());
             } else {
-                tvStatus.setText("Could not locate address");
-                progressIndicator.setIndeterminate(false);
+                if (tvStatus != null) tvStatus.setText("Could not locate address");
+                if (progressIndicator != null) progressIndicator.setIndeterminate(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            tvStatus.setText("Geocoding error");
-            progressIndicator.setIndeterminate(false);
+            if (tvStatus != null) tvStatus.setText("Geocoding error");
+            if (progressIndicator != null) progressIndicator.setIndeterminate(false);
         }
     }
 
     private void queryNearbyReports(double lat, double lng) {
-        tvStatus.setText("Searching for nearby reports...");
-        progressIndicator.setIndeterminate(true);
+        long categoryId = reportData.getCategoryId();
+        String categoryName = reportData.getCategoryName();
+
+        if (tvStatus != null) {
+            tvStatus.setText("Searching for nearby "
+                    + (categoryName != null ? categoryName.toLowerCase(Locale.US) + " " : "")
+                    + "reports…");
+        }
+        if (progressIndicator != null) progressIndicator.setIndeterminate(true);
 
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
-
-        if (accessToken == null || accessToken.trim().isEmpty() || session.isGuest()) {
-            progressIndicator.setIndeterminate(false);
-            tvStatus.setText("Sign in to see nearby reports");
-            tvReportsCount.setText("Nearby check unavailable in guest mode");
-            if (btnNewIssue != null) btnNewIssue.setEnabled(true);
-            return;
-        }
+        final long myId = myCitizenId;   // capture for the background thread
 
         new Thread(() -> {
+            List<NearbyReport> withinRadius = new ArrayList<>();
             try {
-                List<FaultReport> allOpen = SupabaseReports.getNearbyReports(
-                        lat, lng, accessToken);
-
-                List<NearbyReport> withinRadius = new ArrayList<>();
-
-                for (FaultReport r : allOpen) {
-                    double d = SupabaseReports.haversineMeters(
-                            lat, lng, r.getLatitude(), r.getLongitude());
-                    if (d <= RADIUS_METERS) {
-                        String ref = r.getReferenceNumber() != null ? r.getReferenceNumber() : "";
-                        String title = r.getTitle() != null ? r.getTitle() : "Report";
-                        String status = r.getStatus() != null ? r.getStatus() : "Pending";
-                        int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
-
-                        withinRadius.add(new NearbyReport(
-                                r.getReportId(),
-                                ref,
-                                title,
-                                title,
-                                status,
-                                score,
-                                0,
-                                d
-                        ));
-                    }
+                if (categoryId <= 0) {
+                    Log.w(TAG, "No categoryId set on ReportData — nothing to filter by");
+                } else {
+                    withinRadius = SupabaseReports.getNearbyReportsForCategory(
+                            categoryId,
+                            myId,                       // ← excludes your own reports
+                            lat, lng,
+                            RADIUS_METERS,
+                            accessToken);
                 }
-
-                Collections.sort(withinRadius, (a, b) ->
-                        Double.compare(a.getDistance(), b.getDistance()));
-
-                runOnUiThread(() -> updateUI(withinRadius));
-
             } catch (Exception e) {
                 Log.e(TAG, "Nearby query failed: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    progressIndicator.setIndeterminate(false);
-                    tvStatus.setText("Could not load nearby reports");
-                    tvReportsCount.setText("0 reports found");
-                    reportList.clear();
-                    adapter.notifyDataSetChanged();
-                    if (btnNewIssue != null) btnNewIssue.setEnabled(true);
-                });
             }
+
+            final List<NearbyReport> finalList = withinRadius;
+            runOnUiThread(() -> updateUI(finalList, categoryName));
         }).start();
     }
 
-    private void updateUI(List<NearbyReport> withinRadius) {
-        progressIndicator.setIndeterminate(false);
+    private void updateUI(List<NearbyReport> withinRadius, String categoryName) {
+        if (progressIndicator != null) progressIndicator.setIndeterminate(false);
+
         reportList.clear();
         reportList.addAll(withinRadius);
-        adapter.notifyDataSetChanged();
+        if (adapter != null) adapter.notifyDataSetChanged();
+
+        String catLabel = categoryName != null
+                ? categoryName.toLowerCase(Locale.US) + " "
+                : "";
 
         if (withinRadius.isEmpty()) {
-            tvStatus.setText("No nearby reports found within 2 km");
-            tvReportsCount.setText("0 reports found");
+            if (tvStatus != null) tvStatus.setText("No similar reports found nearby — this looks new.");
+            if (tvReportsCount != null) {
+                tvReportsCount.setText("0 " + catLabel + "reports within "
+                        + (int) RADIUS_METERS + "m");
+            }
         } else {
-            tvStatus.setText("Nearby reports found:");
-            tvReportsCount.setText(withinRadius.size() + " report(s) found within 2 km");
+            if (tvStatus != null) tvStatus.setText("Tap a card to upvote it instead of creating a duplicate.");
+            if (tvReportsCount != null) {
+                tvReportsCount.setText(withinRadius.size() + " " + catLabel
+                        + "report(s) within " + (int) RADIUS_METERS + "m");
+            }
         }
     }
 
     private void onReportTapped(NearbyReport report, int position) {
-        Toast.makeText(this,
-                "Upvoting coming soon for: " + report.getTitle(),
-                Toast.LENGTH_SHORT).show();
+        long reportId = report.getReportId();
+
+        // ---- Self-upvote guard (defensive — list should already exclude them) ----
+        if (myCitizenId > 0 && report.getOwnerCitizenId() == myCitizenId) {
+            Toast.makeText(this,
+                    "You can't upvote your own report.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (votedReportIds.contains(reportId)) {
+            Toast.makeText(this,
+                    "You already upvoted this report.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SessionManager session = new SessionManager(this);
+        long citizenId = session.getCitizenProfileId();
+        String token = session.getAccessToken();
+
+        if (citizenId <= 0 || token == null) {
+            Toast.makeText(this, "Please log in to upvote", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Optimistic UI bump
+        int oldCount = report.getVoteCount();
+        report.setVoteCount(oldCount + 1);
+        if (adapter != null) adapter.notifyItemChanged(position);
+        votedReportIds.add(reportId);
+
+        new Thread(() -> {
+            boolean ok = false;
+            try {
+                ok = SupabaseReports.upvoteReport(reportId, citizenId, token);
+            } catch (Exception e) {
+                Log.e(TAG, "Upvote exception", e);
+            }
+
+            final boolean success = ok;
+            runOnUiThread(() -> {
+                if (success) {
+                    // Success → open Thank You screen
+                    Intent i = new Intent(this, ThankYouActivity.class);
+                    i.putExtra("title", "Thank you!");
+                    i.putExtra("message",
+                            "Your upvote has been counted. It helps push this issue up the priority list.");
+                    startActivity(i);
+                    finish();
+                } else {
+                    report.setVoteCount(oldCount);
+                    if (adapter != null) adapter.notifyItemChanged(position);
+                    votedReportIds.remove(reportId);
+
+                    Toast.makeText(this,
+                            "Could not upvote — you may have already voted.",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
     }
 
     @Override
@@ -294,8 +346,8 @@ public class ProximityCheckActivity extends AppCompatActivity {
                 getCurrentLocation();
             } else {
                 Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show();
-                tvStatus.setText("Location permission denied");
-                progressIndicator.setIndeterminate(false);
+                if (tvStatus != null) tvStatus.setText("Location permission denied");
+                if (progressIndicator != null) progressIndicator.setIndeterminate(false);
             }
         }
     }

@@ -7,8 +7,9 @@ public class NearbyReport {
     private String category;
     private String status;
     private int priorityScore;
-    private int voteCount;              // always 0 until Phase 4.5
+    private int voteCount;
     private double distance;            // in meters
+    private long ownerCitizenId = -1;   // citizen_id of the report's creator
 
     public NearbyReport(long reportId,
                         String referenceNumber,
@@ -37,9 +38,16 @@ public class NearbyReport {
     public int getVoteCount() { return voteCount; }
     public double getDistance() { return distance; }
 
+    /** Setter — used by the optimistic upvote UI. */
+    public void setVoteCount(int voteCount) { this.voteCount = voteCount; }
+
+    /** Owner (creator) of the report — used to block self-upvote. */
+    public long getOwnerCitizenId() { return ownerCitizenId; }
+    public void setOwnerCitizenId(long id) { this.ownerCitizenId = id; }
+
     /** Kept for backward compatibility — adapter calls getId(). */
     public int getId() { return (int) reportId; }
 
-    /** Kept for backward compatibility — not called anywhere now that 4.5 is deferred. */
+    /** Kept for backward compatibility. */
     public void incrementVote() { this.voteCount++; }
 }

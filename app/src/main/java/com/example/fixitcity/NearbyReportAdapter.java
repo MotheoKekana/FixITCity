@@ -17,9 +17,9 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
 
     private static final String TAG = "NearbyReportAdapter";
 
-    private Context context;
-    private List<NearbyReport> reports;
-    private OnItemClickListener listener;
+    private final Context context;
+    private final List<NearbyReport> reports;
+    private final OnItemClickListener listener;
 
     public interface OnItemClickListener {
         void onItemClick(NearbyReport report, int position);
@@ -44,11 +44,8 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         NearbyReport report = reports.get(position);
 
         holder.tvTitle.setText(report.getTitle());
-
-        // Vote badge — always "⬆ 0" until Phase 4.5
         holder.tvVotes.setText("⬆ " + report.getVoteCount());
 
-        // Distance — format as m under 1km, else km
         double d = report.getDistance();
         String distStr;
         if (d < 1000) {
@@ -58,12 +55,10 @@ public class NearbyReportAdapter extends RecyclerView.Adapter<NearbyReportAdapte
         }
         holder.tvDistance.setText(distStr);
 
-        // Hint line — reference number + status
         String ref = report.getReferenceNumber() != null ? report.getReferenceNumber() : "";
         String status = report.getStatus() != null ? report.getStatus() : "";
         holder.tvHint.setText(ref + " · " + status + " · Score " + report.getPriorityScore());
 
-        // Icon mapping by category/title
         int iconRes = android.R.drawable.ic_dialog_alert;
         String cat = report.getCategory() != null
                 ? report.getCategory().toLowerCase()

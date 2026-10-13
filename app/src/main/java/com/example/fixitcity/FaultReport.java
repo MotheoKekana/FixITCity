@@ -17,6 +17,10 @@ public class FaultReport {
     public String created_at;
     public String updated_at;
 
+    public Integer vote_count;
+    public Integer getVoteCount() { return vote_count; }
+    public Long getCitizenId() { return citizen_id; }
+
     // Phase 8: true when this report exists only in Room (not yet on server)
     private boolean pendingSync = false;
 

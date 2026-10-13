@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import com.example.fixitcity.data.SessionManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -14,11 +13,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.SupabaseReports;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.fixitcity.data.SupabaseReports;
 
 public class ReportFaultCategoryActivity extends AppCompatActivity {
 
@@ -72,13 +72,18 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             FaultCategory selected = filteredList.get(position);
             long realId = selected.getCategoryId();
             if (realId <= 0) {
-                Toast.makeText(this, "This category is missing an ID. Please pick another.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "This category is missing an ID. Please pick another.",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
-            reportData.setCategory(selected.getName());
+
+            // Persist the selection on ReportData so downstream screens can use it
+            reportData.setCategory(selected.getName());                 // used by getCategoryName()
             reportData.setCategoryId(realId);
             reportData.setCategoryDescription(selected.getDescription());
             reportData.setCategorySeverityWeight(selected.getSeverityWeight());
+
             startActivity(new Intent(this, ReportFaultGPSActivity.class));
         });
 
@@ -101,9 +106,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
 
         findViewById(R.id.navSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileSettingsActivity.class)));
-
-        View backBtn = findViewById(R.id.back_button);
-        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
     private void hideNavForGuests() {
@@ -179,7 +181,8 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 List<FaultCategory> categories = SupabaseReports.getCategories(accessToken);
-                android.util.Log.d("Categories", "Loaded " + categories.size() + " categories from Supabase");
+                android.util.Log.d("Categories",
+                        "Loaded " + categories.size() + " categories from Supabase");
 
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;

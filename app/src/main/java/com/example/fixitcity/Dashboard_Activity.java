@@ -41,13 +41,16 @@ public class Dashboard_Activity extends AppCompatActivity {
 
     private static final double PROXIMITY_RADIUS_M = 2000;
     private static final int NEARBY_PREVIEW_LIMIT = 5;
+    private static final int RECENT_PREVIEW_LIMIT = 5;   // max recent cards shown
 
     private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
     private RecyclerView rvRecentReports, rvNearbyReports;
-    private FaultReportAdapter adapter;
-    private NearbyReportAdapter nearbyAdapter;
-    private List<FaultReport> recentReports = new ArrayList<>();
 
+    // ---- recent reports use the new card-based adapter ----
+    private RecentReportAdapter recentAdapter;
+    private final List<FaultReport> recentReports = new ArrayList<>();
+
+    private NearbyReportAdapter nearbyAdapter;
     private final List<NearbyReport> nearbyList = new ArrayList<>();
 
     private double userLat;
@@ -94,12 +97,12 @@ public class Dashboard_Activity extends AppCompatActivity {
         tvWelcome.setText("Hello, " + firstName);
         tvSubtitle.setText("View your recent reports, track progress, and see nearby issues");
 
-        // My reports RecyclerView
+        // ---------- Recent reports RecyclerView (card layout) ----------
         rvRecentReports.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FaultReportAdapter(this, recentReports);
-        rvRecentReports.setAdapter(adapter);
+        recentAdapter = new RecentReportAdapter(recentReports, this::onRecentReportClicked);
+        rvRecentReports.setAdapter(recentAdapter);
 
-        // Nearby reports RecyclerView
+        // ---------- Nearby reports RecyclerView ----------
         rvNearbyReports.setLayoutManager(new LinearLayoutManager(this));
         nearbyAdapter = new NearbyReportAdapter(this, nearbyList, null);
         rvNearbyReports.setAdapter(nearbyAdapter);
@@ -209,23 +212,52 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                List<FaultReport> reports = SupabaseReports.getUserReports(citizenProfileId, accessToken);
+                List<FaultReport> reports =
+                        SupabaseReports.getUserReports(citizenProfileId, accessToken);
                 if (reports == null) reports = new ArrayList<>();
 
-                final List<FaultReport> finalReports = reports;
+                // Newest first (server already sorts, but be defensive)
+                reports.sort((a, b) -> {
+                    String da = a.getCreatedAt() != null ? a.getCreatedAt() : "";
+                    String db = b.getCreatedAt() != null ? b.getCreatedAt() : "";
+                    return db.compareTo(da);
+                });
+
+                // Limit how many cards we show on the dashboard
+                int limit = Math.min(reports.size(), RECENT_PREVIEW_LIMIT);
+                final List<FaultReport> preview = reports.subList(0, limit);
+                final int total = reports.size();
+
                 runOnUiThread(() -> {
                     recentReports.clear();
-                    recentReports.addAll(finalReports);
-                    adapter.notifyDataSetChanged();
+                    recentReports.addAll(preview);
+                    recentAdapter.notifyDataSetChanged();
 
-                    tvReportCount.setText(finalReports.size() + " report" + (finalReports.size() == 1 ? "" : "s"));
-                    Log.d(TAG, "Loaded " + finalReports.size() + " reports");
+                    tvReportCount.setText(total + " report" + (total == 1 ? "" : "s"));
+                    Log.d(TAG, "Loaded " + total + " reports (showing " + limit + ")");
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load reports: " + e.getMessage(), e);
                 runOnUiThread(() -> tvReportCount.setText("Could not load reports"));
             }
         }).start();
+    }
+
+    // ------------------------------------------------------------------
+    // Recent report card tapped
+    // ------------------------------------------------------------------
+    private void onRecentReportClicked(FaultReport report) {
+        Intent intent = new Intent(this, TrackReportResultActivity.class);
+        intent.putExtra("report_id", report.getReportId());
+        intent.putExtra("reference_number", report.getReferenceNumber());
+        intent.putExtra("title", report.getTitle());
+        intent.putExtra("description", report.getDescription());
+        intent.putExtra("address_line", report.getAddressLine());
+        intent.putExtra("status", report.getStatus());
+        intent.putExtra("priority_score",
+                report.getPriorityScore() != null ? report.getPriorityScore() : 0);
+        intent.putExtra("created_at", report.getCreatedAt());
+        startActivity(intent);
     }
 
     // ------------------------------------------------------------------

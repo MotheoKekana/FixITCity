@@ -100,8 +100,8 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- ========== RecyclerView ========== -->
-            <androidx.recyclerview.widget.RecyclerView
+            <!-- ========== The list (wrapping so it fits all rows inside ScrollView) ========== -->
+            <com.example.fixitcity.WrappingRecyclerView
                 android:id="@+id/rvNearbyReports"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -222,6 +222,7 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -255,6 +256,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -280,6 +282,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -305,6 +308,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"
