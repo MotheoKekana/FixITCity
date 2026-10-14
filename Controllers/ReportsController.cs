@@ -28,23 +28,23 @@ public class ReportsController : ControllerBase
                 .Include(r => r.Category)
                 .Include(r => r.Area)
                 .OrderByDescending(r => r.CreatedAt)
-                .Select(r => new
-                {
-                    r.ReportId,
-                    r.Title,
-                    r.Description,
-                    r.Status,
-                    r.PriorityScore,
-                    r.ReferenceNumber,
-                    r.Latitude,
-                    r.Longitude,
-                    r.CreatedAt,
-                    r.ResolvedAt,
-                    CitizenName = r.Citizen != null ? r.Citizen.FirstName + " " + r.Citizen.LastName : null,
-                    CitizenPhone = r.Citizen != null ? r.Citizen.PhoneNumber : null,
-                    CategoryName = r.Category != null ? r.Category.Name : null,
-                    AreaName = r.Area != null ? r.Area.AreaName : null
-                })
+               .Select(r => new 
+               {
+                   ReportId = r.ReportId,
+                   Title = r.Title,
+                   CategoryName = r.Category.Name,
+                   Status = r.Status,
+                   PriorityScore = r.PriorityScore,
+                   CreatedAt = r.CreatedAt,
+                   ReferenceNumber = r.ReferenceNumber,
+
+                   AreaName = r.Area != null ? r.Area.AreaName : null,
+                   StreetName = r.StreetName,       
+                   SuburbName = r.SuburbName,        
+                   CityName = r.CityName,          
+                   Latitude = r.Latitude,
+                   Longitude = r.Longitude,
+               })
                 .ToListAsync();
 
             return Ok(reports);

@@ -35,6 +35,19 @@ builder.Services.AddDbContext<FixITCityDbContext>(options =>
 });
 
 // -------------------------------------------------
+// Reverse geocoding
+// -------------------------------------------------
+builder.Services.AddHttpClient<IReverseGeocodingService, NominatimReverseGeocodingService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
+builder.Services.AddScoped<IAreaMatcher, AreaMatcher>();
+
+// Background worker that backfills existing reports.
+builder.Services.AddHostedService<GeocodingBackfillService>();
+
+// -------------------------------------------------
 // CORS
 // -------------------------------------------------
 builder.Services.AddCors(options =>

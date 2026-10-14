@@ -32,6 +32,15 @@ public partial class FaultReport
     [Column("address_line")]
     public string? AddressLine { get; set; }
 
+    [Column("street_name")]
+    public string? StreetName { get; set; }
+
+    [Column("suburb_name")]
+    public string? SuburbName { get; set; }
+
+    [Column("city_name")]
+    public string? CityName { get; set; }
+
     [Column("status")]
     public string? Status { get; set; }
 
@@ -74,11 +83,22 @@ public partial class FaultReport
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 
-    // Navigation properties
+    // ─── Geocoding tracking ────────────────────────────────────
+    [Column("geocoded_at")]
+    public DateTime? GeocodedAt { get; set; }
+
+    [Column("geocode_attempts")]
+    public int GeocodeAttempts { get; set; }
+
+    // ─── Navigation properties ─────────────────────────────────
     public virtual CitizenProfile? Citizen { get; set; }
     public virtual FaultCategory? Category { get; set; }
     public virtual ServiceArea? Area { get; set; }
+
+    [ForeignKey(nameof(VerifiedBy))]
     public virtual MunicipalUser? VerifiedByNavigation { get; set; }
+
+    [ForeignKey(nameof(AssignedTo))]
     public virtual MunicipalUser? AssignedToNavigation { get; set; }
 
     public virtual ICollection<ReportPhoto> ReportPhotos { get; set; } = new List<ReportPhoto>();
