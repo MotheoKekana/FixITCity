@@ -170,11 +170,11 @@ html {
     }
 
 /* ═══════════════════════════════════════════════════════ */
-/* STATS GRID (now 3 columns)                              */
+/* STATS GRID                                              */
 /* ═══════════════════════════════════════════════════════ */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 14px;
     margin-bottom: 18px;
 }
@@ -187,9 +187,41 @@ html {
 }
 
 .stat-card {
-    min-height: 150px;
-    padding: 18px;
+    min-height: 120px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-left: 4px solid #cbd5e1;
     border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.stat-card--total {
+    border-left-color: var(--navy);
+}
+
+.stat-card--pending {
+    border-left-color: #f59e0b;
+}
+
+.stat-card--review {
+    border-left-color: #3b82f6;
+}
+
+.stat-card--accepted {
+    border-left-color: #8b5cf6;
+}
+
+.stat-card--progress {
+    border-left-color: #06b6d4;
+}
+
+.stat-card--fixed {
+    border-left-color: #10b981;
+}
+
+.stat-card--rejected {
+    border-left-color: #ef4444;
 }
 
 .stat-card-top,
@@ -577,11 +609,7 @@ html {
     .last-updated {
         text-align: left;
     }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
+  
     .map-legend {
         display: none;
     }

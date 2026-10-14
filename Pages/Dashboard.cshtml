@@ -66,34 +66,56 @@
         <!-- ═══════════════════════════════════════════════ -->
         <!-- STAT CARDS (now 3 columns, not 4)               -->
         <!-- ═══════════════════════════════════════════════ -->
-        <section class="stats-grid" aria-label="Report statistics">
-            <a class="stat-card stat-card-link" href="/Reports?status=Approved">
-                <div class="stat-card-top">
-                    <span class="stat-label">Approved reports</span>
-                    <span class="stat-icon stat-icon--success" aria-hidden="true">✓</span>
-                </div>
-                <strong class="stat-value">@stats.ApprovedCount.ToString("N0")</strong>
-                
-            </a>
+       <section class="stats-grid" aria-label="Report statistics">
+    <a class="stat-card stat-card--total stat-card-link" href="/Reports">
+        <div class="stat-card-top">
+            <span class="stat-label">Total Reports</span>
+        </div>
+        <strong class="stat-value">@stats.Total.ToString("N0")</strong>
+    </a>
 
-            <a class="stat-card stat-card-link" href="/Reports?status=PendingApproval">
-                <div class="stat-card-top">
-                    <span class="stat-label">Pending approval</span>
-                    <span class="stat-icon stat-icon--pending" aria-hidden="true">⌛</span>
-                </div>
-                <strong class="stat-value">@stats.PendingApprovalCount.ToString("N0")</strong>
-                
-            </a>
+    <a class="stat-card stat-card--pending stat-card-link" href="/Reports?statusFilter=Pending">
+        <div class="stat-card-top">
+            <span class="stat-label">Pending</span>
+        </div>
+        <strong class="stat-value">@stats.Pending.ToString("N0")</strong>
+    </a>
 
-            <a class="stat-card stat-card-link" href="/Reports?status=Unresolved">
-                <div class="stat-card-top">
-                    <span class="stat-label">Unresolved</span>
-                    <span class="stat-icon stat-icon--neutral" aria-hidden="true">○</span>
-                </div>
-                <strong class="stat-value">@stats.UnresolvedCount.ToString("N0")</strong>
-               
-            </a>
-        </section>
+    <a class="stat-card stat-card--review stat-card-link" href="/Reports?statusFilter=Under%20Review">
+        <div class="stat-card-top">
+            <span class="stat-label">Under Review</span>
+        </div>
+        <strong class="stat-value">@stats.UnderReview.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--accepted stat-card-link" href="/Reports?statusFilter=Accepted">
+        <div class="stat-card-top">
+            <span class="stat-label">Accepted</span>
+        </div>
+        <strong class="stat-value">@stats.Accepted.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--progress stat-card-link" href="/Reports?statusFilter=In%20Progress">
+        <div class="stat-card-top">
+            <span class="stat-label">In Progress</span>
+        </div>
+        <strong class="stat-value">@stats.InProgress.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--fixed stat-card-link" href="/Reports?statusFilter=Fixed">
+        <div class="stat-card-top">
+            <span class="stat-label">Fixed</span>
+        </div>
+        <strong class="stat-value">@stats.Fixed.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--rejected stat-card-link" href="/Reports?statusFilter=Rejected">
+        <div class="stat-card-top">
+            <span class="stat-label">Rejected</span>
+        </div>
+        <strong class="stat-value">@stats.Rejected.ToString("N0")</strong>
+    </a>
+</section>
 
         <!-- ═══════════════════════════════════════════════ -->
         <!-- MAP (now full width, no emergency panel)        -->

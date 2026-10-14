@@ -14,10 +14,13 @@ namespace FixITCity_Dashboard.ViewModels.Dashboard
 
     public class DashboardStatisticsViewModel
     {
-        public int ApprovedCount { get; set; }
-        public int PendingApprovalCount { get; set; }
-        public int UnresolvedCount { get; set; }
-        public int EmergencyCount { get; set; }
+        public int Total { get; set; }
+        public int Pending { get; set; }
+        public int UnderReview { get; set; }
+        public int Accepted { get; set; }
+        public int InProgress { get; set; }
+        public int Fixed { get; set; }
+        public int Rejected { get; set; }
     }
 
     public class MapSummaryViewModel

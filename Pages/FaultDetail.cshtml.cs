@@ -19,6 +19,7 @@ namespace FixITCity_Dashboard.Pages
 
         // ---- Properties shown on the page ----
         public string PhotoUrl { get; private set; } = "";
+        public bool HasPhoto { get; private set; }
         public decimal? Latitude { get; private set; }
         public decimal? Longitude { get; private set; }
         public int? PriorityScore { get; private set; }
@@ -74,9 +75,14 @@ namespace FixITCity_Dashboard.Pages
                 PriorityScore = dto.PriorityScore;
 
                 // Photo (placeholder for now)
-                PhotoUrl = !string.IsNullOrWhiteSpace(dto.PhotoUrl)
-                    ? dto.PhotoUrl!
-                    : "/images/placeholder.jpg";
+                var primaryPhoto = dto.ReportPhotos
+                     .Where(p => !string.IsNullOrWhiteSpace(p.PhotoUrl))
+                     .OrderByDescending(p => p.IsPrimary ?? false)
+                     .ThenByDescending(p => p.UploadedAt)
+                     .ThenBy(p => p.PhotoId)
+                     .FirstOrDefault();
+                PhotoUrl = primaryPhoto?.PhotoUrl ?? "/images/unavailable_icon.png";
+                HasPhoto = primaryPhoto != null;
 
                 // Audit logs
                 AuditLogs = dto.AuditLogs
@@ -224,10 +230,9 @@ namespace FixITCity_Dashboard.Pages
         public long PhotoId { get; set; }
         public string? PhotoUrl { get; set; }
         public string? SupabaseStoragePath { get; set; }
-        public bool IsPrimary { get; set; }
+        public bool? IsPrimary { get; set; }        // was: bool
         public DateTime? UploadedAt { get; set; }
     }
-
     public class AuditLogDto
     {
         public string? Action { get; set; }
