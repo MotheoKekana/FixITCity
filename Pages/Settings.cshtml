@@ -8,13 +8,27 @@
 <div class="settings-container">
     <div class="settings-header">
         <h2>Settings</h2>
-        <p class="text-muted">Manage your account settings and preferences</p>
+        <p class="text-muted">Manage your personal information</p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
         </div>
     }
 
@@ -38,60 +52,14 @@
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Input.PhoneNumber">Phone Number</label>
-                    <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Enter your phone number" />
-                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-                </div>
-
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
             </form>
         </div>
     </div>
-
-    <!-- ===== WEB PREFERENCES SECTION ===== -->
-    <div class="settings-card">
-        <div class="card-header">
-            <h5><i class="fas fa-globe"></i> Web Preferences</h5>
-            <p class="text-muted">Customize your dashboard experience</p>
-        </div>
-        <div class="card-body">
-            <form method="post" asp-page-handler="UpdatePreferences">
-                <div class="form-group">
-                    <label asp-for="Input.Theme">Theme</label>
-                    <select asp-for="Input.Theme" class="form-control">
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                        <option value="system">System Default</option>
-                    </select>
-                    <span asp-validation-for="Input.Theme" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label>Notifications</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input asp-for="Input.EmailNotifications" type="checkbox" />
-                            <span>Email notifications</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input asp-for="Input.PushNotifications" type="checkbox" />
-                            <span>Push notifications</span>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Preferences
-                </button>
-            </form>
-        </div>
-    </div>
 </div>
 
-<!-- Styles -->
 <style>
     .settings-container {
         max-width: 600px;
@@ -131,6 +99,12 @@
         background: #e6f4ea;
         color: #1e7e34;
         border: 1px solid #c8e6c9;
+    }
+
+    .alert-danger {
+        background: #fdecea;
+        color: #b71c1c;
+        border: 1px solid #f5c6cb;
     }
 
     .alert i {
@@ -213,29 +187,6 @@
         font-size: 0.8rem;
         margin-top: 0.25rem;
         display: block;
-    }
-
-    .checkbox-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 0.25rem;
-    }
-
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        color: #1a1a2e;
-        cursor: pointer;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #2d9e6b;
-        cursor: pointer;
     }
 
     .btn-primary {

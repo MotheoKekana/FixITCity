@@ -285,15 +285,10 @@
 
         <!-- User Info -->
         @{
-            var username = Context.Session.GetString("Username") ?? "Admin";
+            var username = Context.Session.GetString("FullName")
+                        ?? Context.Session.GetString("Username")
+                        ?? "Admin";
         }
-        <div class="sidebar-user">
-            <div class="avatar">@(username.Length > 0 ? username[0].ToString().ToUpper() : "G")</div>
-            <div class="user-info">
-                <div class="name">@username</div>
-                <div class="role">Dashboard User</div>
-            </div>
-        </div>
 
         <!-- Navigation -->
 
