@@ -22,18 +22,20 @@ public class DashboardController : ControllerBase
         {
             var total = await _context.FaultReports.CountAsync();
             var pending = await _context.FaultReports.CountAsync(r => r.Status == "Pending");
-            var verified = await _context.FaultReports.CountAsync(r => r.Status == "Verified");
-            var inProgress = await _context.FaultReports.CountAsync(r => r.Status == "InProgress");
-            var resolved = await _context.FaultReports.CountAsync(r => r.Status == "Resolved");
+            var underReview = await _context.FaultReports.CountAsync(r => r.Status == "Under Review");
+            var accepted = await _context.FaultReports.CountAsync(r => r.Status == "Accepted");
+            var inProgress = await _context.FaultReports.CountAsync(r => r.Status == "In Progress");
+            var fixedCount = await _context.FaultReports.CountAsync(r => r.Status == "Fixed");
             var rejected = await _context.FaultReports.CountAsync(r => r.Status == "Rejected");
 
             return Ok(new
             {
                 total,
                 pending,
-                verified,
+                underReview,
+                accepted,
                 inProgress,
-                resolved,
+                @fixed = fixedCount,
                 rejected
             });
         }
@@ -42,7 +44,6 @@ public class DashboardController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
-
     [HttpGet("reports-by-category")]
     public async Task<IActionResult> GetReportsByCategory()
     {
@@ -65,7 +66,6 @@ public class DashboardController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
-
     [HttpGet("reports-by-area")]
     public async Task<IActionResult> GetReportsByArea()
     {
