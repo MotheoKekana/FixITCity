@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
 using FixITCity_Dashboard.Services.Dashboard.Dtos;
 
 namespace FixITCity_Dashboard.Pages
@@ -9,10 +10,12 @@ namespace FixITCity_Dashboard.Pages
     public class LoginModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(IHttpClientFactory httpClientFactory)
+        public LoginModel(IHttpClientFactory httpClientFactory, ILogger<LoginModel> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -63,7 +66,9 @@ namespace FixITCity_Dashboard.Pages
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Could not reach the login service: " + ex.Message;
+                // Keep internal exception details in server logs, not in the login page.
+                _logger.LogError(ex, "The login service request failed.");
+                TempData["ErrorMessage"] = "We could not connect to the sign-in service. Please try again shortly.";
                 return Page();
             }
         }
