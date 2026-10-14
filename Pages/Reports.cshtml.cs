@@ -11,11 +11,40 @@ namespace FixITCity_Dashboard.Pages
     public class ReportsModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<ReportsModel> _logger;
 
-        public ReportsModel(IHttpClientFactory httpClientFactory)
+        public ReportsModel(IHttpClientFactory httpClientFactory, ILogger<ReportsModel> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
+
+        public static readonly (string Match, string Label, string CssClass)[] StatusDefinitions =
+        {
+            ("pending",     "Pending",      "stat-pending"),
+            ("underreview", "Under Review", "stat-review"),
+            ("accepted",    "Accepted",     "stat-accepted"),
+            ("inprogress",  "In Progress",  "stat-progress"),
+            ("fixed",       "Fixed",        "stat-fixed"),
+            ("rejected",    "Rejected",     "stat-rejected"),
+        };
+
+        public IEnumerable<(string Match, string Label, string CssClass)> StatusOptions => StatusDefinitions;
+
+        public static string NormalizeStatus(string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status)) return string.Empty;
+
+            var buffer = new StringBuilder(status.Length);
+            foreach (var ch in status)
+            {
+                if (char.IsLetterOrDigit(ch))
+                    buffer.Append(char.ToLowerInvariant(ch));
+            }
+            return buffer.ToString();
+        }
+
+        public record StatusCard(string Label, string CssClass, int Count);
 
         // Filters
         public string? SearchTerm { get; set; }
@@ -28,9 +57,7 @@ namespace FixITCity_Dashboard.Pages
 
         // Statistics
         public int TotalReports { get; set; }
-        public int TotalPending { get; set; }
-        public int TotalInProgress { get; set; }
-        public int TotalResolved { get; set; }
+        public List<StatusCard> StatusCards { get; set; } = new();
 
         // Pagination
         public int CurrentPage { get; set; } = 1;
@@ -40,33 +67,24 @@ namespace FixITCity_Dashboard.Pages
         // Categories for dropdown
         public List<string> Categories { get; set; } = new();
 
+        // Error flag
+        public bool LoadFailed { get; set; }
+
         public async Task OnGetAsync(
             string? searchTerm,
             string? statusFilter,
             string? categoryFilter,
             string? dateSort,
-            int? page)
+            int? pageNumber)
         {
             SearchTerm = searchTerm;
             StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "All" : statusFilter;
             CategoryFilter = string.IsNullOrWhiteSpace(categoryFilter) ? "All" : categoryFilter;
             DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Newest" : dateSort;
-            CurrentPage = page ?? 1;
+            CurrentPage = pageNumber ?? 1;
 
-            // Fetch all reports from the API
-            var allReports = new List<ReportListItemDto>();
-            try
-            {
-                var client = _httpClientFactory.CreateClient("Api");
-                var result = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports");
-                if (result != null) allReports = result;
-            }
-            catch
-            {
-                // API down — page will show empty list
-            }
+            var allReports = await FetchAllReportsAsync();
 
-            // Category dropdown
             Categories = allReports
                 .Where(r => !string.IsNullOrWhiteSpace(r.CategoryName))
                 .Select(r => r.CategoryName!)
@@ -74,20 +92,15 @@ namespace FixITCity_Dashboard.Pages
                 .OrderBy(c => c)
                 .ToList();
 
-            // Statistics (based on ALL reports)
             TotalReports = allReports.Count;
-            TotalPending = allReports.Count(r => r.Status == "Pending");
-            TotalInProgress = allReports.Count(r => r.Status == "InProgress");
-            TotalResolved = allReports.Count(r => r.Status == "Resolved");
+            StatusCards = BuildStatusCards(allReports);
 
-            // Apply filters + sort
             var filtered = ApplyFilters(allReports);
 
             var ordered = DateSort == "Oldest"
                 ? filtered.OrderBy(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList()
                 : filtered.OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList();
 
-            // Pagination
             TotalPages = (int)Math.Ceiling(ordered.Count / (double)PageSize);
             if (TotalPages < 1) TotalPages = 1;
             if (CurrentPage < 1) CurrentPage = 1;
@@ -99,45 +112,39 @@ namespace FixITCity_Dashboard.Pages
                 .ToList();
         }
 
-        private List<ReportListItemDto> ApplyFilters(List<ReportListItemDto> reports)
+        private static List<StatusCard> BuildStatusCards(List<ReportListItemDto> reports)
         {
-            var filtered = reports.AsQueryable();
+            var counts = reports
+                .GroupBy(r => NormalizeStatus(r.Status))
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
 
-            if (!string.IsNullOrWhiteSpace(StatusFilter) && StatusFilter != "All")
-                filtered = filtered.Where(r => r.Status == StatusFilter);
-
-            if (!string.IsNullOrWhiteSpace(CategoryFilter) && CategoryFilter != "All")
-                filtered = filtered.Where(r => r.CategoryName == CategoryFilter);
-
-            if (!string.IsNullOrWhiteSpace(SearchTerm))
-            {
-                var search = SearchTerm.Trim().ToLower();
-                filtered = filtered.Where(r =>
-                    (r.Title ?? "").ToLower().Contains(search) ||
-                    (r.CategoryName ?? "").ToLower().Contains(search) ||
-                    (r.Status ?? "").ToLower().Contains(search) ||
-                    (r.AreaName ?? "").ToLower().Contains(search) ||
-                    r.ReportId.ToString().Contains(search));
-            }
-
-            return filtered.ToList();
+            return StatusDefinitions
+                .Select(def => new StatusCard(
+                    def.Label,
+                    def.CssClass,
+                    counts.TryGetValue(def.Match, out var count) ? count : 0))
+                .ToList();
         }
+
         public async Task<IActionResult> OnGetExportCsvAsync(
-        string? searchTerm,
-        string? statusFilter,
-        string? categoryFilter)
+            string? searchTerm,
+            string? statusFilter,
+            string? categoryFilter,
+            string? dateSort)
         {
             SearchTerm = searchTerm;
             StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "All" : statusFilter;
             CategoryFilter = string.IsNullOrWhiteSpace(categoryFilter) ? "All" : categoryFilter;
+            DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Newest" : dateSort;
 
-            var client = _httpClientFactory.CreateClient("Api");
-            var allReports = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports")
-                             ?? new List<ReportListItemDto>();
-
+            var allReports = await FetchAllReportsAsync();
             var matchingReports = ApplyFilters(allReports);
 
-            var rows = matchingReports.Select(report => new ReportExportRow
+            var ordered = DateSort == "Oldest"
+                ? matchingReports.OrderBy(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList()
+                : matchingReports.OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList();
+
+            var rows = ordered.Select(report => new ReportExportRow
             {
                 ReferenceNumber = report.ReferenceNumber,
                 Title = report.Title,
@@ -155,6 +162,52 @@ namespace FixITCity_Dashboard.Pages
 
             var bytes = Encoding.UTF8.GetBytes(writer.ToString());
             return File(bytes, "text/csv; charset=utf-8", "FixITCity_Reports.csv");
+        }
+
+        private async Task<List<ReportListItemDto>> FetchAllReportsAsync()
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Api");
+                var result = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports");
+                return result ?? new List<ReportListItemDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load reports from API");
+                LoadFailed = true;
+                return new List<ReportListItemDto>();
+            }
+        }
+
+        private List<ReportListItemDto> ApplyFilters(List<ReportListItemDto> reports)
+        {
+            var filtered = reports.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(StatusFilter) && StatusFilter != "All")
+            {
+                var target = NormalizeStatus(StatusFilter);
+                filtered = filtered.Where(r => NormalizeStatus(r.Status) == target);
+            }
+
+            if (!string.IsNullOrWhiteSpace(CategoryFilter) && CategoryFilter != "All")
+                filtered = filtered.Where(r => r.CategoryName == CategoryFilter);
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                var search = SearchTerm.Trim().ToLower();
+                filtered = filtered.Where(r =>
+                    (r.Title ?? "").ToLower().Contains(search) ||
+                    (r.CategoryName ?? "").ToLower().Contains(search) ||
+                    (r.Status ?? "").ToLower().Contains(search) ||
+                    (r.AreaName ?? "").ToLower().Contains(search) ||
+                    (r.StreetName ?? "").ToLower().Contains(search) ||
+                    (r.SuburbName ?? "").ToLower().Contains(search) ||
+                    (r.CityName ?? "").ToLower().Contains(search) ||
+                    r.ReportId.ToString().Contains(search));
+            }
+
+            return filtered.ToList();
         }
     }
 }
