@@ -1,191 +1,200 @@
 @page
-
 @model FixITCity_Dashboard.Pages.ForgotPassModel
-
 @{
-    ViewData["Title"] = "Forgot Password";
+    ViewData["Title"] = "Reset password";
     Layout = null;
 }
 
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#009688" />
+    <title>@ViewData["Title"] - FixITCity</title>
 
-    <title>Forgot Password</title>
-
-    <link rel="stylesheet" href="~/css/ForgotPass.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="icon" type="image/png" href="~/images/favicon.ico" />
-
+    <link rel="stylesheet" href="~/css/ForgotPass.css" />
 </head>
-
 <body>
+    <main class="login-container">
 
-    <div class="forgot-password-container">
-
-        <div class="forgot-password-card">
-
-            <h1>Forgot Password</h1>
-
-            <p class="subtitle">
-                Reset your municipal account password
-            </p>
-
-
-            @if (!Model.ShowCodeStep &&
-                 !Model.ShowPasswordStep &&
-                 !Model.ShowSuccessStep)
-            {
-
-                <form method="post" asp-page-handler="SendCode">
-
-                    <div class="form-group">
-
-                        <label asp-for="Email">
-                            Email Address
-                        </label>
-
-                        <input asp-for="Email" type="email" placeholder="Enter your email address" />
-
-                        <span asp-validation-for="Email" class="error-message">
-                        </span>
-
+        <!-- Left panel — same as login -->
+        <aside class="login-visual" aria-hidden="true">
+            <ul class="motto-list">
+                <li class="motto-item">
+                    <span class="motto-icon"><i class="fa-solid fa-bullhorn"></i></span>
+                    <div class="motto-text">
+                        <span class="motto-word">Report</span>
+                        <span class="motto-desc">Log faults in your community</span>
                     </div>
+                </li>
+                <li class="motto-item">
+                    <span class="motto-icon"><i class="fa-solid fa-ranking-star"></i></span>
+                    <div class="motto-text">
+                        <span class="motto-word">Rank</span>
+                        <span class="motto-desc">Prioritise what matters most</span>
+                    </div>
+                </li>
+                <li class="motto-item">
+                    <span class="motto-icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                    <div class="motto-text">
+                        <span class="motto-word">Repair</span>
+                        <span class="motto-desc">Track fixes until resolved</span>
+                    </div>
+                </li>
+            </ul>
+        </aside>
 
+        <!-- Right panel -->
+        <section class="login-card">
 
-                    <button type="submit" class="primary-button">
+            <header class="logo-section">
+                <img class="brand-logo"
+                     src="~/images/android-chrome-512x512.png"
+                     alt="FixITCity logo" />
+            </header>
 
-                        Send Reset Code
+            <div class="login-intro">
+                <h1>Reset your password</h1>
+                <p>
+                    @if (Model.ShowSuccessStep)
+                    {
+                        @:Password reset complete.
+                    }
+                    else if (Model.ShowPasswordStep)
+                    {
+                        @:Choose a new password for your account.
+                    }
+                    else if (Model.ShowCodeStep)
+                    {
+                        @:Enter the 6-digit code we sent to your email.
+                    }
+                    else
+                    {
+                        @:Enter your email and we'll send you a reset code.
+                    }
+                </p>
+            </div>
 
-                    </button>
-
-                </form>
-
+            @if (TempData["InfoMessage"] is string infoMessage)
+            {
+                <div class="alert alert-info" role="status">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>@infoMessage</span>
+                </div>
             }
 
+            @if (TempData["ErrorMessage"] is string errorMessage)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>@errorMessage</span>
+                </div>
+            }
 
+            @* ─── Step 1: Email ─────────────────────────────── *@
+            @if (!Model.ShowCodeStep && !Model.ShowPasswordStep && !Model.ShowSuccessStep)
+            {
+                <form method="post" asp-page-handler="SendCode">
+                    <div class="form-group">
+                        <label asp-for="Email">Email</label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="form-control"
+                               placeholder="you@example.com"
+                               autocomplete="email"
+                               required />
+                        <span asp-validation-for="Email" class="validation-message"></span>
+                    </div>
 
+                    <button type="submit" class="btn-login">Send reset code</button>
+                </form>
+            }
+
+            @* ─── Step 2: Verification code ─────────────────── *@
             @if (Model.ShowCodeStep)
             {
-
                 <form method="post" asp-page-handler="VerifyCode">
-
-                    <p class="instructions">
-
-                        A verification code has been sent
-                        to your email address.
-
-                    </p>
+                    <input type="hidden" asp-for="Email" />
 
                     <div class="form-group">
-
-                        <label asp-for="VerificationCode">
-                            Verification Code
-                        </label>
-
-                        <input asp-for="VerificationCode" maxlength="6" placeholder="Enter 6-digit code" />
-
-                        <span asp-validation-for="VerificationCode" class="error-message">
-                        </span>
-
+                        <label asp-for="VerificationCode">Verification code</label>
+                        <input asp-for="VerificationCode"
+                               type="text"
+                               inputmode="numeric"
+                               pattern="[0-9]*"
+                               maxlength="6"
+                               class="form-control"
+                               placeholder="123456"
+                               autocomplete="one-time-code"
+                               autofocus
+                               required />
+                        <span asp-validation-for="VerificationCode" class="validation-message"></span>
                     </div>
 
-
-                    <button type="submit" class="primary-button">
-
-                        Verify Code
-
-                    </button>
-
+                    <button type="submit" class="btn-login">Verify code</button>
                 </form>
-
             }
 
-
-
+            @* ─── Step 3: New password ──────────────────────── *@
             @if (Model.ShowPasswordStep)
             {
-
                 <form method="post" asp-page-handler="ResetPassword">
+                    <input type="hidden" asp-for="Email" />
+                    <input type="hidden" asp-for="VerificationCode" />
 
                     <div class="form-group">
-
-                        <label asp-for="NewPassword">
-                            New Password
-                        </label>
-
-                        <input asp-for="NewPassword" type="password" placeholder="Enter new password" />
-
-                        <span asp-validation-for="NewPassword" class="error-message">
-                        </span>
-
+                        <label asp-for="NewPassword">New password</label>
+                        <input asp-for="NewPassword"
+                               type="password"
+                               class="form-control"
+                               autocomplete="new-password"
+                               minlength="8"
+                               required />
+                        <span asp-validation-for="NewPassword" class="validation-message"></span>
                     </div>
-
 
                     <div class="form-group">
-
-                        <label asp-for="ConfirmPassword">
-                            Confirm Password
-                        </label>
-
-                        <input asp-for="ConfirmPassword" type="password" placeholder="Confirm new password" />
-
-                        <span asp-validation-for="ConfirmPassword" class="error-message">
-                        </span>
-
+                        <label asp-for="ConfirmPassword">Confirm password</label>
+                        <input asp-for="ConfirmPassword"
+                               type="password"
+                               class="form-control"
+                               autocomplete="new-password"
+                               minlength="8"
+                               required />
+                        <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
                     </div>
 
-
-                    <button type="submit" class="primary-button">
-
-                        Reset Password
-
-                    </button>
-
+                    <button type="submit" class="btn-login">Reset password</button>
                 </form>
-
             }
 
-
-
+            @* ─── Step 4: Success ───────────────────────────── *@
             @if (Model.ShowSuccessStep)
             {
-
-                <div class="success-message">
-
-                    <h2>
-                        Password Changed Successfully
-                    </h2>
-
-                    <p>
-                        Your password has been updated.
-                    </p>
-
-                    <p>
-                        Redirecting to login in
-                        <span id="countdown">5</span>
-                        seconds...
-                    </p>
-
+                <div class="alert alert-success" role="status">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Your password has been reset. You can now sign in.</span>
                 </div>
 
+                <a asp-page="/Login" class="btn-login" style="text-decoration:none;">Back to sign in</a>
             }
 
-        </div>
+            <footer class="login-footer">
+                @if (!Model.ShowSuccessStep)
+                {
+                    <a asp-page="/Login">Back to sign in</a>
+                }
+                <span class="brand-name">FixITCity Dashboard</span>
+            </footer>
+        </section>
 
-    </div>
+    </main>
 
-
-    @if (Model.ShowSuccessStep)
-    {
-        <script src="~/js/ForgotPass.js"></script>
-    }
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
