@@ -91,16 +91,7 @@ public class ReportSuccessActivity extends AppCompatActivity {
             startActivity(Intent.createChooser(shareIntent, "Share via"));
         });
 
-        findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> {
-            SessionManager session = new SessionManager(this);
-            Class<?> target = session.isGuest()
-                    ? Guest_Dashboard_Activity.class
-                    : Dashboard_Activity.class;
-            Intent intent = new Intent(this, target);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+        findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> goToDashboard());
 
         findViewById(R.id.btn_report_another).setOnClickListener(v -> {
             ((FixITCityApp) getApplication()).clearReportData();

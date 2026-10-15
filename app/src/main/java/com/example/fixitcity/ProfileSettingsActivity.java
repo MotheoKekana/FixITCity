@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.NotificationTokenManager;
 import com.example.fixitcity.data.SupabaseReports;
 
 import java.util.List;
@@ -115,6 +116,8 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     startActivity(intent);
                     return;
                 }
+                NotificationTokenManager.deactivateOnLogout(
+                        getApplicationContext(), session.getUserIdBigint(), session.getAccessToken());
                 session.logout();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, Login_Activity.class));

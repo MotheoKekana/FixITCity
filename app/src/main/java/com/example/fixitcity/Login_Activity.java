@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.data.NotificationTokenManager;
 import com.example.fixitcity.services.SyncScheduler;
 import com.example.fixitcity.data.SupabaseAuth;
 import com.example.fixitcity.data.SupabaseUsers;
@@ -212,6 +213,7 @@ public class Login_Activity extends AppCompatActivity {
                 }
 
                 saveSession(accessToken, refreshToken, authUserId, userEmail, userId, profile);
+                NotificationTokenManager.registerAfterLogin(getApplicationContext(), userId, accessToken);
                 // Resume this citizen's queued reports if they signed back in later.
                 SyncScheduler.scheduleSync(getApplicationContext());
 
