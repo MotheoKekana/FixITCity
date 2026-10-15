@@ -87,7 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintTop_toBottomOf="@id/progress_container">
 
         <LinearLayout
@@ -108,7 +108,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="We found these open reports within 2km. Tap one to upvote."
+                android:id="@+id/tv_nearby_hint"
+                android:text="We found these open reports within 2 km. Tap one to upvote."
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
@@ -151,27 +152,6 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- ================= Bottom bar (Continue) ================= -->
-    <LinearLayout
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_continue"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:enabled="false"
-            android:text="Continue"
-            android:backgroundTint="@color/primary_green"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:icon="@android:drawable/ic_media_next"
-            app:iconGravity="textEnd" />
-    </LinearLayout>
 
     <!-- ================= Bottom navigation ================= -->
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -76,6 +76,11 @@ public class ProximityCheckActivity extends AppCompatActivity {
         });
 
         hideNavForGuests();
+        AppNavigation.bindNotificationBell(this);
+        TextView nearbyHint = findViewById(R.id.tv_nearby_hint);
+        if (nearbyHint != null && new SessionManager(this).isGuest()) {
+            nearbyHint.setText("We found open reports within 2 km. Tap one to see its status.");
+        }
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
@@ -104,7 +109,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         if (btnNewIssue != null) {
             btnNewIssue.setOnClickListener(v -> {
                 startActivity(new Intent(this, ReportFaultPhotoActivity.class));
-                finish();
             });
         }
     }
@@ -133,7 +137,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         View navHome = findViewById(R.id.navHome);
-        if (navHome != null) navHome.setOnClickListener(v -> finish());
+        if (navHome != null) navHome.setOnClickListener(v -> AppNavigation.goHome(this));
 
         View navReport = findViewById(R.id.navReport);
         if (navReport != null) {
@@ -223,36 +227,46 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
-        final long myId = myCitizenId;   // capture for the background thread
+        final long myId = myCitizenId;
 
         new Thread(() -> {
             List<NearbyReport> withinRadius = new ArrayList<>();
+            String loadError = null;
             try {
                 if (categoryId <= 0) {
                     Log.w(TAG, "No categoryId set on ReportData — nothing to filter by");
+                    loadError = "Choose a report category before checking nearby reports.";
                 } else {
                     withinRadius = SupabaseReports.getNearbyReportsForCategory(
                             categoryId,
-                            myId,                       // ← excludes your own reports
+                            myId,
                             lat, lng,
                             RADIUS_METERS,
                             accessToken);
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Nearby query failed: " + e.getMessage(), e);
+                loadError = "Could not check nearby reports. Check your connection and try again.";
             }
 
             final List<NearbyReport> finalList = withinRadius;
-            runOnUiThread(() -> updateUI(finalList, categoryName));
+            final String finalError = loadError;
+            runOnUiThread(() -> updateUI(finalList, categoryName, finalError));
         }).start();
     }
 
-    private void updateUI(List<NearbyReport> withinRadius, String categoryName) {
+    private void updateUI(List<NearbyReport> withinRadius, String categoryName, String loadError) {
         if (progressIndicator != null) progressIndicator.setIndeterminate(false);
 
         reportList.clear();
         reportList.addAll(withinRadius);
         if (adapter != null) adapter.notifyDataSetChanged();
+
+        if (loadError != null) {
+            if (tvStatus != null) tvStatus.setText(loadError);
+            if (tvReportsCount != null) tvReportsCount.setText("Nearby reports unavailable");
+            return;
+        }
 
         String catLabel = categoryName != null
                 ? categoryName.toLowerCase(Locale.US) + " "
@@ -265,7 +279,9 @@ public class ProximityCheckActivity extends AppCompatActivity {
                         + (int) RADIUS_METERS + "m");
             }
         } else {
-            if (tvStatus != null) tvStatus.setText("Tap a card to upvote it instead of creating a duplicate.");
+            if (tvStatus != null) tvStatus.setText(new SessionManager(this).isGuest()
+                    ? "Tap a nearby report to see whether this issue was already reported."
+                    : "Tap a card to upvote it instead of creating a duplicate.");
             if (tvReportsCount != null) {
                 tvReportsCount.setText(withinRadius.size() + " " + catLabel
                         + "report(s) within " + (int) RADIUS_METERS + "m");
@@ -274,6 +290,39 @@ public class ProximityCheckActivity extends AppCompatActivity {
     }
 
     private void onReportTapped(NearbyReport report, int position) {
+        SessionManager guestSession = new SessionManager(this);
+        if (guestSession.isGuest()) {
+            new Thread(() -> {
+                try {
+                    FaultReport existing = SupabaseReports.trackExternalAsGuest(
+                            report.getReferenceNumber(), guestSession.getAccessToken());
+                    runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        if (existing == null) {
+                            Toast.makeText(this, "Your own reports are in Recent reports.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        Intent intent = new Intent(this, TrackReportResultActivity.class);
+                        intent.putExtra("report_id", existing.getReportId());
+                        intent.putExtra("reference_number", existing.getReferenceNumber());
+                        intent.putExtra("title", existing.getTitle());
+                        intent.putExtra("description", existing.getDescription());
+                        intent.putExtra("address_line", existing.getAddressLine());
+                        intent.putExtra("status", existing.getStatus());
+                        intent.putExtra("priority_score", existing.getPriorityScore() != null
+                                ? existing.getPriorityScore() : 0);
+                        intent.putExtra("created_at", existing.getCreatedAt());
+                        intent.putExtra("external_guest", true);
+                        startActivity(intent);
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "Guest nearby details failed", e);
+                    runOnUiThread(() -> Toast.makeText(this,
+                            "Could not open this report. Check your connection.", Toast.LENGTH_LONG).show());
+                }
+            }, "guest-nearby-details").start();
+            return;
+        }
         long reportId = report.getReportId();
 
         // ---- Self-upvote guard (defensive — list should already exclude them) ----
@@ -307,16 +356,21 @@ public class ProximityCheckActivity extends AppCompatActivity {
         votedReportIds.add(reportId);
 
         new Thread(() -> {
-            boolean ok = false;
+            String errorMessage = null;
             try {
-                ok = SupabaseReports.upvoteReport(reportId, citizenId, token);
-            } catch (Exception e) {
-                Log.e(TAG, "Upvote exception", e);
+                SupabaseReports.upvoteReport(reportId, citizenId, token);
+            } catch (IOException e) {
+                Log.e(TAG, "Upvote failed", e);
+                String detail = e.getMessage();
+                errorMessage = detail != null
+                        && detail.contains("report_votes_unique_per_citizen")
+                        ? "You already upvoted this report."
+                        : "Could not upvote. Check your connection and try again.";
             }
 
-            final boolean success = ok;
+            final String failure = errorMessage;
             runOnUiThread(() -> {
-                if (success) {
+                if (failure == null) {
                     // Success → open Thank You screen
                     Intent i = new Intent(this, ThankYouActivity.class);
                     i.putExtra("title", "Thank you!");
@@ -329,9 +383,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
                     if (adapter != null) adapter.notifyItemChanged(position);
                     votedReportIds.remove(reportId);
 
-                    Toast.makeText(this,
-                            "Could not upvote — you may have already voted.",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, failure, Toast.LENGTH_LONG).show();
                 }
             });
         }).start();

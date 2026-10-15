@@ -19,13 +19,6 @@ public class SupabaseReports {
     private static final String TAG = "SupabaseReports";
     private static final Gson gson = new Gson();
 
-    public static int computePriorityScore(double severityWeight) {
-        int score = (int) Math.round(severityWeight * 10.0);
-        if (score < 0) score = 0;
-        if (score > 100) score = 100;
-        return score;
-    }
-
     public static String generateReferenceNumber() {
         String year = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
@@ -57,13 +50,36 @@ public class SupabaseReports {
         } else {
             response = SupabaseClient.get(path);
         }
-        Log.d(TAG, "getOpenReports response: " + response);
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
             return new ArrayList<>();
         }
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
         List<FaultReport> results = gson.fromJson(response, listType);
         return results != null ? results : new ArrayList<>();
+    }
+
+    /** Open reports within 2 km, including reports from other citizens. */
+    public static List<FaultReport> getNearbyReports(
+            double latitude, double longitude, String accessToken) throws IOException {
+        if (Double.isNaN(latitude) || Double.isInfinite(latitude)
+                || Double.isNaN(longitude) || Double.isInfinite(longitude)
+                || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+            throw new IOException("Invalid location for nearby reports");
+        }
+        if (accessToken == null || accessToken.trim().isEmpty()) {
+            throw new IOException("Sign in to view nearby reports");
+        }
+
+        String body = "{\"lat\":" + latitude + ",\"lng\":" + longitude + "}";
+        String response = SupabaseClient.postWithAuth(
+                "/rpc/nearby_reports", body, accessToken);
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Invalid nearby reports response");
+        }
+
+        Type listType = new TypeToken<List<FaultReport>>() {}.getType();
+        List<FaultReport> reports = gson.fromJson(response, listType);
+        return reports != null ? reports : new ArrayList<>();
     }
 
     public static List<FaultCategory> getCategories(String accessToken) throws IOException {
@@ -74,7 +90,6 @@ public class SupabaseReports {
         } else {
             response = SupabaseClient.get(path);
         }
-        Log.d(TAG, "Categories raw: " + response);
         if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
             return new ArrayList<>();
         }
@@ -118,7 +133,6 @@ public class SupabaseReports {
     public static FaultReport submitReport(
             long citizenId,
             long categoryId,
-            double severityWeight,
             String referenceNumber,
             String title,
             String description,
@@ -127,8 +141,6 @@ public class SupabaseReports {
             String addressLine,
             String accessToken
     ) throws IOException {
-
-        int priorityScore = computePriorityScore(severityWeight);
 
         StringBuilder json = new StringBuilder();
         json.append("{");
@@ -141,20 +153,63 @@ public class SupabaseReports {
         json.append("\"address_line\":\"").append(escape(addressLine)).append("\",");
         json.append("\"status\":\"Pending\",");
         json.append("\"reference_number\":\"").append(referenceNumber).append("\",");
-        json.append("\"priority_score\":").append(priorityScore).append(",");
         json.append("\"is_offline\":false,");
         json.append("\"sync_status\":\"Synced\",");
         json.append("\"is_duplicate\":false");
         json.append("}");
 
-        Log.d(TAG, "Submitting: " + json.toString());
         String response = SupabaseClient.postWithAuth("/fault_reports", json.toString(), accessToken);
-        Log.d(TAG, "Submit response: " + response);
 
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
         List<FaultReport> created = gson.fromJson(response, listType);
         if (created == null || created.isEmpty()) {
             throw new IOException("Failed to create report");
+        }
+
+        // The database trigger calculates priority after insert. The POST response
+        // can still contain the pre-trigger value, so reload once for display.
+        try {
+            FaultReport saved = getReportByReference(referenceNumber, accessToken);
+            if (saved != null) return saved;
+        } catch (IOException e) {
+            // The insert already succeeded. Do not retry it or queue a duplicate.
+            Log.w(TAG, "Created report, but could not reload its priority", e);
+        }
+        return created.get(0);
+    }
+
+    /** Guest-owned report: RLS must enforce guest_auth_user_id = auth.uid(). */
+    public static FaultReport submitGuestReport(String guestAuthId, long categoryId,
+                                                String referenceNumber, String title,
+                                                String description, double latitude,
+                                                double longitude, String addressLine,
+                                                String accessToken) throws IOException {
+        org.json.JSONObject json = new org.json.JSONObject();
+        try {
+            json.put("guest_auth_user_id", guestAuthId);
+            json.put("category_id", categoryId);
+            json.put("reference_number", referenceNumber);
+            json.put("title", title);
+            json.put("description", description == null ? "" : description);
+            json.put("latitude", latitude);
+            json.put("longitude", longitude);
+            json.put("address_line", addressLine == null ? "" : addressLine);
+            json.put("status", "Pending");
+            json.put("is_offline", false);
+            json.put("sync_status", "Synced");
+            json.put("is_duplicate", false);
+        } catch (org.json.JSONException e) {
+            throw new IOException("Could not prepare guest report", e);
+        }
+        String response = SupabaseClient.postWithAuth("/fault_reports", json.toString(), accessToken);
+        Type type = new TypeToken<List<FaultReport>>() {}.getType();
+        List<FaultReport> created = gson.fromJson(response, type);
+        if (created == null || created.isEmpty()) throw new IOException("Could not create guest report");
+        try {
+            FaultReport saved = getReportByReference(referenceNumber, accessToken);
+            if (saved != null) return saved;
+        } catch (IOException e) {
+            Log.w(TAG, "Guest report created; priority reload failed", e);
         }
         return created.get(0);
     }
@@ -186,9 +241,39 @@ public class SupabaseReports {
                 + "\"is_offline\":false,"
                 + "\"sync_status\":\"Synced\""
                 + "}";
-        Log.d(TAG, "Inserting photo: " + json);
-        String response = SupabaseClient.postWithAuth("/report_photos", json, accessToken);
-        Log.d(TAG, "Photo insert response: " + response);
+        SupabaseClient.postWithAuth("/report_photos", json, accessToken);
+    }
+
+    /** Avoid inserting a second photo row after a retry or an uncertain response. */
+    public static boolean photoExists(long reportId, String storagePath,
+                                      String accessToken) throws IOException {
+        String path = "/report_photos?report_id=eq." + reportId
+                + "&supabase_storage_path=eq."
+                + java.net.URLEncoder.encode(storagePath, "UTF-8")
+                + "&select=report_id&limit=1";
+        String response = SupabaseClient.getWithAuth(path, accessToken);
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Could not check whether the photo already synced");
+        }
+        return !response.trim().equals("[]");
+    }
+
+    /** Photo rows for a report, with the primary photo first. */
+    public static List<String> getPhotoUrls(long reportId, String accessToken) throws IOException {
+        String response = SupabaseClient.getWithAuth("/report_photos?report_id=eq."
+                        + reportId + "&select=photo_url,is_primary&order=is_primary.desc,supabase_storage_path.asc",
+                accessToken);
+        try {
+            org.json.JSONArray rows = new org.json.JSONArray(response);
+            List<String> urls = new ArrayList<>();
+            for (int i = 0; i < rows.length(); i++) {
+                String url = rows.getJSONObject(i).optString("photo_url", "");
+                if (!url.isEmpty()) urls.add(url);
+            }
+            return urls;
+        } catch (org.json.JSONException e) {
+            throw new IOException("Could not read report photos", e);
+        }
     }
 
     public static void insertStatusHistory(long reportId,
@@ -211,7 +296,6 @@ public class SupabaseReports {
             json.append("\"notes\":\"").append(escape(notes)).append("\"");
         }
         json.append("}");
-        Log.d(TAG, "insertStatusHistory: " + json);
         SupabaseClient.postWithAuth("/fault_status_history", json.toString(), accessToken);
     }
 
@@ -224,6 +308,28 @@ public class SupabaseReports {
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
         List<FaultReport> results = gson.fromJson(response, listType);
         return results != null ? results : new ArrayList<>();
+    }
+
+    public static List<FaultReport> getGuestReports(String guestAuthId, String accessToken)
+            throws IOException {
+        String response = SupabaseClient.getWithAuth("/fault_reports?guest_auth_user_id=eq."
+                + guestAuthId + "&order=created_at.desc", accessToken);
+        Type type = new TypeToken<List<FaultReport>>() {}.getType();
+        List<FaultReport> reports = gson.fromJson(response, type);
+        return reports != null ? reports : new ArrayList<>();
+    }
+
+    /** Exposes only the limited fields returned by the database's guest tracking RPC. */
+    public static FaultReport trackExternalAsGuest(String reference, String accessToken)
+            throws IOException {
+        org.json.JSONObject request = new org.json.JSONObject();
+        try { request.put("p_reference", reference); }
+        catch (org.json.JSONException e) { throw new IOException("Invalid reference", e); }
+        String response = SupabaseClient.postWithAuth("/rpc/guest_track_report",
+                request.toString(), accessToken);
+        Type type = new TypeToken<List<FaultReport>>() {}.getType();
+        List<FaultReport> matches = gson.fromJson(response, type);
+        return matches == null || matches.isEmpty() ? null : matches.get(0);
     }
 
     public static FaultReport getReportByReference(String referenceNumber, String accessToken) throws IOException {
@@ -257,12 +363,13 @@ public class SupabaseReports {
         } else {
             response = SupabaseClient.get(path);
         }
-        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            return new ArrayList<>();
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Could not load status history");
         }
         Type listType = new TypeToken<List<StatusHistoryDTO>>(){}.getType();
         List<StatusHistoryDTO> results = gson.fromJson(response, listType);
-        return results != null ? results : new ArrayList<>();
+        if (results == null) throw new IOException("Invalid status history response");
+        return results;
     }
 
     // ==================================================================
@@ -281,9 +388,27 @@ public class SupabaseReports {
             String accessToken
     ) throws IOException {
 
+        if (currentCitizenId <= 0) {
+            List<NearbyReport> out = new ArrayList<>();
+            for (FaultReport r : getNearbyReports(userLat, userLng, accessToken)) {
+                if (r.category_id != categoryId) continue;
+                double d = haversineMeters(userLat, userLng, r.getLatitude(), r.getLongitude());
+                if (d > radiusMeters) continue;
+                String title = r.getTitle() != null ? r.getTitle() : "Report";
+                NearbyReport nearby = new NearbyReport(r.getReportId(),
+                        r.getReferenceNumber(), title, title, r.getStatus(),
+                        r.getPriorityScore() != null ? r.getPriorityScore() : 0,
+                        r.getVoteCount() != null ? r.getVoteCount() : 0, d);
+                nearby.setOwnerCitizenId(r.getCitizenId() != null ? r.getCitizenId() : -1L);
+                out.add(nearby);
+            }
+            out.sort((a, b) -> Double.compare(a.getDistance(), b.getDistance()));
+            return out;
+        }
+
         String path = "/fault_reports"
                 + "?category_id=eq." + categoryId
-                + "&status=in.(Pending,Assigned)"
+                + "&status=in.(Pending,%22Under%20Review%22)"
                 + "&order=created_at.desc";
 
         String response;
@@ -292,10 +417,9 @@ public class SupabaseReports {
         } else {
             response = SupabaseClient.get(path);
         }
-        Log.d(TAG, "getNearbyReportsForCategory raw: " + response);
 
-        if (response == null || response.trim().isEmpty() || !response.trim().startsWith("[")) {
-            return new ArrayList<>();
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Could not load nearby reports for this category");
         }
 
         Type listType = new TypeToken<List<FaultReport>>(){}.getType();
@@ -333,23 +457,17 @@ public class SupabaseReports {
     /**
      * Inserts a row into report_votes. The bump_vote_count trigger on
      * the DB side increments fault_reports.vote_count automatically.
-     * Returns true if the insert succeeded.
+     * Let HTTP errors reach the caller so it can distinguish an existing vote
+     * from a connection or permissions problem.
      */
-    public static boolean upvoteReport(long reportId,
-                                       long citizenProfileId,
-                                       String accessToken) throws IOException {
+    public static void upvoteReport(long reportId,
+                                    long citizenProfileId,
+                                    String accessToken) throws IOException {
         String json = "{"
                 + "\"report_id\":" + reportId + ","
                 + "\"citizen_id\":" + citizenProfileId
                 + "}";
-        Log.d(TAG, "upvoteReport: " + json);
-        try {
-            SupabaseClient.postWithAuth("/report_votes", json, accessToken);
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "upvoteReport failed", e);
-            return false;
-        }
+        SupabaseClient.postWithAuth("/report_votes", json, accessToken);
     }
 
     private static String escape(String s) {

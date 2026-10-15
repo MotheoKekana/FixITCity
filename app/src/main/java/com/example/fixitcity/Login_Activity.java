@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
+import com.example.fixitcity.services.SyncScheduler;
 import com.example.fixitcity.data.SupabaseAuth;
 import com.example.fixitcity.data.SupabaseUsers;
 
@@ -114,15 +115,35 @@ public class Login_Activity extends AppCompatActivity {
         btnSignIn.setOnClickListener(view -> attemptLogin());
 
         btnGuest.setOnClickListener(view -> {
-            SessionManager guestSession = new SessionManager(this);
-
-            guestSession.logout();
-            guestSession.saveSession("guest", "guest", "guest@local", "guest");
-            guestSession.setHasCitizenProfile(false);
-
-            // ↓ CHANGED: go to Guest_Mode_Activity first (was Guest_Dashboard_Activity)
-            startActivity(new Intent(this, Guest_Mode_Activity.class));
-            finish();
+            btnGuest.setEnabled(false);
+            new Thread(() -> {
+                try {
+                    JSONObject result = new JSONObject(SupabaseAuth.signInAnonymously());
+                    String token = result.optString("access_token", "");
+                    String refresh = result.optString("refresh_token", "");
+                    String uuid = result.optJSONObject("user") != null
+                            ? result.getJSONObject("user").optString("id", "") : "";
+                    if (token.isEmpty() || refresh.isEmpty() || uuid.isEmpty()) {
+                        throw new IOException("Guest session was not created");
+                    }
+                    SessionManager guestSession = new SessionManager(getApplicationContext());
+                    guestSession.logout();
+                    guestSession.saveSession(token, uuid, "", "guest");
+                    guestSession.saveRefreshToken(refresh);
+                    guestSession.setHasCitizenProfile(false);
+                    runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        startActivity(new Intent(this, Guest_Mode_Activity.class));
+                        finish();
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "Guest sign-in failed", e);
+                    runOnUiThread(() -> {
+                        btnGuest.setEnabled(true);
+                        Toast.makeText(this, "Could not start guest mode. Check your connection and try again.", Toast.LENGTH_LONG).show();
+                    });
+                }
+            }, "guest-sign-in").start();
         });
 
         btnRegisterLink.setOnClickListener(view ->
@@ -191,6 +212,8 @@ public class Login_Activity extends AppCompatActivity {
                 }
 
                 saveSession(accessToken, refreshToken, authUserId, userEmail, userId, profile);
+                // Resume this citizen's queued reports if they signed back in later.
+                SyncScheduler.scheduleSync(getApplicationContext());
 
                 runOnUiThread(() -> {
                     Toast.makeText(

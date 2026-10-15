@@ -138,6 +138,29 @@
                         android:textSize="14sp"
                         android:visibility="gone" />
 
+                    <TextView
+                        android:id="@+id/tv_report_photos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Loading photos…"
+                        android:textColor="@color/secondary_blue"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fillViewport="true">
+
+                        <LinearLayout
+                            android:id="@+id/report_photo_strip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" />
+                    </HorizontalScrollView>
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_share_status"
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -203,14 +226,14 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ============== Notify Me button (underneath the timeline) ============== -->
+            <!-- Open the citizen's notifications after viewing the timeline -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_notify_me"
+                android:id="@+id/btn_view_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/notify_me"
+                android:text="View Notifications"
                 android:backgroundTint="@color/primary_green"
                 android:textColor="@color/white"
                 app:cornerRadius="12dp"

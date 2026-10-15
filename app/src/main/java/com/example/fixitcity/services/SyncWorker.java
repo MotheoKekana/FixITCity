@@ -15,11 +15,16 @@ import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SessionRefresher;
 import com.example.fixitcity.data.SupabaseClient;
 import com.example.fixitcity.data.SupabaseReports;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class SyncWorker extends Worker {
 
@@ -36,8 +41,8 @@ public class SyncWorker extends Worker {
         Log.d(TAG, "SyncWorker starting");
 
         SessionManager session = new SessionManager(getApplicationContext());
-        if (!session.isLoggedIn() || session.isGuest()) {
-            Log.d(TAG, "Not logged in as citizen — aborting sync");
+        if (!session.isLoggedIn() || (session.isGuest() && !session.hasGuestAuthSession())) {
+            Log.d(TAG, "No valid report session — aborting sync");
             return Result.success();
         }
 
@@ -59,11 +64,20 @@ public class SyncWorker extends Worker {
             Log.w(TAG, "No access token — aborting");
             return Result.success();
         }
+        long citizenProfileId = session.getCitizenProfileId();
+        String authUserId = session.getUserId();
+        boolean guest = session.isGuest();
+        if ((!guest && citizenProfileId <= 0) || authUserId == null || authUserId.isEmpty()) {
+            Log.w(TAG, "No report identity for current session — leaving outbox untouched");
+            return Result.success();
+        }
 
         // 2) Load pending rows
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         ReportDao dao = db.reportDao();
-        List<ReportEntity> pending = dao.getPending();
+        List<ReportEntity> pending = guest
+                ? dao.getPendingForGuest(authUserId + ":")
+                : dao.getPendingForCitizen(citizenProfileId);
 
         Log.d(TAG, "Pending reports to sync: " + pending.size());
 
@@ -74,12 +88,19 @@ public class SyncWorker extends Worker {
         boolean anyTransientFailure = false;
 
         for (ReportEntity row : pending) {
+            // Stop if the account changed while this worker was running.
+            if (session.isGuest() != guest
+                    || session.getCitizenProfileId() != citizenProfileId
+                    || !authUserId.equals(session.getUserId())) {
+                Log.d(TAG, "Account changed — leaving remaining queued reports untouched");
+                return Result.success();
+            }
             row.sync_status = "Syncing";
             row.last_sync_attempt = System.currentTimeMillis();
             dao.update(row);
 
             try {
-                syncOne(row, dao, session, accessToken);
+                syncOne(row, dao, accessToken, guest ? authUserId : null);
             } catch (TransientException te) {
                 Log.w(TAG, "Transient sync failure for " + row.reference_number + ": " + te.getMessage());
                 row.sync_status = "Pending";  // will retry
@@ -102,90 +123,100 @@ public class SyncWorker extends Worker {
 
     private void syncOne(ReportEntity row,
                          ReportDao dao,
-                         SessionManager session,
-                         String accessToken) throws Exception {
+                         String accessToken, String guestAuthId) throws Exception {
 
-        // --- Idempotency: does it already exist on the server? ---
-        boolean exists = SupabaseReports.reportExistsByReference(row.reference_number, accessToken);
-        if (exists) {
-            Log.d(TAG, "Report " + row.reference_number + " already on server — cleanup");
-            deleteLocalPhoto(row.photo_filename);
-            dao.delete(row);
-            return;
-        }
-
-        // --- Insert report ---
+        // A previous attempt may have inserted the report but failed to upload its photo.
+        // Reuse that server row rather than posting a duplicate or discarding the photo.
         FaultReport created;
         try {
-            created = SupabaseReports.submitReport(
-                    row.citizen_id,
-                    row.category_id,
-                    row.reference_number,
-                    row.title,
-                    row.description,
-                    row.latitude,
-                    row.longitude,
-                    row.address_line,
-                    accessToken
-            );
+            created = SupabaseReports.getReportByReference(row.reference_number, accessToken);
+            if (created == null) {
+                created = guestAuthId != null
+                        ? SupabaseReports.submitGuestReport(guestAuthId, row.category_id,
+                        row.reference_number, row.title, row.description,
+                        row.latitude, row.longitude, row.address_line, accessToken)
+                        : SupabaseReports.submitReport(row.citizen_id, row.category_id,
+                        row.reference_number, row.title, row.description,
+                        row.latitude, row.longitude, row.address_line, accessToken);
+            }
         } catch (IOException io) {
-            // Network error → transient
             throw new TransientException(io.getMessage());
         }
+        if (created == null || created.getReportId() <= 0) {
+            throw new IOException("Report was saved without a valid report ID");
+        }
 
-        // --- Upload photo if present ---
+        // Keep the outbox row and files until every photo record exists on the server.
         if (row.photo_filename != null && !row.photo_filename.isEmpty()) {
             try {
-                byte[] bytes = readLocalPhoto(row.photo_filename);
-                if (bytes != null && bytes.length > 0) {
-                    String storagePath = "reports/"
-                            + created.getReportId() + "/"
-                            + System.currentTimeMillis() + ".jpg";
-
+                boolean legacy = !row.photo_filename.startsWith("[");
+                List<String> filenames = photoFilenames(row.photo_filename);
+                for (int i = 0; i < filenames.size(); i++) {
+                    String storagePath = "reports/" + created.getReportId() + "/"
+                            + row.reference_number + (legacy ? "" : "-" + (i + 1)) + ".jpg";
+                    if (SupabaseReports.photoExists(created.getReportId(), storagePath, accessToken)) continue;
+                    byte[] bytes = readLocalPhoto(filenames.get(i));
                     String publicUrl = SupabaseClient.uploadToStorage(
-                            SupabaseClient.REPORT_PHOTOS_BUCKET,
-                            storagePath,
-                            bytes,
+                            SupabaseClient.REPORT_PHOTOS_BUCKET, storagePath, bytes,
                             row.photo_mime_type != null ? row.photo_mime_type : "image/jpeg",
-                            accessToken
-                    );
-
-                    SupabaseReports.insertPhoto(
-                            created.getReportId(),
-                            publicUrl,
-                            storagePath,
-                            true,
-                            accessToken
-                    );
-
-                    Log.d(TAG, "Photo synced for " + row.reference_number);
+                            accessToken);
+                    SupabaseReports.insertPhoto(created.getReportId(), publicUrl,
+                            storagePath, i == 0, accessToken);
                 }
+                Log.d(TAG, "Photos synced for " + row.reference_number);
+            } catch (FileNotFoundException photoEx) {
+                // A missing local file needs intervention; a network retry cannot restore it.
+                throw photoEx;
+            } catch (IOException photoEx) {
+                Log.w(TAG, "Photo sync will retry for " + row.reference_number, photoEx);
+                throw new TransientException(photoEx.getMessage());
             } catch (Exception photoEx) {
-                // Photo failure shouldn't lose the report — log and move on
-                Log.e(TAG, "Photo sync failed (report saved): " + photoEx.getMessage());
+                // Preserve the local photo and row even for an unexpected failure.
+                throw photoEx;
             }
         }
 
-        // --- Cleanup ---
-        deleteLocalPhoto(row.photo_filename);
         dao.delete(row);
+        for (String filename : photoFilenames(row.photo_filename)) deleteLocalPhoto(filename);
         Log.d(TAG, "Synced and removed: " + row.reference_number);
     }
 
-    private byte[] readLocalPhoto(String filename) {
-        try {
-            File dir = new File(getApplicationContext().getFilesDir(), PHOTO_DIR);
-            File f = new File(dir, filename);
-            if (!f.exists()) return null;
-            FileInputStream fis = new FileInputStream(f);
-            byte[] bytes = new byte[(int) f.length()];
-            int read = fis.read(bytes);
-            fis.close();
-            return read > 0 ? bytes : null;
-        } catch (IOException e) {
-            Log.e(TAG, "readLocalPhoto failed: " + e.getMessage());
-            return null;
+    private byte[] readLocalPhoto(String filename) throws IOException {
+        File dir = new File(getApplicationContext().getFilesDir(), PHOTO_DIR);
+        File f = new File(dir, filename);
+        if (!f.isFile()) throw new FileNotFoundException("Offline photo is missing: " + filename);
+        try (FileInputStream fis = new FileInputStream(f);
+             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            byte[] chunk = new byte[8192];
+            int count;
+            while ((count = fis.read(chunk)) != -1) {
+                buffer.write(chunk, 0, count);
+            }
+            byte[] bytes = buffer.toByteArray();
+            if (bytes.length == 0) throw new FileNotFoundException("Offline photo is empty: " + filename);
+            return bytes;
         }
+    }
+
+    private List<String> photoFilenames(String value) throws JSONException {
+        List<String> filenames = new ArrayList<>();
+        if (value == null || value.isEmpty()) return filenames;
+        if (!value.startsWith("[")) {
+            filenames.add(value); // Existing single-photo outbox rows.
+            return filenames;
+        }
+        JSONArray array = new JSONArray(value);
+        if (array.length() < 1 || array.length() > 3) {
+            throw new JSONException("Invalid offline photo count");
+        }
+        for (int i = 0; i < array.length(); i++) {
+            String filename = array.getString(i);
+            if (!filename.matches("[a-fA-F0-9-]{36}\\.jpg")) {
+                throw new JSONException("Invalid offline photo filename");
+            }
+            filenames.add(filename);
+        }
+        return filenames;
     }
 
     private void deleteLocalPhoto(String filename) {

@@ -14,8 +14,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.fixitcity.Login_Activity;
 import com.example.fixitcity.R;
+import com.example.fixitcity.Splash_Activity;
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseUsers;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -29,7 +29,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        Log.d(TAG, "New FCM token: " + token);
+        Log.d(TAG, "FCM token refreshed");
 
         SessionManager session = new SessionManager(this);
         long userId = session.getUserIdBigint();
@@ -65,7 +65,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         if (message.getData().size() > 0) {
-            Log.d(TAG, "Data payload: " + message.getData());
             if (message.getData().containsKey("title")) {
                 title = message.getData().get("title");
             }
@@ -88,8 +87,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
 
-        Intent intent = new Intent(this, Login_Activity.class);
+        // Reuse the normal startup route so a signed-in citizen keeps their session.
+        Intent intent = new Intent(this, Splash_Activity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("open_notifications", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE

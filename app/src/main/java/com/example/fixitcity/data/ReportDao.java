@@ -23,11 +23,18 @@ public interface ReportDao {
     @Query("SELECT * FROM report_outbox ORDER BY created_at_local ASC")
     List<ReportEntity> getAll();
 
-    @Query("SELECT * FROM report_outbox WHERE sync_status = 'Pending' OR sync_status = 'Failed' ORDER BY created_at_local ASC")
-    List<ReportEntity> getPending();
+    // A process can stop after SyncWorker marks a row Syncing. Include it on
+    // the next run so an interrupted upload is retried by reference number.
+    @Query("SELECT * FROM report_outbox WHERE citizen_id = :citizenId AND sync_status IN ('Pending', 'Failed', 'Syncing') ORDER BY created_at_local ASC")
+    List<ReportEntity> getPendingForCitizen(long citizenId);
 
-    @Query("SELECT COUNT(*) FROM report_outbox WHERE sync_status = 'Pending' OR sync_status = 'Failed'")
-    int getPendingCount();
+    // Guest offline IDs begin with the Supabase anonymous auth UUID.
+    // This scopes pending reports to the current guest session without a Room migration.
+    @Query("SELECT * FROM report_outbox WHERE citizen_id = -1 AND offline_id LIKE :guestPrefix || '%' AND sync_status IN ('Pending', 'Failed', 'Syncing') ORDER BY created_at_local ASC")
+    List<ReportEntity> getPendingForGuest(String guestPrefix);
+
+    @Query("SELECT COUNT(*) FROM report_outbox WHERE citizen_id = :citizenId AND sync_status IN ('Pending', 'Failed', 'Syncing')")
+    int getPendingCountForCitizen(long citizenId);
 
     @Query("SELECT * FROM report_outbox WHERE offline_id = :offlineId LIMIT 1")
     ReportEntity getById(String offlineId);

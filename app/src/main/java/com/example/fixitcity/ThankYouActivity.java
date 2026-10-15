@@ -2,7 +2,6 @@ package com.example.fixitcity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,8 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.fixitcity.data.SessionManager;
 
 public class ThankYouActivity extends AppCompatActivity {
-
-    private static final String TAG = "ThankYouActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +42,14 @@ public class ThankYouActivity extends AppCompatActivity {
             btnGoDashboard.setOnClickListener(v -> {
                 SessionManager session = new SessionManager(this);
 
-                boolean realLogin = session.isLoggedIn()
-                        && session.getCitizenProfileId() > 0;
-
-                Log.d(TAG, "Go Home tapped — isLoggedIn=" + session.isLoggedIn()
-                        + " citizenProfileId=" + session.getCitizenProfileId()
-                        + " isGuest=" + session.isGuest()
-                        + " → routing to "
-                        + (realLogin ? "Dashboard_Activity" : "Guest_Dashboard_Activity"));
-
-                Class<?> target = realLogin
-                        ? Dashboard_Activity.class
-                        : Guest_Dashboard_Activity.class;
+                Class<?> target;
+                if (session.isGuest() && session.hasGuestAuthSession()) {
+                    target = Guest_Dashboard_Activity.class;
+                } else if (session.isLoggedIn() && session.getCitizenProfileId() > 0) {
+                    target = Dashboard_Activity.class;
+                } else {
+                    target = Login_Activity.class;
+                }
 
                 Intent intent = new Intent(this, target);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

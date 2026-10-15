@@ -104,7 +104,8 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         // ---------- Nearby reports RecyclerView ----------
         rvNearbyReports.setLayoutManager(new LinearLayoutManager(this));
-        nearbyAdapter = new NearbyReportAdapter(this, nearbyList, null);
+        nearbyAdapter = new NearbyReportAdapter(this, nearbyList,
+                (report, position) -> AppNavigation.openNearbySummary(this, report));
         rvNearbyReports.setAdapter(nearbyAdapter);
 
         // Nearby radius label
@@ -115,6 +116,10 @@ public class Dashboard_Activity extends AppCompatActivity {
             tvSeeMoreNearby.setOnClickListener(v ->
                     startActivity(new Intent(this, NearbyReportsActivity.class)));
         }
+
+        View seeAllRecent = findViewById(R.id.btnSeeAllRecent);
+        if (seeAllRecent != null) seeAllRecent.setOnClickListener(v ->
+                startActivity(new Intent(this, ReportHistoryActivity.class)));
 
         // Notifications bell
         ImageView ivNotif = findViewById(R.id.ivNotifications);

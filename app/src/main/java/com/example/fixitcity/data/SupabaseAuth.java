@@ -13,6 +13,23 @@ import okhttp3.Response;
 
 public class SupabaseAuth {
 
+    /** Supabase Auth anonymous sign-in returns access_token, refresh_token and user.id. */
+    public static String signInAnonymously() throws IOException {
+        Request request = new Request.Builder()
+                .url(SupabaseClient.AUTH_URL + "/signup")
+                .addHeader("apikey", SupabaseClient.SUPABASE_ANON_KEY)
+                .addHeader("Content-Type", "application/json")
+                .post(RequestBody.create("{}", SupabaseClient.JSON))
+                .build();
+        try (Response response = SupabaseClient.getHttpClient().newCall(request).execute()) {
+            String body = response.body() != null ? response.body().string() : "";
+            if (!response.isSuccessful()) {
+                throw new IOException("Guest sign-in failed (HTTP " + response.code() + "): " + body);
+            }
+            return body;
+        }
+    }
+
     public static String register(
             String email,
             String password,

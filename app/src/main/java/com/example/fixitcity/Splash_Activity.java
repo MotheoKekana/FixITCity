@@ -58,6 +58,12 @@ public class Splash_Activity extends AppCompatActivity {
         }
 
         if (session.isGuest()) {
+            if (!session.hasGuestAuthSession()
+                    || SessionRefresher.refresh(session) == SessionRefresher.Result.INVALID_SESSION) {
+                session.logout();
+                navigateAfterMinimumDelay(Login_Activity.class);
+                return;
+            }
             navigateAfterMinimumDelay(Guest_Dashboard_Activity.class);
             return;
         }
@@ -85,7 +91,8 @@ public class Splash_Activity extends AppCompatActivity {
             Log.i(TAG, "Offline at startup; continuing with cached account data");
         }
 
-        navigateAfterMinimumDelay(Dashboard_Activity.class);
+        navigateAfterMinimumDelay(getIntent().getBooleanExtra("open_notifications", false)
+                ? Notifications_Activity.class : Dashboard_Activity.class);
     }
 
     private void navigateAfterMinimumDelay(Class<?> destination) {

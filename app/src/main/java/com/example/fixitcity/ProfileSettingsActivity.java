@@ -66,12 +66,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             long citizenProfileId = session.getCitizenProfileId();
             String accessToken = session.getAccessToken();
 
-            if (!session.isGuest() && citizenProfileId > 0 && accessToken != null) {
+            if ((session.isGuest() && session.hasGuestAuthSession())
+                    || (!session.isGuest() && citizenProfileId > 0 && accessToken != null)) {
                 tvReportsCount.setText("…");
                 new Thread(() -> {
                     try {
                         List<com.example.fixitcity.FaultReport> reports =
-                                SupabaseReports.getUserReports(citizenProfileId, accessToken);
+                                session.isGuest()
+                                        ? SupabaseReports.getGuestReports(session.getUserId(), accessToken)
+                                        : SupabaseReports.getUserReports(citizenProfileId, accessToken);
                         int count = (reports != null) ? reports.size() : 0;
                         runOnUiThread(() -> tvReportsCount.setText(String.valueOf(count)));
                     } catch (Exception e) {
@@ -99,11 +102,19 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
                     startActivity(intent);
                 });
+        if (session.isGuest()) findViewById(R.id.settingsNotifications).setVisibility(View.GONE);
 
         // ===== Logout button =====
         View logoutBtn = findViewById(R.id.btnLogout);
         if (logoutBtn != null) {
             logoutBtn.setOnClickListener(v -> {
+                if (session.isGuest()) {
+                    Intent intent = new Intent(this, Guest_Dashboard_Activity.class);
+                    intent.putExtra("request_guest_logout", true);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    return;
+                }
                 session.logout();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, Login_Activity.class));

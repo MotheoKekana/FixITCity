@@ -40,6 +40,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         });
 
         hideNavForGuests();
+        AppNavigation.bindNotificationBell(this);
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
@@ -96,7 +97,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         });
 
         // Bottom navigation
-        findViewById(R.id.navHome).setOnClickListener(v -> finish());
+        findViewById(R.id.navHome).setOnClickListener(v -> AppNavigation.goHome(this));
 
         findViewById(R.id.navReport).setOnClickListener(v ->
                 Toast.makeText(this, "You're already reporting", Toast.LENGTH_SHORT).show());

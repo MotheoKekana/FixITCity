@@ -1,7 +1,5 @@
 package com.example.fixitcity.data;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -11,7 +9,6 @@ import java.util.List;
 
 public class SupabaseUsers {
 
-    private static final String TAG = "SupabaseUsers";
     private static final Gson gson = new Gson();
 
     /**
@@ -33,14 +30,12 @@ public class SupabaseUsers {
                 accessToken
         );
 
-        Log.d(TAG, "findUserIdByAuthUuid response: " + response);
-
         if (response == null
                 || response.trim().isEmpty()
                 || !response.trim().startsWith("[")) {
 
             throw new IOException(
-                    "Could not load the user account: " + response
+                    "Could not load the user account"
             );
         }
 
@@ -78,18 +73,12 @@ public class SupabaseUsers {
                 accessToken
         );
 
-        Log.d(TAG,
-                "findCitizenProfileByUserId response: "
-                        + response
-        );
-
         if (response == null
                 || response.trim().isEmpty()
                 || !response.trim().startsWith("[")) {
 
             throw new IOException(
-                    "Could not load the citizen profile: "
-                            + response
+                    "Could not load the citizen profile"
             );
         }
 
@@ -141,29 +130,9 @@ public class SupabaseUsers {
             String accessToken
     ) throws IOException {
 
-        String lookupPath = "/device_tokens"
-                + "?user_id=eq." + userId
-                + "&device_token=eq." + escape(token)
-                + "&select=token_id"
-                + "&limit=1";
+        long existingTokenId = findDeviceTokenId(userId, token, accessToken);
 
-        String lookupResponse =
-                SupabaseClient.getWithAuth(
-                        lookupPath,
-                        accessToken
-                );
-
-        Log.d(TAG,
-                "saveDeviceToken lookup: "
-                        + lookupResponse
-        );
-
-        boolean exists =
-                lookupResponse != null
-                        && lookupResponse.trim().startsWith("[")
-                        && !lookupResponse.trim().equals("[]");
-
-        if (exists) {
+        if (existingTokenId > 0) {
             String patchBody = "{"
                     + "\"is_active\":true,"
                     + "\"last_used_at\":\""
@@ -173,16 +142,13 @@ public class SupabaseUsers {
 
             String patchPath = "/device_tokens"
                     + "?user_id=eq." + userId
-                    + "&device_token=eq."
-                    + escape(token);
+                    + "&token_id=eq." + existingTokenId;
 
             SupabaseClient.patchWithAuth(
                     patchPath,
                     patchBody,
                     accessToken
             );
-
-            Log.d(TAG, "Device token refreshed");
 
         } else {
             String json = "{"
@@ -194,15 +160,10 @@ public class SupabaseUsers {
                     + "\"is_active\":true"
                     + "}";
 
-            String response =
-                    SupabaseClient.postWithAuth(
-                            "/device_tokens",
-                            json,
-                            accessToken
-                    );
-
-            Log.d(TAG,
-                    "Device token inserted: " + response
+            SupabaseClient.postWithAuth(
+                    "/device_tokens",
+                    json,
+                    accessToken
             );
         }
     }
@@ -213,12 +174,14 @@ public class SupabaseUsers {
             String accessToken
     ) throws IOException {
 
+        long tokenId = findDeviceTokenId(userId, token, accessToken);
+        if (tokenId <= 0) return;
+
         String patchBody = "{\"is_active\":false}";
 
         String patchPath = "/device_tokens"
                 + "?user_id=eq." + userId
-                + "&device_token=eq."
-                + escape(token);
+                + "&token_id=eq." + tokenId;
 
         SupabaseClient.patchWithAuth(
                 patchPath,
@@ -226,7 +189,32 @@ public class SupabaseUsers {
                 accessToken
         );
 
-        Log.d(TAG, "Device token deactivated");
+    }
+
+    /** Find the current user's device token without putting it into a request URL. */
+    private static long findDeviceTokenId(long userId, String token,
+                                          String accessToken) throws IOException {
+        String path = "/device_tokens?user_id=eq." + userId
+                + "&select=token_id,device_token";
+        String response = SupabaseClient.getWithAuth(path, accessToken);
+        if (response == null || !response.trim().startsWith("[")) {
+            throw new IOException("Could not check registered device tokens");
+        }
+        Type listType = new TypeToken<List<DeviceTokenDTO>>() {}.getType();
+        List<DeviceTokenDTO> tokens = gson.fromJson(response, listType);
+        if (tokens != null) {
+            for (DeviceTokenDTO saved : tokens) {
+                if (token != null && token.equals(saved.device_token)) {
+                    return saved.token_id;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static class DeviceTokenDTO {
+        long token_id;
+        String device_token;
     }
 
     private static String nowIso() {

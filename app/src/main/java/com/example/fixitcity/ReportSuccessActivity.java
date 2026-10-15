@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -22,12 +23,21 @@ public class ReportSuccessActivity extends AppCompatActivity {
     private String referenceNumber;
     private int priorityScore;
     private boolean isQueued;
+    private boolean photoQueued;
+    private boolean photoFailed;
     private boolean hasPriorityScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_success);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                goToDashboard();
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -44,6 +54,8 @@ public class ReportSuccessActivity extends AppCompatActivity {
         referenceNumber = getIntent().getStringExtra("reference_number");
         priorityScore = getIntent().getIntExtra("priority_score", 0);
         isQueued = getIntent().getBooleanExtra("is_queued", false);
+        photoQueued = getIntent().getBooleanExtra("photo_queued", false);
+        photoFailed = getIntent().getBooleanExtra("photo_failed", false);
         hasPriorityScore = !isQueued && getIntent().hasExtra("priority_score");
 
         if (referenceNumber == null) referenceNumber = "FIX-0000-0000";
@@ -53,10 +65,14 @@ public class ReportSuccessActivity extends AppCompatActivity {
                 : hasPriorityScore ? priorityScore + "/100" : "Calculating");
         tvStatus.setText(isQueued ? "Queued" : "Pending");
         ((TextView) findViewById(R.id.tv_success_title)).setText(
-                isQueued ? "Report saved on this phone" : "Report submitted!");
+                isQueued ? "Report saved on this phone"
+                        : photoFailed ? "Report submitted; photo not saved"
+                          : "Report submitted!");
         ((TextView) findViewById(R.id.tv_success_message)).setText(isQueued
                 ? "It will be sent when you're online. Keep this reference number to track it later."
-                : "Your report has been sent. Keep this reference number to track its progress.");
+                : photoQueued ? "Your report was sent. Its photo will sync when the connection is available."
+                  : photoFailed ? "Your report was sent, but its photo could not be saved for retry. Keep the reference number to track the report."
+                    : "Your report has been sent. Keep this reference number to track its progress.");
 
         findViewById(R.id.btn_copy_ref).setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -93,9 +109,14 @@ public class ReportSuccessActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        if (new SessionManager(this).isGuest() || isQueued) {
+            ((TextView) findViewById(R.id.btn_track_report)).setText(isQueued
+                    ? "View pending report" : "View my reports");
+        }
+
         findViewById(R.id.btn_track_report).setOnClickListener(v -> {
-            if (isQueued) {
-                Toast.makeText(this, "You can track this report after it syncs", Toast.LENGTH_LONG).show();
+            if (new SessionManager(this).isGuest() || isQueued) {
+                startActivity(new Intent(this, ReportHistoryActivity.class));
                 return;
             }
             Intent intent = new Intent(this, TrackReportSearchActivity.class);
@@ -113,13 +134,13 @@ public class ReportSuccessActivity extends AppCompatActivity {
         if (bottomNav != null) bottomNav.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onBackPressed() {
+    private void goToDashboard() {
         SessionManager session = new SessionManager(this);
-        Class<?> target = session.isGuest()
-                ? Guest_Dashboard_Activity.class
-                : Dashboard_Activity.class;
-        Intent intent = new Intent(this, target);
+
+        Intent intent = session.isGuest()
+                ? new Intent(this, Guest_Dashboard_Activity.class)
+                : new Intent(this, Dashboard_Activity.class);
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

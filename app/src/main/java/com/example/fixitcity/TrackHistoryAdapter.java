@@ -50,8 +50,13 @@ public class TrackHistoryAdapter
         holder.tvDate.setText("📅 " + (r.getCreatedAt() != null ? r.getCreatedAt() : "—"));
 
         // Priority
-        int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
-        holder.tvPriority.setText("Score " + score + "/100");
+        if (r.isPendingSync()) {
+            holder.tvPriority.setText("Score after sync");
+        } else if (r.getPriorityScore() != null) {
+            holder.tvPriority.setText("Score " + r.getPriorityScore() + "/100");
+        } else {
+            holder.tvPriority.setText("Calculating score");
+        }
 
         // Status badge text + colour
         String status = r.getStatus() != null ? r.getStatus() : "Pending";
@@ -77,6 +82,9 @@ public class TrackHistoryAdapter
     private int colorForStatus(String status) {
         switch (status) {
             case "Pending":      return 0xFFFFA500;  // orange
+            case "Pending sync": return 0xFFFFA500;
+            case "Syncing":      return 0xFF2196F3;
+            case "Sync failed":  return 0xFFF44336;
             case "Under Review": return 0xFF2196F3;  // blue
             case "Accepted":     return 0xFF4CAF50;  // green
             case "Rejected":     return 0xFFF44336;  // red

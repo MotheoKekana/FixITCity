@@ -88,11 +88,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             });
         }
 
-        View ivNotif = findViewById(R.id.ivNotifications);
-        if (ivNotif != null) {
-            ivNotif.setOnClickListener(v ->
-                    startActivity(new Intent(this, Notifications_Activity.class)));
-        }
+        AppNavigation.bindNotificationBell(this);
     }
 
     private void hideNavForGuests() {
@@ -116,15 +112,19 @@ public class TrackReportSearchActivity extends AppCompatActivity {
 
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
+        boolean guest = session.isGuest();
 
         new Thread(() -> {
             try {
-                FaultReport report = SupabaseReports.getReportByReference(ref, accessToken);
+                FaultReport report = guest
+                        ? SupabaseReports.trackExternalAsGuest(ref, accessToken)
+                        : SupabaseReports.getReportByReference(ref, accessToken);
                 runOnUiThread(() -> {
                     btnTrack.setEnabled(true);
                     if (report == null) {
                         Toast.makeText(this,
-                                "No report found with that reference number",
+                                guest ? "No external report found. Your own reports are in Recent reports."
+                                        : "No report found with that reference number",
                                 Toast.LENGTH_LONG).show();
                     } else {
                         Intent intent = new Intent(this, TrackReportResultActivity.class);
@@ -137,6 +137,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
                         intent.putExtra("priority_score",
                                 report.getPriorityScore() != null ? report.getPriorityScore() : 0);
                         intent.putExtra("created_at", report.getCreatedAt());
+                        intent.putExtra("external_guest", guest);
                         startActivity(intent);
                     }
                 });

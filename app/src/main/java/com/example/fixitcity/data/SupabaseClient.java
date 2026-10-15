@@ -2,6 +2,8 @@ package com.example.fixitcity.data;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +12,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 public class SupabaseClient {
 
@@ -53,26 +54,8 @@ public class SupabaseClient {
 
     public static synchronized OkHttpClient getHttpClient() {
         if (httpClient == null) {
-            HttpLoggingInterceptor logging =
-                    new HttpLoggingInterceptor(
-                            message -> Log.d(
-                                    "SupabaseHTTP",
-                                    message
-                            )
-                    );
-
-            /*
-             * BASIC logs the URL and response status without
-             * printing passwords and access tokens contained
-             * in request and response bodies.
-             */
-            logging.setLevel(
-                    HttpLoggingInterceptor.Level.BASIC
-            );
-
             httpClient =
                     new OkHttpClient.Builder()
-                            .addInterceptor(logging)
                             .connectTimeout(
                                     30,
                                     TimeUnit.SECONDS
@@ -442,22 +425,27 @@ public class SupabaseClient {
                             ? response.body().string()
                             : "";
 
-            Log.d(
-                    TAG,
-                    operation
-                            + " | HTTP "
-                            + response.code()
-                            + " | "
-                            + responseBody
-            );
+            // Paths can contain device tokens in query parameters; response bodies
+            // can contain private profile data. Log only the route and status.
+            String safeOperation = operation.split("\\?", 2)[0];
+            Log.d(TAG, safeOperation + " | HTTP " + response.code());
 
             if (!response.isSuccessful()) {
+                String errorCode = "";
+                try {
+                    errorCode = new JSONObject(responseBody).optString("code", "");
+                } catch (Exception ignored) {
+                    // A non-JSON error still has an HTTP status for diagnosis.
+                }
+                // The upvote screen uses this constraint name to explain repeat votes.
+                String voteConstraint = responseBody.contains("report_votes_unique_per_citizen")
+                        ? " (report_votes_unique_per_citizen)" : "";
                 throw new IOException(
-                        operation
+                        safeOperation
                                 + " failed (HTTP "
                                 + response.code()
-                                + "): "
-                                + responseBody
+                                + (errorCode.isEmpty() ? "" : ", code " + errorCode)
+                                + ")" + voteConstraint
                 );
             }
 

@@ -50,6 +50,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
         });
 
         hideNavForGuests();
+        AppNavigation.bindNotificationBell(this);
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
         tvAddress = findViewById(R.id.tv_location_address);
@@ -77,7 +78,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.navHome).setOnClickListener(v -> finish());
+        findViewById(R.id.navHome).setOnClickListener(v -> AppNavigation.goHome(this));
         findViewById(R.id.navReport).setOnClickListener(v -> {
             startActivity(new Intent(this, ReportFaultCategoryActivity.class));
             finish();

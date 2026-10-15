@@ -128,6 +128,13 @@ public class SessionManager {
         return "guest".equalsIgnoreCase(getRole());
     }
 
+    /** Older builds saved a placeholder token instead of a Supabase session. */
+    public boolean hasGuestAuthSession() {
+        return isGuest() && getUserId() != null && !"guest".equals(getUserId())
+                && getAccessToken() != null && !"guest".equals(getAccessToken())
+                && getRefreshToken() != null && !getRefreshToken().isEmpty();
+    }
+
     public String getFirstName() {
         return prefs.getString(KEY_FIRST_NAME, "");
     }

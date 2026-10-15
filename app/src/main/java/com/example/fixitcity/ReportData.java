@@ -1,5 +1,9 @@
 package com.example.fixitcity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class ReportData {
 
     private String category;
@@ -16,6 +20,7 @@ public class ReportData {
     private String photoUri;
     private byte[] photoBytes;
     private String photoMimeType;
+    private final List<byte[]> photos = new ArrayList<>();
 
     // Upvote tracking
     private int upvotedReportId = -1;
@@ -45,8 +50,30 @@ public class ReportData {
     public double getLongitude() { return longitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
 
-    public int getPhotoCount() { return photoCount; }
+    public int getPhotoCount() { return photos.size(); }
     public void setPhotoCount(int photoCount) { this.photoCount = photoCount; }
+
+    public List<byte[]> getPhotos() { return Collections.unmodifiableList(photos); }
+    public void addPhoto(byte[] bytes) {
+        if (bytes == null || bytes.length == 0 || photos.size() >= 3) {
+            throw new IllegalArgumentException("A report can contain up to three photos");
+        }
+        photos.add(bytes);
+        photoBytes = bytes;
+        photoCount = photos.size();
+    }
+    public void removeLastPhoto() {
+        if (!photos.isEmpty()) photos.remove(photos.size() - 1);
+        photoBytes = photos.isEmpty() ? null : photos.get(photos.size() - 1);
+        photoCount = photos.size();
+    }
+    public void clearPhotos() {
+        photos.clear();
+        photoBytes = null;
+        photoUri = null;
+        photoMimeType = null;
+        photoCount = 0;
+    }
 
     public String getAdditionalDetails() { return additionalDetails; }
     public void setAdditionalDetails(String additionalDetails) { this.additionalDetails = additionalDetails; }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,9 +38,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
     /** Radius in meters — 2 km. */
     private static final double RADIUS_METERS = 2000.0;
 
-    /** Fallback coordinates if the device location can't be obtained. */
-    private static final double DEFAULT_LAT = -33.9608;
-    private static final double DEFAULT_LNG = 25.6022;
 
     /** Dropdown options. */
     private static final String FILTER_ALL   = "All Reports";
@@ -77,8 +75,8 @@ public class NearbyReportsActivity extends AppCompatActivity {
     private String currentFilter = FILTER_ALL;
 
     private FusedLocationProviderClient fusedClient;
-    private double userLat = DEFAULT_LAT;
-    private double userLng = DEFAULT_LNG;
+    private double userLat;
+    private double userLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +123,7 @@ public class NearbyReportsActivity extends AppCompatActivity {
         }
 
 // ---------- Notification bell ----------
-        View ivNotif = findViewById(R.id.ivNotifications);
-        if (ivNotif != null) {
-            ivNotif.setOnClickListener(v ->
-                    startActivity(new Intent(this, Notifications_Activity.class)));
-        }
+        AppNavigation.bindNotificationBell(this);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -146,7 +140,42 @@ public class NearbyReportsActivity extends AppCompatActivity {
         }
         rvNearbyReports.setLayoutManager(new LinearLayoutManager(this));
         rvNearbyReports.setNestedScrollingEnabled(false);
-        adapter = new NearbyReportAdapter(this, nearbyList, null);
+        adapter = new NearbyReportAdapter(this, nearbyList, (report, position) -> {
+            SessionManager session = new SessionManager(this);
+            if (!session.isGuest()) {
+                AppNavigation.openNearbySummary(this, report);
+                return;
+            }
+            new Thread(() -> {
+                try {
+                    FaultReport details = SupabaseReports.trackExternalAsGuest(
+                            report.getReferenceNumber(), session.getAccessToken());
+                    runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        if (details == null) {
+                            Toast.makeText(this, "Your own reports are in Recent reports.",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        Intent intent = new Intent(this, TrackReportResultActivity.class);
+                        intent.putExtra("report_id", details.getReportId());
+                        intent.putExtra("reference_number", details.getReferenceNumber());
+                        intent.putExtra("title", details.getTitle());
+                        intent.putExtra("description", details.getDescription());
+                        intent.putExtra("address_line", details.getAddressLine());
+                        intent.putExtra("status", details.getStatus());
+                        intent.putExtra("priority_score", details.getPriorityScore() != null
+                                ? details.getPriorityScore() : 0);
+                        intent.putExtra("created_at", details.getCreatedAt());
+                        intent.putExtra("external_guest", true);
+                        startActivity(intent);
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> Toast.makeText(this,
+                            "Could not open this report. Check your connection.", Toast.LENGTH_LONG).show());
+                }
+            }, "guest-nearby-detail").start();
+        });
         rvNearbyReports.setAdapter(adapter);
 
         tvEmptyState = findViewById(R.id.tvEmptyState);
@@ -206,7 +235,7 @@ public class NearbyReportsActivity extends AppCompatActivity {
     private void fetchLocationThenLoad() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            loadAllNearbyReports();
+            showLocationUnavailable();
             return;
         }
 
@@ -217,14 +246,14 @@ public class NearbyReportsActivity extends AppCompatActivity {
                         userLng = loc.getLongitude();
                         android.util.Log.d(TAG, "Using device location: "
                                 + userLat + ", " + userLng);
+                        loadAllNearbyReports();
                     } else {
-                        android.util.Log.d(TAG, "No location available, using defaults");
+                        showLocationUnavailable();
                     }
-                    loadAllNearbyReports();
                 })
                 .addOnFailureListener(e -> {
-                    android.util.Log.e(TAG, "Location failed, using defaults", e);
-                    loadAllNearbyReports();
+                    android.util.Log.e(TAG, "Location unavailable", e);
+                    showLocationUnavailable();
                 });
     }
 
@@ -239,10 +268,19 @@ public class NearbyReportsActivity extends AppCompatActivity {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 fetchLocationThenLoad();
             } else {
-                android.util.Log.d(TAG, "Location permission denied, using defaults");
-                loadAllNearbyReports();
+                showLocationUnavailable();
             }
         }
+    }
+
+    private void showLocationUnavailable() {
+        if (tvEmptyState != null) {
+            tvEmptyState.setText("Enable location to find reports within 2 km of you.");
+            tvEmptyState.setVisibility(View.VISIBLE);
+        }
+        allWithinRadius.clear();
+        nearbyList.clear();
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 
     /** Fetch open reports from Supabase and keep those within RADIUS_METERS. */
@@ -252,9 +290,10 @@ public class NearbyReportsActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                List<FaultReport> allOpen = SupabaseReports.getOpenReports(accessToken);
+                List<FaultReport> allOpen = SupabaseReports.getNearbyReports(
+                        userLat, userLng, accessToken);
 
-                android.util.Log.d(TAG, "getOpenReports returned "
+                android.util.Log.d(TAG, "getNearbyReports returned "
                         + (allOpen == null ? "NULL" : allOpen.size() + " items"));
 
                 List<NearbyReport> fresh = new ArrayList<>();

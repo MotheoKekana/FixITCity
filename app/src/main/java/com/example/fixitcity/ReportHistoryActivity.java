@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkInfo;
 
 import com.example.fixitcity.data.AppDatabase;
 import com.example.fixitcity.data.ReportEntity;
@@ -23,8 +24,11 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 
 public class ReportHistoryActivity extends AppCompatActivity {
 
@@ -34,6 +38,11 @@ public class ReportHistoryActivity extends AppCompatActivity {
     private TrackHistoryAdapter adapter;              // ← was FaultReportAdapter
     private TextView tvEmptyState;
     private MaterialButton btnSyncPending;
+    private int pendingSyncCount;
+    private WorkInfo.State activeSyncState;
+    private boolean observedActiveSync;
+    private boolean waitingForEnqueue;
+    private final Set<UUID> seenFinishedWorkIds = new HashSet<>();
 
     private final List<FaultReport> allReports = new ArrayList<>();
     private final List<FaultReport> filteredReports = new ArrayList<>();
@@ -68,11 +77,49 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         if (btnSyncPending != null) {
             btnSyncPending.setOnClickListener(v -> {
+                waitingForEnqueue = true;
+                activeSyncState = WorkInfo.State.ENQUEUED;
+                updateSyncButton(pendingSyncCount);
                 SyncScheduler.scheduleSync(this);
-                btnSyncPending.setEnabled(false);
-                btnSyncPending.setText("Syncing…");
             });
+
+            SyncScheduler.observeSync(this).observe(this, this::onSyncWorkChanged);
         }
+    }
+
+    private void onSyncWorkChanged(List<WorkInfo> jobs) {
+        WorkInfo.State state = null;
+        boolean newCompletion = false;
+        if (jobs != null) {
+            for (WorkInfo job : jobs) {
+                if (job.getState().isFinished()
+                        && seenFinishedWorkIds.add(job.getId())) {
+                    newCompletion = true;
+                }
+                if (job.getState() == WorkInfo.State.RUNNING) {
+                    state = WorkInfo.State.RUNNING;
+                    break;
+                }
+                if (job.getState() == WorkInfo.State.ENQUEUED
+                        || job.getState() == WorkInfo.State.BLOCKED) {
+                    state = WorkInfo.State.ENQUEUED;
+                }
+            }
+        }
+
+        if (state != null) {
+            waitingForEnqueue = false;
+            observedActiveSync = true;
+            activeSyncState = state;
+        } else if (observedActiveSync || (waitingForEnqueue && newCompletion)) {
+            waitingForEnqueue = false;
+            observedActiveSync = false;
+            activeSyncState = null;
+            loadReports();
+        } else if (!waitingForEnqueue) {
+            activeSyncState = null;
+        }
+        updateSyncButton(pendingSyncCount);
     }
 
     private void hideNavForGuests() {
@@ -137,20 +184,19 @@ public class ReportHistoryActivity extends AppCompatActivity {
             });
         }
 
-        View ivNotif = findViewById(R.id.ivNotifications);
-        if (ivNotif != null) {
-            ivNotif.setOnClickListener(v ->
-                    startActivity(new Intent(this, Notifications_Activity.class)));
-        }
+        AppNavigation.bindNotificationBell(this);
     }
 
     private void loadReports() {
         SessionManager session = new SessionManager(this);
         long citizenProfileId = session.getCitizenProfileId();
         String accessToken = session.getAccessToken();
+        boolean guest = session.isGuest();
+        String guestAuthId = guest ? session.getUserId() : null;
 
-        if (citizenProfileId <= 0 || accessToken == null) {
-            showEmptyState("Please log in to view your report history.");
+        if ((!guest && citizenProfileId <= 0) || accessToken == null
+                || (guest && !session.hasGuestAuthSession())) {
+            showEmptyState("Start a guest session to view your reports.");
             return;
         }
 
@@ -160,8 +206,11 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         // 1) Local pending rows first — always available offline
         new Thread(() -> {
-            List<ReportEntity> pending = AppDatabase.getInstance(getApplicationContext())
-                    .reportDao().getPending();
+            List<ReportEntity> pending = guest
+                    ? AppDatabase.getInstance(getApplicationContext()).reportDao()
+                    .getPendingForGuest(guestAuthId + ":")
+                    : AppDatabase.getInstance(getApplicationContext()).reportDao()
+                    .getPendingForCitizen(citizenProfileId);
 
             List<FaultReport> localAsReports = new ArrayList<>();
             for (ReportEntity r : pending) {
@@ -170,7 +219,13 @@ public class ReportHistoryActivity extends AppCompatActivity {
                 f.reference_number = r.reference_number;
                 f.title = r.title;
                 f.description = r.description;
-                f.status = "Pending";
+                if ("Failed".equalsIgnoreCase(r.sync_status)) {
+                    f.status = "Sync failed";
+                } else if ("Syncing".equalsIgnoreCase(r.sync_status)) {
+                    f.status = "Syncing";
+                } else {
+                    f.status = "Pending sync";
+                }
                 f.priority_score = r.priority_score;
                 f.created_at = formatLocalTimestamp(r.created_at_local);
                 f.setPendingSync(true);
@@ -182,14 +237,19 @@ public class ReportHistoryActivity extends AppCompatActivity {
             // 2) Then Supabase
             List<FaultReport> serverReports;
             try {
-                serverReports = SupabaseReports.getUserReports(citizenProfileId, accessToken);
+                serverReports = guest
+                        ? SupabaseReports.getGuestReports(guestAuthId, accessToken)
+                        : SupabaseReports.getUserReports(citizenProfileId, accessToken);
                 if (serverReports == null) serverReports = new ArrayList<>();
             } catch (Exception e) {
                 Log.e(TAG, "Server fetch failed: " + e.getMessage(), e);
                 serverReports = new ArrayList<>();
                 if (localAsReports.isEmpty()) {
                     final String msg = "Could not load reports. Check your connection and try again.";
-                    runOnUiThread(() -> showEmptyState(msg));
+                    runOnUiThread(() -> {
+                        updateSyncButton(0);
+                        showEmptyState(msg);
+                    });
                     return;
                 }
             }
@@ -198,8 +258,23 @@ public class ReportHistoryActivity extends AppCompatActivity {
             final int pendingFinal = pendingCount;
 
             runOnUiThread(() -> {
+                // An earlier load must not display another account's reports after sign-in changes.
+                SessionManager current = new SessionManager(this);
+                if (current.isGuest() != guest
+                        || (guest ? !guestAuthId.equals(current.getUserId())
+                        : current.getCitizenProfileId() != citizenProfileId)) return;
+                Set<String> onlineReferences = new HashSet<>();
+                for (FaultReport serverReport : serverFinal) {
+                    onlineReferences.add(serverReport.getReferenceNumber());
+                }
                 allReports.clear();
-                allReports.addAll(localAsReports);   // pending first
+                for (FaultReport localReport : localAsReports) {
+                    // A queued photo belongs to an already submitted report.
+                    // Show the server report once, while keeping the sync button count.
+                    if (!onlineReferences.contains(localReport.getReferenceNumber())) {
+                        allReports.add(localReport);
+                    }
+                }
                 allReports.addAll(serverFinal);      // then server rows
                 updateSyncButton(pendingFinal);
                 applyFilter();
@@ -215,10 +290,19 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
     private void updateSyncButton(int pendingCount) {
         if (btnSyncPending == null) return;
+        pendingSyncCount = pendingCount;
         if (pendingCount > 0) {
             btnSyncPending.setVisibility(View.VISIBLE);
-            btnSyncPending.setEnabled(true);
-            btnSyncPending.setText("⟳ Sync pending (" + pendingCount + ")");
+            if (activeSyncState == WorkInfo.State.RUNNING) {
+                btnSyncPending.setEnabled(false);
+                btnSyncPending.setText("Syncing…");
+            } else if (activeSyncState == WorkInfo.State.ENQUEUED) {
+                btnSyncPending.setEnabled(false);
+                btnSyncPending.setText("Sync queued (" + pendingCount + ")");
+            } else {
+                btnSyncPending.setEnabled(true);
+                btnSyncPending.setText("⟳ Sync pending (" + pendingCount + ")");
+            }
         } else {
             btnSyncPending.setVisibility(View.GONE);
         }
@@ -236,7 +320,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
             }
 
             String status = r.getStatus() != null ? r.getStatus() : "Pending";
-            String s = status.toLowerCase(Locale.US);
+            String s = status.trim().toLowerCase(Locale.US);
 
             boolean include;
             switch (currentFilter) {
@@ -244,10 +328,12 @@ public class ReportHistoryActivity extends AppCompatActivity {
                     include = s.equals("pending") || s.equals("open");
                     break;
                 case "In Progress":
-                    include = s.equals("in progress") || s.equals("assigned");
+                    include = s.equals("under review") || s.equals("in progress")
+                            || s.equals("assigned");
                     break;
                 case "Resolved":
-                    include = s.equals("resolved") || s.equals("completed")
+                    include = s.equals("fixed") || s.equals("resolved")
+                            || s.equals("completed")
                             || s.equals("closed");
                     break;
                 default:
@@ -286,7 +372,9 @@ public class ReportHistoryActivity extends AppCompatActivity {
     private void onReportClicked(FaultReport report) {
         if (report.isPendingSync()) {
             android.widget.Toast.makeText(this,
-                    "This report hasn't synced yet — try Sync pending first.",
+                    "Sync failed".equals(report.getStatus())
+                            ? "This report could not sync. Tap Sync pending to retry."
+                            : "This report hasn't synced yet — try Sync pending first.",
                     android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
