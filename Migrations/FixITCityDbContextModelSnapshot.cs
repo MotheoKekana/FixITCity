@@ -385,6 +385,10 @@ namespace FixITCityAPI.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("status");
 
+                    b.Property<string>("StreetName")
+                        .HasColumnType("text")
+                        .HasColumnName("street_name");
+
                     b.Property<string>("SuburbName")
                         .HasColumnType("text")
                         .HasColumnName("suburb_name");
@@ -412,9 +416,6 @@ namespace FixITCityAPI.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("verified_by");
 
-                    b.Property<int?>("VerifiedByNavigationMunicipalUserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("ReportId");
 
                     b.HasIndex("AreaId");
@@ -425,7 +426,7 @@ namespace FixITCityAPI.Migrations
 
                     b.HasIndex("CitizenId");
 
-                    b.HasIndex("VerifiedByNavigationMunicipalUserId");
+                    b.HasIndex("VerifiedBy");
 
                     b.ToTable("fault_reports", (string)null);
                 });
@@ -706,6 +707,49 @@ namespace FixITCityAPI.Migrations
                     b.HasIndex("ReportId");
 
                     b.ToTable("notifications", (string)null);
+                });
+
+            modelBuilder.Entity("FixITCityAPI.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTime?>("ConsumedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("consumed_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ConsumedAt")
+                        .HasDatabaseName("ix_password_reset_tokens_user_consumed");
+
+                    b.ToTable("password_reset_tokens", (string)null);
                 });
 
             modelBuilder.Entity("FixITCityAPI.Models.PriorityScore", b =>
@@ -1067,7 +1111,7 @@ namespace FixITCityAPI.Migrations
 
                     b.HasOne("FixITCityAPI.Models.MunicipalUser", "VerifiedByNavigation")
                         .WithMany()
-                        .HasForeignKey("VerifiedByNavigationMunicipalUserId");
+                        .HasForeignKey("VerifiedBy");
 
                     b.Navigation("Area");
 
@@ -1119,6 +1163,17 @@ namespace FixITCityAPI.Migrations
                     b.Navigation("Citizen");
 
                     b.Navigation("Report");
+                });
+
+            modelBuilder.Entity("FixITCityAPI.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("FixITCityAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FixITCityAPI.Models.PriorityScore", b =>

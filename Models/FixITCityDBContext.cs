@@ -36,6 +36,8 @@ public partial class FixITCityDbContext : DbContext
     public virtual DbSet<ServiceArea> ServiceAreas { get; set; }
     public virtual DbSet<User> Users { get; set; }
 
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ============================================================
@@ -57,6 +59,28 @@ public partial class FixITCityDbContext : DbContext
         modelBuilder.Entity<ServiceArea>().ToTable("service_areas");
         modelBuilder.Entity<User>().ToTable("users");
         // ============================================================
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("password_reset_tokens");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.CodeHash)
+                .HasMaxLength(64)
+                .HasColumnName("code_hash");
+            entity.Property(e => e.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(e => e.Attempts).HasColumnName("attempts");
+            entity.Property(e => e.ConsumedAt).HasColumnName("consumed_at");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.UserId, e.ConsumedAt })
+                .HasDatabaseName("ix_password_reset_tokens_user_consumed");
+        });
 
         modelBuilder.Entity<AuditLog>(entity =>
         {
