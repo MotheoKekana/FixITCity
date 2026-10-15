@@ -10,6 +10,9 @@ public partial class User
 
     public string? Email { get; set; }
 
+    [Column("full_name")]
+    public string? FullName { get; set; }
+
     public string? PasswordHash { get; set; }
 
     public string? Role { get; set; }
