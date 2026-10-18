@@ -14,112 +14,128 @@ namespace FixITCity_Dashboard.Services.Dashboard
         }
 
         public async Task<DashboardViewModel> GetDashboardSummaryAsync()
-        {
+{
             var model = new DashboardViewModel();
             var client = _httpClientFactory.CreateClient("Api");
 
-            // Stats
-            try
+            // Start all three requests before waiting for any of them.
+            var statsTask = GetSafelyAsync<DashboardStatsApiResponse>(
+                client, "Dashboard/stats");
+
+            var categoriesTask = GetSafelyAsync<List<CategoryCountDto>>(
+                client, "Dashboard/reports-by-category");
+
+            var reportsTask = GetSafelyAsync<List<ReportListItemDto>>(
+                client, "Reports");
+
+            await Task.WhenAll(statsTask, categoriesTask, reportsTask);
+
+            var statsResult = await statsTask;
+            var categoriesResult = await categoriesTask;
+            var reportsResult = await reportsTask;
+
+            AddWarning(model, statsResult.Error, "Statistics unavailable");
+            AddWarning(model, categoriesResult.Error, "Category breakdown unavailable");
+            AddWarning(model, reportsResult.Error, "Report data unavailable");
+
+            if (statsResult.Data is { } stats)
             {
-                var stats = await client.GetFromJsonAsync<DashboardStatsApiResponse>("Dashboard/stats");
-                if (stats != null)
+                model.Statistics = new DashboardStatisticsViewModel
                 {
-                    model.Statistics = new DashboardStatisticsViewModel
+                    Total = stats.Total,
+                    Pending = stats.Pending,
+                    UnderReview = stats.UnderReview,
+                    Accepted = stats.Accepted,
+                    InProgress = stats.InProgress,
+                    Fixed = stats.Fixed,
+                    Rejected = stats.Rejected
+                };
+            }
+
+            if (categoriesResult.Data is { } categories)
+            {
+                model.Categories = new CategoryStatisticsViewModel
+                {
+                    ReportsByCategory = categories
+                        .Where(c => !string.IsNullOrWhiteSpace(c.CategoryName))
+                        .ToDictionary(c => c.CategoryName!, c => c.Count)
+                };
+            }
+
+            if (reportsResult.Data is { } reports)
+            {
+                model.Map.MapPoints = reports
+                    .Where(r => r.Latitude != 0 && r.Longitude != 0)
+                    .Select(r => new MapPointViewModel
                     {
-                        Total = stats.Total,
-                        Pending = stats.Pending,
-                        UnderReview = stats.UnderReview,
-                        Accepted = stats.Accepted,
-                        InProgress = stats.InProgress,
-                        Fixed = stats.Fixed,
-                        Rejected = stats.Rejected
-                    };
+                        Latitude = r.Latitude,
+                        Longitude = r.Longitude,
+                        Title = r.Title,
+                        Description = r.Description,
+                        IsEmergency = false
+                    })
+                    .ToList();
+
+                var today = DateTime.Today;
+                var startDate = today.AddDays(-6);
+
+                var countsByDate = reports
+                    .Where(r => r.CreatedAt.HasValue)
+                    .Select(r => r.CreatedAt!.Value.Date)
+                    .Where(d => d >= startDate && d <= today)
+                    .GroupBy(d => d)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var activity = new Dictionary<string, int>();
+
+                for (int i = 0; i < 7; i++)
+                {
+                    var day = startDate.AddDays(i);
+                    var label = day.ToString("ddd");
+                    activity[label] = countsByDate.TryGetValue(day, out var count)
+                        ? count
+                        : 0;
                 }
-            }
-            catch (Exception ex)
-            {
-                model.Alerts.Add(new DashboardAlertViewModel
+
+                model.Activity = new ActivityStatisticsViewModel
                 {
-                    Message = "Statistics unavailable: " + ex.Message,
-                    Type = "warning"
-                });
-            }
-
-            // Categories
-            try
-            {
-                var categories = await client.GetFromJsonAsync<List<CategoryCountDto>>("Dashboard/reports-by-category");
-                if (categories != null)
-                {
-                    model.Categories = new CategoryStatisticsViewModel
-                    {
-                        ReportsByCategory = categories
-                            .Where(c => !string.IsNullOrWhiteSpace(c.CategoryName))
-                            .ToDictionary(c => c.CategoryName!, c => c.Count)
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                model.Alerts.Add(new DashboardAlertViewModel
-                {
-                    Message = "Category breakdown unavailable: " + ex.Message,
-                    Type = "warning"
-                });
-            }
-
-            // Reports (feeds map + activity chart)
-            try
-            {
-                var reports = await client.GetFromJsonAsync<List<ReportListItemDto>>("Reports");
-                if (reports != null)
-                {
-                    model.Map.MapPoints = reports
-                        .Where(r => r.Latitude != 0 && r.Longitude != 0)
-                        .Select(r => new MapPointViewModel
-                        {
-                            Latitude = r.Latitude,
-                            Longitude = r.Longitude,
-                            Title = r.Title,
-                            Description = r.Description,
-                            IsEmergency = false
-                        })
-                        .ToList();
-
-                    var today = DateTime.Today;
-                    var startDate = today.AddDays(-6);
-
-                    var countsByDate = reports
-                        .Where(r => r.CreatedAt.HasValue)
-                        .Select(r => r.CreatedAt!.Value.Date)
-                        .Where(d => d >= startDate && d <= today)
-                        .GroupBy(d => d)
-                        .ToDictionary(g => g.Key, g => g.Count());
-
-                    var activity = new Dictionary<string, int>();
-                    for (int i = 0; i < 7; i++)
-                    {
-                        var day = startDate.AddDays(i);
-                        var label = day.ToString("ddd");
-                        activity[label] = countsByDate.TryGetValue(day, out var c) ? c : 0;
-                    }
-
-                    model.Activity = new ActivityStatisticsViewModel
-                    {
-                        ReportsByDay = activity
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                model.Alerts.Add(new DashboardAlertViewModel
-                {
-                    Message = "Report data unavailable: " + ex.Message,
-                    Type = "warning"
-                });
+                    ReportsByDay = activity
+                };
             }
 
             return model;
         }
+
+        private static async Task<(T? Data, string? Error)> GetSafelyAsync<T>(
+            HttpClient client,
+            string path)
+            where T : class
+        {
+            try
+            {
+                var data = await client.GetFromJsonAsync<T>(path);
+                return (data, null);
+            }
+            catch (Exception ex)
+            {
+                return (null, ex.Message);
+            }
+        }
+
+            private static void AddWarning(
+                DashboardViewModel model,
+                string? error,
+                string message)
+            {
+                if (error != null)
+                {
+                    model.Alerts.Add(new DashboardAlertViewModel
+                    {
+                        Message = $"{message}: {error}",
+                        Type = "warning"
+                    });
+                }
+                
+            }
     }
 }
