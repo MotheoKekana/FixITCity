@@ -1,357 +1,120 @@
 @{
     Layout = null;
+
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    var username = Context.Session.GetString("FullName")
+        ?? Context.Session.GetString("Username")
+        ?? "Admin";
+    var userInitial = string.IsNullOrWhiteSpace(username)
+        ? "A"
+        : username.Trim()[0].ToString().ToUpperInvariant();
 }
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#123d3a" />
     <title>@ViewData["Title"] - FixITCity</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="icon" type="image/png" href="~/images/favicon.ico" />
-
-
-    <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: #f4f6f9;
-                display: flex;
-                min-height: 100vh;
-            }
-
-            /* ===== SIDEBAR ===== */
-            .sidebar {
-                width: 250px;
-                background: #009688;
-                color: #fff;
-                display: flex;
-                flex-direction: column;
-                padding: 1.5rem 1rem;
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                overflow-y: auto;
-                z-index: 1000;
-                transition: transform 0.3s ease;
-            }
-
-            /* Brand / Logo */
-            .sidebar-brand {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                padding-bottom: 2rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                margin-bottom: 1.5rem;
-            }
-
-            .sidebar-brand .brand-icon {
-                width: 40px;
-                height: 40px;
-                background: #2d9e6b;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.2rem;
-                color: white;
-            }
-
-            .sidebar-brand .brand-text {
-                font-size: 1.2rem;
-                font-weight: 700;
-                color: white;
-            }
-
-            .sidebar-brand .brand-text span {
-                color: #2d9e6b;
-            }
-
-            /* User Profile in Sidebar */
-            .sidebar-user {
-                display: flex;
-                align-items: center;
-                text: white;
-                gap: 0.75rem;
-                padding: 1rem 0.75rem;
-                background: #009688;
-                border-radius: 10px;
-                margin-bottom: 1.5rem;
-            }
-
-            .sidebar-user .avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #2d9e6b;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                color: white;
-                font-size: 1rem;
-            }
-
-            .sidebar-user .user-info {
-                flex: 1;
-            }
-
-            .sidebar-user .user-info .name {
-                font-size: 0.9rem;
-                font-weight: 600;
-            }
-
-            .sidebar-user .user-info .role {
-                font-size: 0.75rem;
-                color: rgba(255, 255, 255, 0.5);
-            }
-
-            /* Navigation Links */
-            .sidebar-nav {
-                flex: 1;
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-
-            .sidebar-nav .nav-label {
-                font-size: 0.7rem;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                color: white;
-                padding: 0.75rem 0.75rem 0.5rem;
-                font-weight: 600;
-            }
-
-            .sidebar-nav li {
-                margin-bottom: 0.15rem;
-            }
-
-            .sidebar-nav li a {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                padding: 0.65rem 0.75rem;
-                border-radius: 8px;
-                color: rgba(255, 255, 255, 0.6);
-                text-decoration: none;
-                font-size: 0.9rem;
-                transition: all 0.15s;
-            }
-
-            .sidebar-nav li a i {
-                width: 20px;
-                text-align: center;
-                font-size: 1rem;
-            }
-
-            .sidebar-nav li a:hover {
-                background: rgba(255, 255, 255, 0.08);
-                color: #fff;
-            }
-
-            /* 👇 ACTIVE LINK - GREYED OUT */
-            .sidebar-nav li a.active {
-                background: rgba(255, 255, 255, 0.06);
-                color: rgba(255, 255, 255, 0.35);
-                cursor: default;
-                pointer-events: none;
-            }
-
-            /* Logout at bottom */
-            .sidebar-footer {
-                border-top: 1px solid rgba(255, 255, 255, 0.08);
-                padding-top: 1rem;
-                margin-top: auto;
-            }
-
-            .sidebar-footer a {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                padding: 0.65rem 0.75rem;
-                border-radius: 8px;
-                color: rgba(255, 255, 255, 0.5);
-                text-decoration: none;
-                font-size: 0.9rem;
-                transition: all 0.15s;
-            }
-
-            .sidebar-footer a:hover {
-                background: rgba(255, 255, 255, 0.08);
-                color: #fff;
-            }
-
-            .sidebar-footer a i {
-                width: 20px;
-                text-align: center;
-            }
-
-            /* ===== MAIN CONTENT ===== */
-            .main-content {
-                margin-left: 260px;
-                flex: 1;
-                padding: 2rem;
-                min-height: 100vh;
-            }
-
-            /* ===== RESPONSIVE ===== */
-            @@media (max-width: 768px) {
-                .sidebar {
-                    transform: translateX(-100%);
-                    width: 280px;
-                }
-
-                .sidebar.open {
-                    transform: translateX(0);
-                }
-
-                .main-content {
-                    margin-left: 0;
-                    padding: 1.25rem;
-                }
-
-                .hamburger {
-                    display: flex !important;
-                }
-            }
-
-            .hamburger {
-                display: none;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: white;
-                color: white;
-                border: none;
-                width: 42px;
-                height: 42px;
-                border-radius: 8px;
-                font-size: 1.3rem;
-                cursor: pointer;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .hamburger:hover {
-                background: #2a2a4e;
-            }
-
-            /* Overlay for mobile */
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.4);
-                z-index: 999;
-            }
-
-            .sidebar-overlay.active {
-                display: block;
-            }
-    </style>
+    <link rel="stylesheet" href="~/css/sidebar-layout.css" asp-append-version="true" />
 </head>
-
 <body>
+    <a class="skip-link" href="#mainContent">Skip to main content</a>
 
-    <!-- Mobile Hamburger -->
-    <button class="hamburger" id="hamburgerBtn">
-        <i class="fas fa-bars"></i>
+    <!-- Mobile navigation controls -->
+    <button class="sidebar-toggle"
+            id="hamburgerBtn"
+            type="button"
+            aria-label="Open navigation"
+            aria-controls="sidebar"
+            aria-expanded="false">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
     </button>
+    <button class="sidebar-overlay"
+            id="sidebarOverlay"
+            type="button"
+            aria-label="Close navigation"
+            aria-hidden="true"
+            tabindex="-1"></button>
 
-    <!-- Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar" id="sidebar">
-        <!-- Brand -->
+    <aside class="sidebar" id="sidebar" aria-label="Application sidebar">
         <div class="sidebar-brand">
-            <img src="~/images/android-chrome-512x512.png" alt="FixITCity" style="height: 40px;" />
-            <div class="brand-text">
-                FixITCity
-            </div>
-        </div>
-
-        <!-- User Info -->
-        @{
-            var username = Context.Session.GetString("FullName")
-                        ?? Context.Session.GetString("Username")
-                        ?? "Admin";
-        }
-
-        <!-- Navigation -->
-
-        <ul class="sidebar-nav">
-
-            <li>
-                <a asp-page="/Dashboard"
-                   class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Dashboard" ? "active" : "")">
-                    <i></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a asp-page="/Reports"
-                   class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Reports" ? "active" : "")">
-                    <i></i> Reports
-                </a>
-            </li>
-            <li>
-                <a asp-page="/Privacy"
-                   class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Privacy" ? "active" : "")">
-                    <i></i> Privacy Policy
-                </a>
-            </li>
-            <li>
-                <a asp-page="/Settings"
-                   class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Settings" ? "active" : "")">
-                    <i></i> Settings
-                </a>
-            </li>
-
-        </ul>
-
-        <!-- Footer -->
-        <div class="sidebar-footer">
-            <a asp-page="/Logout">
-                <i class="fas fa-sign-out-alt"></i> Logout
+            <a class="sidebar-brand-link" asp-page="/Dashboard" aria-label="FixITCity dashboard">
+                <span class="sidebar-logo-frame">
+                    <img src="~/images/android-chrome-512x512.png" alt="" />
+                </span>
+                <span class="sidebar-brand-copy">
+                    <span class="sidebar-brand-name">FixITCity</span>
+                    <span class="sidebar-brand-caption">Municipal services portal</span>
+                </span>
             </a>
         </div>
+
+        <div class="sidebar-user">
+            <span class="sidebar-avatar" aria-hidden="true">@userInitial</span>
+            <span class="sidebar-user-copy">
+                <span class="sidebar-user-label">Signed in</span>
+                <strong class="sidebar-user-name">@username</strong>
+            </span>
+            <span class="sidebar-user-status" title="Signed in" aria-label="Signed in"></span>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Primary navigation">
+            <a asp-page="/Dashboard"
+               class="sidebar-link @(currentPage == "/Dashboard" ? "active" : "")"
+               aria-current="@(currentPage == "/Dashboard" ? "page" : null)">
+                <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a asp-page="/Reports"
+               class="sidebar-link @(currentPage == "/Reports" ? "active" : "")"
+               aria-current="@(currentPage == "/Reports" ? "page" : null)">
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+                <span>Reports</span>
+            </a>
+
+            <a asp-page="/Privacy"
+               class="sidebar-link @(currentPage == "/Privacy" ? "active" : "")"
+               aria-current="@(currentPage == "/Privacy" ? "page" : null)">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                <span>Privacy Policy</span>
+            </a>
+
+            <a asp-page="/Settings"
+               class="sidebar-link @(currentPage == "/Settings" ? "active" : "")"
+               aria-current="@(currentPage == "/Settings" ? "page" : null)">
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+    <form method="post"
+          asp-page="/Logout"
+          class="sidebar-logout-form">
+
+        <button type="submit" class="sidebar-logout">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+            <span>Sign out</span>
+        </button>
+
+    </form>
+</div>
     </aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent" tabindex="-1">
         @RenderBody()
     </main>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Mobile sidebar toggle
-        const hamburger = document.getElementById('hamburgerBtn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        function toggleSidebar() {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-        }
-
-        hamburger.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar);
-    </script>
+    <script src="~/js/sidebar-layout.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Globalization;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
 
 namespace FixITCity_Dashboard.Pages
 {
@@ -8,6 +10,19 @@ namespace FixITCity_Dashboard.Pages
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<FaultDetailModel> _logger;
+
+        // Two log rows for the same event this close together count as one.
+        private const double DuplicateWindowSeconds = 5;
+
+        private static readonly string[] KnownStatuses =
+        {
+            "Pending", "Under Review", "Accepted", "In Progress", "Fixed", "Rejected"
+        };
+
+        // Matches: Status changed to Accepted.  /  Status changed to "Under Review"
+        private static readonly Regex StatusChangedRegex = new(
+            "^\\s*Status changed to\\s+\"?(?<status>[^\"]+?)\"?\\s*\\.?\\s*$",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public FaultDetailModel(
             IHttpClientFactory httpClientFactory,
@@ -18,8 +33,10 @@ namespace FixITCity_Dashboard.Pages
         }
 
         // ---- Properties shown on the page ----
-        public string PhotoUrl { get; private set; } = "";
-        public bool HasPhoto { get; private set; }
+        public List<string> PhotoUrls { get; private set; } = new();
+        public bool HasPhoto => PhotoUrls.Count > 0;
+
+        public string? AddressLine { get; private set; }
         public decimal? Latitude { get; private set; }
         public decimal? Longitude { get; private set; }
         public int? PriorityScore { get; private set; }
@@ -30,6 +47,22 @@ namespace FixITCity_Dashboard.Pages
             Latitude.HasValue &&
             Longitude.HasValue &&
             !(Latitude.Value == 0 && Longitude.Value == 0);
+
+        // Invariant culture so a comma decimal separator never breaks the map
+        public string? LatitudeText =>
+            Latitude?.ToString(CultureInfo.InvariantCulture);
+
+        public string? LongitudeText =>
+            Longitude?.ToString(CultureInfo.InvariantCulture);
+
+        public string? CoordinatesText => HasCoordinates
+            ? $"{Latitude!.Value.ToString("0.000000", CultureInfo.InvariantCulture)}, " +
+              $"{Longitude!.Value.ToString("0.000000", CultureInfo.InvariantCulture)}"
+            : null;
+
+        public string? GoogleMapsUrl => HasCoordinates
+            ? $"https://www.google.com/maps/search/?api=1&query={LatitudeText},{LongitudeText}"
+            : null;
 
         // ---------------------------------------------------------
         // Load fault report on GET
@@ -73,28 +106,20 @@ namespace FixITCity_Dashboard.Pages
                 Latitude = dto.Latitude;
                 Longitude = dto.Longitude;
                 PriorityScore = dto.PriorityScore;
+                AddressLine = dto.AddressLine;
 
-                // Photo (placeholder for now)
-                var primaryPhoto = dto.ReportPhotos
-                     .Where(p => !string.IsNullOrWhiteSpace(p.PhotoUrl))
-                     .OrderByDescending(p => p.IsPrimary ?? false)
-                     .ThenByDescending(p => p.UploadedAt)
-                     .ThenBy(p => p.PhotoId)
-                     .FirstOrDefault();
-                PhotoUrl = primaryPhoto?.PhotoUrl ?? "/images/unavailable_icon.png";
-                HasPhoto = primaryPhoto != null;
-
-                // Audit logs
-                AuditLogs = dto.AuditLogs
-                    .OrderByDescending(l => l.Timestamp)
-                    .Select(l => new AuditLogEntry
-                    {
-                        Action = l.Action ?? "",
-                        AdminName = l.AdminName ?? "System",
-                        Timestamp = l.Timestamp,
-                        Reason = l.Reason ?? ""
-                    })
+                // All photos: primary first, then in the order they were uploaded
+                PhotoUrls = (dto.ReportPhotos ?? new())
+                    .Where(p => !string.IsNullOrWhiteSpace(p.PhotoUrl))
+                    .OrderByDescending(p => p.IsPrimary ?? false)
+                    .ThenBy(p => p.UploadedAt)
+                    .ThenBy(p => p.PhotoId)
+                    .Select(p => p.PhotoUrl!)
+                    .Distinct()
                     .ToList();
+
+                // Audit log: one readable line per event
+                AuditLogs = BuildAuditLog(dto.AuditLogs);
 
                 return Page();
             }
@@ -121,23 +146,7 @@ namespace FixITCity_Dashboard.Pages
         // ---------------------------------------------------------
         public async Task<IActionResult> OnPostVerifyAsync(long id)
         {
-            return await UpdateReportStatusAsync(id, "Accepted",
-                "Report verified and moved to the ranked queue.");
-        }
-
-        // ---------------------------------------------------------
-        // Reject report
-        // ---------------------------------------------------------
-        public async Task<IActionResult> OnPostRejectAsync(long id, string? reason)
-        {
-            if (string.IsNullOrWhiteSpace(reason))
-            {
-                TempData["ErrorMessage"] =
-                    "Please enter a reason for rejecting the report.";
-                return RedirectToPage(new { id });
-            }
-
-            return await UpdateReportStatusAsync(id, "Rejected", reason.Trim());
+            return await UpdateReportStatusAsync(id, "Accepted");
         }
 
         // ---------------------------------------------------------
@@ -152,15 +161,13 @@ namespace FixITCity_Dashboard.Pages
                 return RedirectToPage(new { id });
             }
 
-            return await UpdateReportStatusAsync(id, statusUpdate.Trim(),
-                $"Status changed to {statusUpdate.Trim()}.");
+            return await UpdateReportStatusAsync(id, statusUpdate.Trim());
         }
 
         // ---------------------------------------------------------
         // Send status update to API
         // ---------------------------------------------------------
-        private async Task<IActionResult> UpdateReportStatusAsync(
-            long id, string status, string reason)
+        private async Task<IActionResult> UpdateReportStatusAsync(long id, string status)
         {
             var client = _httpClientFactory.CreateClient("Api");
 
@@ -169,7 +176,8 @@ namespace FixITCity_Dashboard.Pages
                 var request = new UpdateReportRequest
                 {
                     Status = status,
-                    Reason = reason
+                    // Same wording for every status change, so the log reads consistently
+                    Reason = $"Status changed to \"{status}\""
                 };
 
                 using var response = await client
@@ -201,6 +209,72 @@ namespace FixITCity_Dashboard.Pages
 
             return RedirectToPage(new { id });
         }
+
+        // ---------------------------------------------------------
+        // Audit log helpers
+        // ---------------------------------------------------------
+        private static List<AuditLogEntry> BuildAuditLog(IEnumerable<AuditLogDto>? logs)
+        {
+            var entries = new List<AuditLogEntry>();
+            if (logs == null) return entries;
+
+            foreach (var log in logs.OrderByDescending(l => l.Timestamp))
+            {
+                var summary = BuildSummary(log);
+                var admin = string.IsNullOrWhiteSpace(log.AdminName)
+                    ? "System"
+                    : log.AdminName.Trim();
+
+                // Same event recorded twice within a few seconds? Keep only one row.
+                var duplicate = entries.FirstOrDefault(e =>
+                    e.Summary == summary &&
+                    Math.Abs((e.Timestamp - log.Timestamp).TotalSeconds) <= DuplicateWindowSeconds);
+
+                if (duplicate == null)
+                {
+                    entries.Add(new AuditLogEntry
+                    {
+                        Summary = summary,
+                        AdminName = admin,
+                        Timestamp = log.Timestamp
+                    });
+                }
+                else if (duplicate.AdminName == "System" && admin != "System")
+                {
+                    // Prefer the row that names the real admin
+                    duplicate.AdminName = admin;
+                }
+            }
+
+            return entries;
+        }
+
+        private static string BuildSummary(AuditLogDto log)
+        {
+            var action = log.Action?.Trim() ?? "";
+            var reason = log.Reason?.Trim() ?? "";
+
+            // 1. The reason already says "Status changed to X"
+            var match = StatusChangedRegex.Match(reason);
+            if (match.Success)
+            {
+                return $"Status changed to \"{match.Groups["status"].Value}\"";
+            }
+
+            // 2. The action itself is a status name (e.g. "Accepted")
+            var knownStatus = KnownStatuses.FirstOrDefault(s =>
+                s.Equals(action, StringComparison.OrdinalIgnoreCase));
+            if (knownStatus != null)
+            {
+                return $"Status changed to \"{knownStatus}\"";
+            }
+
+            // 3. Anything else: show what the API recorded
+            if (action.Length > 0 && reason.Length > 0) return $"{action}: {reason}";
+            if (action.Length > 0) return action;
+            if (reason.Length > 0) return reason;
+            return "Activity recorded";
+        }
     }
 
     // -------------------------------------------------------------
@@ -230,9 +304,10 @@ namespace FixITCity_Dashboard.Pages
         public long PhotoId { get; set; }
         public string? PhotoUrl { get; set; }
         public string? SupabaseStoragePath { get; set; }
-        public bool? IsPrimary { get; set; }        // was: bool
+        public bool? IsPrimary { get; set; }
         public DateTime? UploadedAt { get; set; }
     }
+
     public class AuditLogDto
     {
         public string? Action { get; set; }
@@ -249,9 +324,8 @@ namespace FixITCity_Dashboard.Pages
 
     public class AuditLogEntry
     {
-        public string Action { get; set; } = "";
+        public string Summary { get; set; } = "";
         public string AdminName { get; set; } = "";
         public DateTime Timestamp { get; set; }
-        public string Reason { get; set; } = "";
     }
 }
