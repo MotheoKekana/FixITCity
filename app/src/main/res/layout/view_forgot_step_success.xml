@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:visibility="gone">
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="@string/forgot_password_success_icon_cd"
+        android:src="@drawable/ic_check_circle"
+        app:tint="?attr/colorPrimary" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/forgot_password_success_message"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurface" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBackToSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:minHeight="48dp"
+        android:text="@string/forgot_password_btn_back_to_sign_in" />
+
+</LinearLayout>

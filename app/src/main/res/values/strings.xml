@@ -111,4 +111,31 @@
     <string name="receive_push_notifications">Receive push notifications</string>
     <string name="view_nearby_reports_from_others">View nearby reports from others</string>
 
+    <string name="forgot_password_title">Reset your password</string>
+
+    <string name="forgot_password_subtitle_email">Enter your email and we\'ll send you a reset code.</string>
+    <string name="forgot_password_subtitle_code">Enter the 6-digit code we sent to your email.</string>
+    <string name="forgot_password_subtitle_password">Choose a new password for your account.</string>
+    <string name="forgot_password_subtitle_success">Password reset complete.</string>
+
+    <string name="forgot_password_label_email">Email</string>
+    <string name="forgot_password_label_code">Verification code</string>
+    <string name="forgot_password_label_new_password">New password</string>
+    <string name="forgot_password_label_confirm_password">Confirm password</string>
+
+    <string name="forgot_password_btn_send_code">Send reset code</string>
+    <string name="forgot_password_btn_verify_code">Verify code</string>
+    <string name="forgot_password_btn_reset_password">Reset password</string>
+    <string name="forgot_password_btn_back_to_sign_in">Back to sign in</string>
+
+    <string name="forgot_password_success_message">Your password has been reset. You can now sign in.</string>
+    <string name="forgot_password_back">Back to sign in</string>
+
+    <string name="forgot_password_placeholder_email">you@example.com</string>
+    <string name="forgot_password_placeholder_code">123456</string>
+    <string name="forgot_password_hint_new_password">At least 8 characters</string>
+
+    <string name="forgot_password_brand_logo_cd">FixITCity logo</string>
+    <string name="forgot_password_success_icon_cd">Success</string>
+
 </resources>
