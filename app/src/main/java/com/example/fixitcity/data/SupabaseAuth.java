@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -167,6 +166,84 @@ public class SupabaseAuth {
         OkHttpClient client = SupabaseClient.getHttpClient();
         try (Response response = client.newCall(request).execute()) {
             // Ignore
+        }
+    }
+    // ─── ADD THESE 3 METHODS TO SupabaseAuth.java ───────────────────────
+
+    public static void sendRecoveryEmail(String email) throws IOException {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("email", email);
+        } catch (JSONException e) {
+            throw new IOException("Could not prepare recovery data", e);
+        }
+
+        RequestBody requestBody = RequestBody.create(body.toString(), SupabaseClient.JSON);
+        Request request = new Request.Builder()
+                .url(SupabaseClient.AUTH_URL + "/recover")
+                .addHeader("apikey", SupabaseClient.SUPABASE_ANON_KEY)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        try (Response response = SupabaseClient.getHttpClient().newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String responseStr = response.body() != null ? response.body().string() : "";
+                // THIS IS WHERE WE PRINT THE 500 ERROR
+                android.util.Log.e("SUPABASE_500", "Error Body: " + responseStr);
+                throw new IOException("Recovery failed (" + response.code() + "): " + responseStr);
+            }
+        }
+    }
+    public static String verifyRecoveryCode(String email, String code) throws IOException {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("email", email);
+            body.put("token", code);
+            body.put("type", "recovery");
+        } catch (JSONException e) {
+            throw new IOException("Could not prepare verify data", e);
+        }
+
+        RequestBody requestBody = RequestBody.create(body.toString(), SupabaseClient.JSON);
+        Request request = new Request.Builder()
+                .url(SupabaseClient.AUTH_URL + "/verify")
+                .addHeader("apikey", SupabaseClient.SUPABASE_ANON_KEY)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        try (Response response = SupabaseClient.getHttpClient().newCall(request).execute()) {
+            String responseStr = response.body() != null ? response.body().string() : "";
+            if (!response.isSuccessful()) {
+                throw new IOException("Verification failed (" + response.code() + "): " + responseStr);
+            }
+            return responseStr;
+        }
+    }
+
+    public static void updatePassword(String accessToken, String newPassword) throws IOException {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("password", newPassword);
+        } catch (JSONException e) {
+            throw new IOException("Could not prepare password data", e);
+        }
+
+        RequestBody requestBody = RequestBody.create(body.toString(), SupabaseClient.JSON);
+        Request request = new Request.Builder()
+                .url(SupabaseClient.AUTH_URL + "/user")
+                .addHeader("apikey", SupabaseClient.SUPABASE_ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Content-Type", "application/json")
+                .put(requestBody)
+                .build();
+
+        try (Response response = SupabaseClient.getHttpClient().newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String responseStr = response.body() != null ? response.body().string() : "";
+                throw new IOException("Update password failed (" + response.code() + "): " + responseStr);
+            }
         }
     }
 }

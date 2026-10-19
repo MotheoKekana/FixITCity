@@ -27,7 +27,7 @@
             <ImageView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="@drawable/bg_circle_green"
+                android:background="@drawable/ic_check_circle"
                 android:padding="16dp"
                 android:src="@drawable/ic_check_success"
                 app:tint="@color/white" />
@@ -67,12 +67,15 @@
                     android:padding="16dp">
 
                     <!-- Reference Number -->
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="REFERENCE NO."
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
@@ -81,12 +84,11 @@
                             android:id="@+id/tv_reference_number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
                             android:textColor="@color/secondary_blue"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             tools:text="FIX-2024-001" />
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
@@ -95,12 +97,15 @@
                         android:background="@color/divider" />
 
                     <!-- Priority Score -->
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="PRIORITY SCORE"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
@@ -109,22 +114,24 @@
                             android:id="@+id/tv_priority_score"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
                             android:background="@drawable/bg_badge_priority"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
                             android:textColor="@color/white"
                             tools:text="92/100" />
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <!-- Status -->
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp">
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="STATUS"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
@@ -133,16 +140,15 @@
                             android:id="@+id/tv_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
                             android:background="@drawable/bg_badge_status_received"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
                             android:text="Pending"
                             android:textColor="#D32F2F" />
-                    </RelativeLayout>
+                    </LinearLayout>
 
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
 
             <!-- Copy & Share -->
             <LinearLayout

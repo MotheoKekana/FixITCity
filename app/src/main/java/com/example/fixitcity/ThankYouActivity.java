@@ -25,14 +25,17 @@ public class ThankYouActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Optional report name (from ProximityCheckActivity)
+        // Get the report name passed from ProximityCheckActivity
         String reportName = getIntent().getStringExtra("report_name");
-        TextView tvReportName = findViewById(R.id.tv_report_name);
-        if (tvReportName != null) {
+
+        // Find the title TextView and update it dynamically
+        TextView tvTitle = findViewById(R.id.tv_thank_you_title);
+        if (tvTitle != null) {
             if (reportName != null && !reportName.isEmpty()) {
-                tvReportName.setText(reportName);
+                // This will display: Thank you for upvoting "Burst Pipe"
+                tvTitle.setText("Thank you for upvoting\n\"" + reportName + "\"");
             } else {
-                tvReportName.setText("this issue");
+                tvTitle.setText("Thank you for upvoting!");
             }
         }
 

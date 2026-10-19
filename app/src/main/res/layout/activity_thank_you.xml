@@ -31,33 +31,23 @@
                 android:src="@drawable/ic_check_success"
                 app:tint="@color/white" />
 
-            <!-- Thank you title -->
+            <!-- Dynamic Thank you title -->
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_thank_you_title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Thank you for upvoting!"
-                android:textColor="@color/secondary_blue"
-                android:textSize="26sp"
-                android:textStyle="bold" />
-
-            <!-- Report name -->
-            <TextView
-                android:id="@+id/tv_report_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:textColor="@color/secondary_blue"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                tools:text="Burst Water Pipe" />
+                tools:text="Thank you for upvoting\n&quot;Burst Pipe&quot;" />
 
             <!-- Subtitle -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:text="Your voice matters – we'll prioritise this issue."
                 android:textColor="@color/text_secondary"

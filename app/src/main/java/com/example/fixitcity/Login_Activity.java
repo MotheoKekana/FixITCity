@@ -151,12 +151,9 @@ public class Login_Activity extends AppCompatActivity {
                 startActivity(new Intent(this, Register_Activity.class))
         );
 
+        // UPDATE: Launch the ForgotPasswordActivity
         tvForgotPassword.setOnClickListener(view ->
-                Toast.makeText(
-                        this,
-                        "Forgot password coming soon",
-                        Toast.LENGTH_SHORT
-                ).show()
+                startActivity(new Intent(this, ForgotPasswordActivity.class))
         );
     }
 

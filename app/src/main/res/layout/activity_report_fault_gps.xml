@@ -64,6 +64,7 @@
             android:id="@+id/tv_step_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Step 2 of 4"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:textStyle="bold"

@@ -251,40 +251,29 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
             final List<NearbyReport> finalList = withinRadius;
             final String finalError = loadError;
-            runOnUiThread(() -> updateUI(finalList, categoryName, finalError));
+            runOnUiThread(() -> updateUI(finalList, categoryName));
         }).start();
     }
 
-    private void updateUI(List<NearbyReport> withinRadius, String categoryName, String loadError) {
+    private void updateUI(List<NearbyReport> withinRadius, String categoryName) {
         if (progressIndicator != null) progressIndicator.setIndeterminate(false);
 
         reportList.clear();
         reportList.addAll(withinRadius);
         if (adapter != null) adapter.notifyDataSetChanged();
 
-        if (loadError != null) {
-            if (tvStatus != null) tvStatus.setText(loadError);
-            if (tvReportsCount != null) tvReportsCount.setText("Nearby reports unavailable");
-            return;
-        }
-
-        String catLabel = categoryName != null
-                ? categoryName.toLowerCase(Locale.US) + " "
-                : "";
+        String catLabel = categoryName != null ? categoryName.toLowerCase(Locale.US) + " " : "";
 
         if (withinRadius.isEmpty()) {
-            if (tvStatus != null) tvStatus.setText("No similar reports found nearby — this looks new.");
+            // Removed the "No similar reports found nearby" text as requested
+            if (tvStatus != null) tvStatus.setText("");
             if (tvReportsCount != null) {
-                tvReportsCount.setText("0 " + catLabel + "reports within "
-                        + (int) RADIUS_METERS + "m");
+                tvReportsCount.setText("0 " + catLabel + "reports within " + (int) RADIUS_METERS + "m");
             }
         } else {
-            if (tvStatus != null) tvStatus.setText(new SessionManager(this).isGuest()
-                    ? "Tap a nearby report to see whether this issue was already reported."
-                    : "Tap a card to upvote it instead of creating a duplicate.");
+            if (tvStatus != null) tvStatus.setText("Tap a card to upvote it instead of creating a duplicate.");
             if (tvReportsCount != null) {
-                tvReportsCount.setText(withinRadius.size() + " " + catLabel
-                        + "report(s) within " + (int) RADIUS_METERS + "m");
+                tvReportsCount.setText(withinRadius.size() + " " + catLabel + "report(s) within " + (int) RADIUS_METERS + "m");
             }
         }
     }
@@ -348,7 +337,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
             Toast.makeText(this, "Please log in to upvote", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // Optimistic UI bump
         int oldCount = report.getVoteCount();
         report.setVoteCount(oldCount + 1);
@@ -373,9 +361,8 @@ public class ProximityCheckActivity extends AppCompatActivity {
                 if (failure == null) {
                     // Success → open Thank You screen
                     Intent i = new Intent(this, ThankYouActivity.class);
-                    i.putExtra("title", "Thank you!");
-                    i.putExtra("message",
-                            "Your upvote has been counted. It helps push this issue up the priority list.");
+                    // Pass the actual category/title to Thank You
+                    i.putExtra("report_name", report.getCategory());
                     startActivity(i);
                     finish();
                 } else {

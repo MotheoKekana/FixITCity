@@ -120,6 +120,22 @@
                 android:text="Pending" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_under_review"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Under Review" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_accepted"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Accepted" />
+
+            <com.google.android.material.chip.Chip
                 android:id="@+id/chip_in_progress"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
@@ -128,12 +144,12 @@
                 android:text="In Progress" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_resolved"
+                android:id="@+id/chip_fixed"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
-                android:text="Resolved" />
+                android:text="Fixed" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 

@@ -138,10 +138,12 @@ public class ReportHistoryActivity extends AppCompatActivity {
         group.setOnCheckedStateChangeListener((g, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
             int id = checkedIds.get(0);
-            if (id == R.id.chip_pending)          currentFilter = "Pending";
+            if (id == R.id.chip_pending) currentFilter = "Pending";
+            else if (id == R.id.chip_under_review) currentFilter = "Under Review";
+            else if (id == R.id.chip_accepted) currentFilter = "Accepted";
             else if (id == R.id.chip_in_progress) currentFilter = "In Progress";
-            else if (id == R.id.chip_resolved)    currentFilter = "Resolved";
-            else                                  currentFilter = "All";
+            else if (id == R.id.chip_fixed) currentFilter = "Fixed";
+            else currentFilter = "All";
 
             applyFilter();
         });
@@ -320,27 +322,22 @@ public class ReportHistoryActivity extends AppCompatActivity {
             }
 
             String status = r.getStatus() != null ? r.getStatus() : "Pending";
-            String s = status.trim().toLowerCase(Locale.US);
-
             boolean include;
-            switch (currentFilter) {
-                case "Pending":
-                    include = s.equals("pending") || s.equals("open");
-                    break;
-                case "In Progress":
-                    include = s.equals("under review") || s.equals("in progress")
-                            || s.equals("assigned");
-                    break;
-                case "Resolved":
-                    include = s.equals("fixed") || s.equals("resolved")
-                            || s.equals("completed")
-                            || s.equals("closed");
-                    break;
-                default:
-                    include = true;
+
+            if ("All".equalsIgnoreCase(currentFilter)) {
+                include = true;
+            } else if ("Fixed".equalsIgnoreCase(currentFilter)) {
+                // Catch "Fixed" and any legacy "resolved" variants
+                String s = status.toLowerCase(Locale.US);
+                include = s.equals("fixed") || s.equals("resolved") || s.equals("completed") || s.equals("closed");
+            } else {
+                // Direct match for Pending, Under Review, Accepted, In Progress
+                include = status.equalsIgnoreCase(currentFilter);
             }
 
-            if (include) filteredReports.add(r);
+            if (include) {
+                filteredReports.add(r);
+            }
         }
 
         adapter.notifyDataSetChanged();
@@ -355,7 +352,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
             hideEmptyState();
         }
     }
-
     private void showEmptyState(String message) {
         if (tvEmptyState != null) {
             tvEmptyState.setText(message);
