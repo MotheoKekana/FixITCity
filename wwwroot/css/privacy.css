@@ -104,3 +104,35 @@ body.dark-mode .contact-box {
     background: #102f2e !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
 }
+/* Privacy page: dark mode */
+html[data-theme="dark"] .privacy-container {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .privacy-header h2,
+html[data-theme="dark"] .privacy-section h3 {
+    color: #f3f4f6;
+}
+
+html[data-theme="dark"] .privacy-header .text-muted {
+    color: #aeb8c4 !important;
+}
+
+html[data-theme="dark"] .privacy-card,
+html[data-theme="dark"] .privacy-section,
+html[data-theme="dark"] .contact-box {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .privacy-section p,
+html[data-theme="dark"] .privacy-section li,
+html[data-theme="dark"] .contact-box p {
+    color: #d5dce5;
+}
+
+html[data-theme="dark"] .privacy-section strong,
+html[data-theme="dark"] .contact-box strong {
+    color: #ffffff;
+}

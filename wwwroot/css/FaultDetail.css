@@ -358,3 +358,78 @@ dialog.photo-lightbox.single .lb-counter {
         width: 100%;
     }
 }
+/* FaultDetail page: dark mode */
+html[data-theme="dark"] .fault-detail-container {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .fault-header h2,
+html[data-theme="dark"] .fault-content h4,
+html[data-theme="dark"] .audit-log h4 {
+    color: #f3f4f6;
+}
+
+html[data-theme="dark"] .fault-header .text-muted,
+html[data-theme="dark"] .photo-caption {
+    color: #aeb8c4 !important;
+}
+
+html[data-theme="dark"] .fault-photo,
+html[data-theme="dark"] .fault-map,
+html[data-theme="dark"] .priority-breakdown,
+html[data-theme="dark"] .audit-log,
+html[data-theme="dark"] .fault-photo-empty,
+html[data-theme="dark"] .fault-map-empty {
+    background-color: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .fault-map-footer,
+html[data-theme="dark"] .priority-total {
+    background-color: #263648;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .fault-map-footer a {
+    color: #8bd5b2;
+}
+
+html[data-theme="dark"] .priority-breakdown .list-group-item {
+    background-color: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .audit-log .table {
+    --bs-table-color: #e5e7eb;
+    --bs-table-bg: #1e2935;
+    --bs-table-border-color: #465365;
+    --bs-table-striped-color: #e5e7eb;
+    --bs-table-striped-bg: #253242;
+    --bs-table-hover-color: #ffffff;
+    --bs-table-hover-bg: #334155;
+}
+
+html[data-theme="dark"] .audit-log .table th {
+    color: #ffffff;
+    background-color: #263648;
+}
+
+html[data-theme="dark"] .fault-actions .form-select {
+    background-color: #263342;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+html[data-theme="dark"] .main-content .fault-detail-container,
+html[data-theme="dark"] .main-content .fault-content {
+    background: #121820 !important;
+    color: #e5e7eb !important;
+}
+
+html[data-theme="dark"] .main-content .fault-header,
+html[data-theme="dark"] .main-content .fault-actions {
+    background: transparent !important;
+    color: #e5e7eb !important;
+}

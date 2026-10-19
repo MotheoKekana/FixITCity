@@ -472,3 +472,68 @@ body {
         animation-iteration-count: 1 !important;
     }
 }
+/* Forgot Password page: dark mode */
+html[data-theme="dark"] body {
+    background: #121820;
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .login-visual {
+    background: #17212b;
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .motto-word {
+    color: #f3f4f6;
+}
+
+html[data-theme="dark"] .motto-desc {
+    color: #bdc7d2;
+}
+
+html[data-theme="dark"] .login-card {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #374151;
+}
+
+html[data-theme="dark"] .login-intro h1,
+html[data-theme="dark"] .login-intro p,
+html[data-theme="dark"] .login-card label,
+html[data-theme="dark"] .brand-name {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .login-card .form-control {
+    background: #263342;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+html[data-theme="dark"] .login-card .form-control::placeholder {
+    color: #aeb8c4;
+}
+
+html[data-theme="dark"] .login-footer a {
+    color: #8bd5b2;
+}
+html[data-theme="dark"] .login-card input.form-control {
+    background-color: #263342 !important;
+    color: #f3f4f6 !important;
+    caret-color: #f3f4f6;
+    border-color: #64748b !important;
+}
+
+html[data-theme="dark"] .login-card input.form-control::placeholder {
+    color: #bdc7d2 !important;
+    opacity: 1;
+}
+
+/* Keep saved or autofilled credentials readable */
+html[data-theme="dark"] .login-card input.form-control:-webkit-autofill,
+html[data-theme="dark"] .login-card input.form-control:-webkit-autofill:hover,
+html[data-theme="dark"] .login-card input.form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f3f4f6 !important;
+    -webkit-box-shadow: 0 0 0 1000px #263342 inset !important;
+    caret-color: #f3f4f6;
+}

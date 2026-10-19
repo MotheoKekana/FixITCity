@@ -631,3 +631,116 @@ html {
         gap: 5px;
     }
 }
+/* Dashboard page: dark mode */
+html[data-theme="dark"] .dashboard-shell,
+html[data-theme="dark"] .dashboard-main {
+    background: #121820;
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .dashboard-header h1,
+html[data-theme="dark"] .panel-heading h2,
+html[data-theme="dark"] .panel-kicker,
+html[data-theme="dark"] .eyebrow {
+    color: #f3f4f6;
+}
+
+html[data-theme="dark"] .last-updated,
+html[data-theme="dark"] .panel-meta {
+    color: #bdc7d2;
+}
+
+/* Analytics panels */
+html[data-theme="dark"] .panel {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+/* Statistic cards */
+html[data-theme="dark"] .stat-card {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .stat-label {
+    color: #bdc7d2;
+}
+
+html[data-theme="dark"] .stat-value {
+    color: #ffffff;
+}
+
+html[data-theme="dark"] .stat-card--total {
+    border-left-color: #60a5fa;
+}
+
+html[data-theme="dark"] .stat-card--pending {
+    border-left-color: #fbbf24;
+}
+
+html[data-theme="dark"] .stat-card--review {
+    border-left-color: #c084fc;
+}
+
+html[data-theme="dark"] .stat-card--accepted {
+    border-left-color: #22d3ee;
+}
+
+html[data-theme="dark"] .stat-card--progress {
+    border-left-color: #818cf8;
+}
+
+html[data-theme="dark"] .stat-card--fixed {
+    border-left-color: #4ade80;
+}
+
+html[data-theme="dark"] .stat-card--rejected {
+    border-left-color: #f87171;
+}
+
+/* Category and activity charts */
+html[data-theme="dark"] .category-copy,
+html[data-theme="dark"] .activity-value,
+html[data-theme="dark"] .activity-label,
+html[data-theme="dark"] .empty-state {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .progress-track,
+html[data-theme="dark"] .activity-bar-shell {
+    background: #334155;
+}
+
+html[data-theme="dark"] .empty-state p {
+    color: #bdc7d2;
+}
+
+/* Map fallback and alerts */
+html[data-theme="dark"] .map-fallback {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .map-fallback span,
+html[data-theme="dark"] .map-legend {
+    color: #bdc7d2;
+}
+
+html[data-theme="dark"] .dashboard-alert {
+    color: #e5e7eb;
+    background: #263648;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .refresh-button {
+    color: #e5e7eb;
+    background: #263342;
+    border-color: #4b5563;
+}
+
+html[data-theme="dark"] .refresh-button:hover {
+    background: #334155;
+}

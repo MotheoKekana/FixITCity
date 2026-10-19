@@ -22,6 +22,197 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="icon" type="image/png" href="~/images/favicon.ico" />
     <link rel="stylesheet" href="~/css/sidebar-layout.css" asp-append-version="true" />
+    <script>
+    document.documentElement.dataset.theme =
+        localStorage.getItem("fixitcity-theme") || "light";
+</script>
+
+<style>
+    html[data-theme="dark"] body {
+        background: #121820;
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .main-content {
+        background: #121820;
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .sidebar {
+        background: #17212b;
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .sidebar-brand-name,
+    html[data-theme="dark"] .sidebar-brand-caption,
+    html[data-theme="dark"] .sidebar-user-label,
+    html[data-theme="dark"] .sidebar-user-name,
+    html[data-theme="dark"] .sidebar-link {
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .sidebar-link:hover,
+    html[data-theme="dark"] .sidebar-link.active {
+        background: #263342;
+        color: #fff;
+    }
+
+    html[data-theme="dark"] .settings-card,
+    html[data-theme="dark"] .card,
+    html[data-theme="dark"] .modal-content {
+        background: #1e2935;
+        color: #e5e7eb;
+        border-color: #374151;
+    }
+
+    html[data-theme="dark"] .settings-card .card-header {
+        background: #263342;
+        border-color: #374151;
+    }
+
+    html[data-theme="dark"] h1,
+    html[data-theme="dark"] h2,
+    html[data-theme="dark"] h3,
+    html[data-theme="dark"] h4,
+    html[data-theme="dark"] h5,
+    html[data-theme="dark"] label {
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .text-muted {
+        color: #aeb8c4 !important;
+    }
+
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea,
+    html[data-theme="dark"] .form-control {
+        background: #263342;
+        color: #e5e7eb;
+        border-color: #4b5563;
+    }
+
+    html[data-theme="dark"] input::placeholder,
+    html[data-theme="dark"] textarea::placeholder {
+        color: #aeb8c4;
+    }
+
+    html[data-theme="dark"] table {
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .table {
+        --bs-table-color: #e5e7eb;
+        --bs-table-bg: #1e2935;
+        --bs-table-border-color: #374151;
+    }
+
+    html[data-theme="dark"] .table {
+    --bs-table-color: #e5e7eb;
+    --bs-table-bg: #1e2935;
+    --bs-table-border-color: #465365;
+    --bs-table-striped-color: #e5e7eb;
+    --bs-table-striped-bg: #253242;
+    --bs-table-hover-color: #ffffff;
+    --bs-table-hover-bg: #334155;
+}
+
+html[data-theme="dark"] .table > :not(caption) > * > * {
+    color: #e5e7eb;
+    background-color: var(--bs-table-bg);
+    border-bottom-color: var(--bs-table-border-color);
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--bs-table-striped-bg);
+}
+
+html[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+    background-color: var(--bs-table-hover-bg);
+    color: var(--bs-table-hover-color);
+}
+
+html[data-theme="dark"] .table thead th {
+    color: #ffffff;
+    background-color: #263648;
+}
+
+html[data-theme="dark"] .table a {
+    color: #8bd5b2;
+}
+
+    .appearance-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.appearance-title {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #1a1a2e;
+    font-weight: 600;
+}
+
+.appearance-description {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 26px;
+    margin: 0;
+}
+
+.theme-switch input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: #cbd5e1;
+    border-radius: 26px;
+    transition: background 0.2s;
+}
+
+.theme-slider::before {
+    position: absolute;
+    content: "";
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.theme-switch input:checked + .theme-slider {
+    background: #2d9e6b;
+}
+
+.theme-switch input:checked + .theme-slider::before {
+    transform: translateX(20px);
+}
+
+.theme-switch input:focus-visible + .theme-slider {
+    outline: 3px solid rgba(45, 158, 107, 0.3);
+    outline-offset: 2px;
+}
+}
+
+</style>
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
