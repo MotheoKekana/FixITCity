@@ -212,8 +212,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         String newPass = inputNewPassword.getText() != null ? inputNewPassword.getText().toString() : "";
         String confirmPass = inputConfirmPassword.getText() != null ? inputConfirmPassword.getText().toString() : "";
 
-        if (newPass.length() < 8) {
-            tilNewPassword.setError("Must be at least 8 characters");
+        String passwordError = RegistrationValidation.passwordError(newPass);
+        if (passwordError != null) {
+            tilNewPassword.setError(passwordError);
             return;
         }
         if (!newPass.equals(confirmPass)) {

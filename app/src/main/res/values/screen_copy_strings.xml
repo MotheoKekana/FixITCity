@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_report_step_one">Step 1 of 4</string>
+    <string name="ui_add_photos">Add Photos</string>
+    <string name="ui_review_report">Review Report</string>
+    <string name="ui_description_optional">Description (Optional)</string>
+    <string name="ui_guest_reference_reminder">Keep your reference number to track the report.</string>
+    <string name="ui_onboarding_report_description">Report faults with photos and your GPS location.</string>
+    <string name="ui_onboarding_track_description">Use your reference number to check a report’s status.</string>
+    <string name="ui_onboarding_community_description">Help the municipality identify and repair faults.</string>
+    <string name="ui_registration_phone_hint">10 digits starting with 0, or an international number starting with +.</string>
+    <string name="ui_registration_password_hint">At least 8 characters, including a lowercase letter, an uppercase letter, a number and a symbol.</string>
+</resources>

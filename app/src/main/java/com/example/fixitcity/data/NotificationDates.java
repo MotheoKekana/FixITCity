@@ -4,12 +4,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
-/** Converts Supabase UTC timestamps to the phone's local date and time. */
+/** Displays local wall times as stored, and converts explicitly offset timestamps. */
 public final class NotificationDates {
     private NotificationDates() {}
 
@@ -28,13 +27,14 @@ public final class NotificationDates {
         if (value.length() > 10) value = value.replaceFirst("([+-]\\d{2})$", "$1:00");
         try {
             Instant instant;
-            try {
+            if (value.endsWith("Z") || value.matches(".*[+-]\\d{2}:\\d{2}$")) {
                 instant = OffsetDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                         .toInstant();
-            } catch (DateTimeParseException withoutOffset) {
-                // This project's timestamp-without-time-zone columns store UTC.
+            } else {
+                // This project's timestamp-without-time-zone rows are displayed
+                // as the wall time sent by the API. Do not add two hours.
                 instant = LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                        .toInstant(ZoneOffset.UTC);
+                        .atZone(zone).toInstant();
             }
             return DateTimeFormatter.ofPattern("d MMM uuuu 'at' HH:mm", locale)
                     .withZone(zone).format(instant);

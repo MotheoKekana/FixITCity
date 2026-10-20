@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="registration_email_help">Use an email address you can access.</string>
+    <string name="registration_phone_help">Optional. Use a 10-digit South African number or an international number starting with +.</string>
+    <string name="registration_password_help">At least 8 characters, including a lowercase letter, an uppercase letter, a number and a symbol.</string>
+</resources>
