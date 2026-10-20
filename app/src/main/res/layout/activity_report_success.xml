@@ -1,200 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:ns0="http://schemas.android.com/apk/res/android"
-    xmlns:ns1="http://schemas.android.com/apk/res-auto"
-    xmlns:ns2="http://schemas.android.com/tools"
-    ns0:id="@+id/main"
-    ns0:layout_width="match_parent"
-    ns0:layout_height="match_parent"
-    ns0:background="@color/background_light"
-    ns0:padding="24dp">
-    <com.google.android.material.card.MaterialCardView
-        ns0:layout_width="match_parent"
-        ns0:layout_height="wrap_content"
-        ns1:cardCornerRadius="16dp"
-        ns1:cardElevation="8dp"
-        ns1:layout_constraintBottom_toBottomOf="parent"
-        ns1:layout_constraintTop_toTopOf="parent"
-        ns1:cardBackgroundColor="@color/surface">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:padding="24dp">
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
         <LinearLayout
-            ns0:layout_width="match_parent"
-            ns0:layout_height="wrap_content"
-            ns0:gravity="center"
-            ns0:orientation="vertical"
-            ns0:padding="24dp">
-            <!-- Checkmark Icon -->
-            <ImageView
-                ns0:layout_width="80dp"
-                ns0:layout_height="80dp"
-                ns0:background="@drawable/bg_circle_green"
-                ns0:padding="16dp"
-                ns0:src="@drawable/ic_check_success"
-                ns1:tint="@color/on_primary" />
-            <TextView
-                ns0:id="@+id/tv_success_title"
-                ns0:layout_width="wrap_content"
-                ns0:layout_height="wrap_content"
-                ns0:layout_marginTop="24dp"
-                ns0:text="Report Submitted!"
-                ns0:textColor="@color/secondary_blue"
-                ns0:textSize="26sp"
-                ns0:textStyle="bold" />
-            <TextView
-                ns0:id="@+id/tv_success_message"
-                ns0:layout_width="wrap_content"
-                ns0:layout_height="wrap_content"
-                ns0:layout_marginTop="8dp"
-                ns0:gravity="center"
-                ns0:text="Thank you for helping keep FixITCity safe and functional."
-                ns0:textColor="@color/text_secondary" />
-            <!-- Details Card -->
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
             <com.google.android.material.card.MaterialCardView
-                ns0:layout_width="match_parent"
-                ns0:layout_height="wrap_content"
-                ns0:layout_marginTop="24dp"
-                ns1:cardBackgroundColor="@color/surface_variant"
-                ns1:cardCornerRadius="8dp"
-                ns1:cardElevation="0dp">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
-                    ns0:layout_width="match_parent"
-                    ns0:layout_height="wrap_content"
-                    ns0:orientation="vertical"
-                    ns0:padding="16dp">
-                    <!-- Reference Number -->
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+                    <!-- Checkmark Icon -->
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_circle_green"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_check_success"
+                        app:tint="@color/on_primary"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+                    <TextView
+                        android:id="@+id/tv_success_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="Report Submitted!"
+                        android:textColor="@color/secondary_blue"
+                        android:textSize="26sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tv_success_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="Thank you for helping keep FixITCity safe and functional."
+                        android:textColor="@color/text_secondary" />
+                    <!-- Details Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        app:cardBackgroundColor="@color/surface_variant"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <!-- Reference Number -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="start">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="REFERENCE NO."
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/tv_reference_number"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/secondary_blue"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    tools:text="FIX-2024-001"
+                                    android:layout_marginTop="6dp" />
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginVertical="12dp"
+                                android:background="@color/divider" />
+                            <!-- Priority Score -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="start">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="PRIORITY SCORE"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/tv_priority_score"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_badge_priority"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp"
+                                    android:textColor="@color/status_pending_text"
+                                    tools:text="92/100"
+                                    android:layout_marginTop="6dp" />
+                            </LinearLayout>
+                            <!-- Status -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:orientation="vertical"
+                                android:gravity="start">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="STATUS"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/tv_status"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_badge_status_received"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp"
+                                    android:text="Pending"
+                                    android:textColor="@color/severity_high_text"
+                                    android:layout_marginTop="6dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                    <!-- Copy & Share -->
                     <LinearLayout
-                        ns0:layout_width="match_parent"
-                        ns0:layout_height="wrap_content"
-                        ns0:orientation="horizontal"
-                        ns0:gravity="center_vertical">
-                        <TextView
-                            ns0:layout_width="0dp"
-                            ns0:layout_height="wrap_content"
-                            ns0:layout_weight="1"
-                            ns0:text="REFERENCE NO."
-                            ns0:textColor="@color/text_secondary"
-                            ns0:textSize="12sp"
-                            ns0:textStyle="bold" />
-                        <TextView
-                            ns0:id="@+id/tv_reference_number"
-                            ns0:layout_width="wrap_content"
-                            ns0:layout_height="wrap_content"
-                            ns0:textColor="@color/secondary_blue"
-                            ns0:textSize="16sp"
-                            ns0:textStyle="bold"
-                            ns2:text="FIX-2024-001" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="horizontal">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_copy_ref"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Copy Ref"
+                            app:icon="@android:drawable/ic_menu_edit" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_share"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Share"
+                            app:icon="@android:drawable/ic_menu_share" />
                     </LinearLayout>
-                    <View
-                        ns0:layout_width="match_parent"
-                        ns0:layout_height="1dp"
-                        ns0:layout_marginVertical="12dp"
-                        ns0:background="@color/divider" />
-                    <!-- Priority Score -->
-                    <LinearLayout
-                        ns0:layout_width="match_parent"
-                        ns0:layout_height="wrap_content"
-                        ns0:orientation="horizontal"
-                        ns0:gravity="center_vertical">
-                        <TextView
-                            ns0:layout_width="0dp"
-                            ns0:layout_height="wrap_content"
-                            ns0:layout_weight="1"
-                            ns0:text="PRIORITY SCORE"
-                            ns0:textColor="@color/text_secondary"
-                            ns0:textSize="12sp"
-                            ns0:textStyle="bold" />
-                        <TextView
-                            ns0:id="@+id/tv_priority_score"
-                            ns0:layout_width="wrap_content"
-                            ns0:layout_height="wrap_content"
-                            ns0:background="@drawable/bg_badge_priority"
-                            ns0:paddingHorizontal="8dp"
-                            ns0:paddingVertical="2dp"
-                            ns0:textColor="@color/status_pending_text"
-                            ns2:text="92/100" />
-                    </LinearLayout>
-                    <!-- Status -->
-                    <LinearLayout
-                        ns0:layout_width="match_parent"
-                        ns0:layout_height="wrap_content"
-                        ns0:layout_marginTop="12dp"
-                        ns0:orientation="horizontal"
-                        ns0:gravity="center_vertical">
-                        <TextView
-                            ns0:layout_width="0dp"
-                            ns0:layout_height="wrap_content"
-                            ns0:layout_weight="1"
-                            ns0:text="STATUS"
-                            ns0:textColor="@color/text_secondary"
-                            ns0:textSize="12sp"
-                            ns0:textStyle="bold" />
-                        <TextView
-                            ns0:id="@+id/tv_status"
-                            ns0:layout_width="wrap_content"
-                            ns0:layout_height="wrap_content"
-                            ns0:background="@drawable/bg_badge_status_received"
-                            ns0:paddingHorizontal="8dp"
-                            ns0:paddingVertical="2dp"
-                            ns0:text="Pending"
-                            ns0:textColor="@color/severity_high_text" />
-                    </LinearLayout>
+                    <!-- Go to Dashboard -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_go_dashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="Go to Dashboard"
+                        android:backgroundTint="@color/primary_green"
+                        app:cornerRadius="8dp"
+                        android:minHeight="60dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
+                    <!-- Report Another Fault -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_report_another"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Report Another Fault"
+                        android:textColor="@color/secondary_blue"
+                        app:strokeColor="@color/divider"
+                        app:cornerRadius="8dp"
+                        android:minHeight="60dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
+                    <!-- Track Report -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_track_report"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Track This Report"
+                        android:textColor="@color/secondary_blue"
+                        app:strokeColor="@color/divider"
+                        app:cornerRadius="8dp"
+                        android:minHeight="60dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Copy & Share -->
-            <LinearLayout
-                ns0:layout_width="match_parent"
-                ns0:layout_height="wrap_content"
-                ns0:layout_marginTop="24dp"
-                ns0:orientation="horizontal">
-                <com.google.android.material.button.MaterialButton
-                    ns0:id="@+id/btn_copy_ref"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    ns0:layout_width="0dp"
-                    ns0:layout_height="wrap_content"
-                    ns0:layout_weight="1"
-                    ns0:layout_marginEnd="8dp"
-                    ns0:text="Copy Ref"
-                    ns1:icon="@android:drawable/ic_menu_edit" />
-                <com.google.android.material.button.MaterialButton
-                    ns0:id="@+id/btn_share"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    ns0:layout_width="0dp"
-                    ns0:layout_height="wrap_content"
-                    ns0:layout_weight="1"
-                    ns0:layout_marginStart="8dp"
-                    ns0:text="Share"
-                    ns1:icon="@android:drawable/ic_menu_share" />
-            </LinearLayout>
-            <!-- Go to Dashboard -->
-            <com.google.android.material.button.MaterialButton
-                ns0:id="@+id/btn_go_dashboard"
-                ns0:layout_width="match_parent"
-                ns0:layout_height="60dp"
-                ns0:layout_marginTop="24dp"
-                ns0:text="Go to Dashboard"
-                ns0:backgroundTint="@color/primary_green"
-                ns1:cornerRadius="8dp" />
-            <!-- Report Another Fault -->
-            <com.google.android.material.button.MaterialButton
-                ns0:id="@+id/btn_report_another"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                ns0:layout_width="match_parent"
-                ns0:layout_height="60dp"
-                ns0:layout_marginTop="12dp"
-                ns0:text="Report Another Fault"
-                ns0:textColor="@color/secondary_blue"
-                ns1:strokeColor="@color/divider"
-                ns1:cornerRadius="8dp" />
-            <!-- Track Report -->
-            <com.google.android.material.button.MaterialButton
-                ns0:id="@+id/btn_track_report"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                ns0:layout_width="match_parent"
-                ns0:layout_height="60dp"
-                ns0:layout_marginTop="12dp"
-                ns0:text="Track This Report"
-                ns0:textColor="@color/secondary_blue"
-                ns1:strokeColor="@color/divider"
-                ns1:cornerRadius="8dp" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

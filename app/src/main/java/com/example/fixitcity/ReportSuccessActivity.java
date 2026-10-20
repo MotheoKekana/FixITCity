@@ -74,15 +74,14 @@ public class ReportSuccessActivity extends AppCompatActivity {
             Toast.makeText(this, "Reference copied: " + referenceNumber, Toast.LENGTH_SHORT).show();
         });
 
-        findViewById(R.id.btn_share).setOnClickListener(v -> {
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/plain");
-            String shareText = "FixITCity Report\nReference: " + referenceNumber
-                    + (hasPriorityScore ? "\nPriority: " + priorityScore + "/100" : "")
-                    + "\nStatus: " + (isQueued ? "Queued (will sync when online)" : "Pending");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
-            startActivity(Intent.createChooser(shareIntent, "Share via"));
-        });
+        findViewById(R.id.btn_share).setOnClickListener(v ->
+                ReportShare.share(this, v, new ReportShareData(
+                        referenceNumber,
+                        getIntent().getStringExtra("report_title"),
+                        isQueued ? "Pending sync" : "Pending",
+                        isQueued,
+                        hasPriorityScore ? priorityScore : null,
+                        java.time.ZonedDateTime.now())));
 
         findViewById(R.id.btn_go_dashboard).setOnClickListener(v -> goToDashboard());
 

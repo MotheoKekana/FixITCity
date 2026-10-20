@@ -10,11 +10,15 @@
     <!-- ============== Header ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         android:background="@color/surface"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:minHeight="64dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -26,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent" />
         <TextView
             android:id="@+id/tvAppName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/app_name"
@@ -35,25 +39,35 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivNotifications"
+            android:layout_marginEnd="8dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
         <ImageView
             android:id="@+id/ivNotifications"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@string/content_desc_notifications"
             android:src="@drawable/ic_notification"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/secondary_blue" />
+            app:tint="@color/secondary_blue"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- ============== ScrollView ============== -->
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,12 +82,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/track_progress_result"
-                android:textColor="@color/text_secondary" />
             <!-- ============== Report detail card (kept) ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -187,13 +195,6 @@
                         android:textColor="@color/secondary_blue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Every status change on this report"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
                     <!-- Empty / loading state -->
                     <TextView
                         android:id="@+id/tv_history_empty"
@@ -221,7 +222,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_notifications"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:text="View Notifications"
@@ -229,26 +230,33 @@
                 android:textColor="@color/on_primary"
                 app:cornerRadius="12dp"
                 app:icon="@android:drawable/ic_popup_reminder"
-                app:iconGravity="textStart" />
+                app:iconGravity="textStart"
+                android:minHeight="56dp"
+                android:singleLine="false"
+                android:maxLines="3" />
         </LinearLayout>
     </ScrollView>
     <!-- ============== Bottom Navigation (unchanged) ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="72dp"
         android:background="@color/surface"
         android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -267,11 +275,13 @@
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
-            app:layout_constraintStart_toEndOf="@+id/navHome">
+            app:layout_constraintStart_toEndOf="@+id/navHome"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -290,11 +300,13 @@
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
-            app:layout_constraintStart_toEndOf="@+id/navReport">
+            app:layout_constraintStart_toEndOf="@+id/navReport"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
@@ -320,11 +332,13 @@
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/navTrack">
+            app:layout_constraintStart_toEndOf="@+id/navTrack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"

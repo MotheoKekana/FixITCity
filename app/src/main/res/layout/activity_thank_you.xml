@@ -7,57 +7,67 @@
     android:layout_height="match_parent"
     android:background="@color/background_light"
     android:padding="24dp">
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:cardBackgroundColor="@color/surface">
+        app:layout_constraintBottom_toBottomOf="parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="vertical"
-            android:padding="32dp">
-            <!-- Green checkmark circle -->
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/bg_circle_green"
-                android:padding="16dp"
-                android:src="@drawable/ic_check_success"
-                app:tint="@color/on_primary" />
-            <!-- Dynamic Thank you title -->
-            <TextView
-                android:id="@+id/tv_thank_you_title"
+            android:gravity="center">
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:textColor="@color/secondary_blue"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:text="Thank you for upvoting\n&quot;Burst Pipe&quot;" />
-            <!-- Subtitle -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center"
-                android:text="Your voice matters – we'll prioritise this issue."
-                android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
-            <!-- Go to Dashboard button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_go_dashboard"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="32dp"
-                android:text="Go to Dashboard"
-                android:backgroundTint="@color/primary_green"
-                app:cornerRadius="8dp" />
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/surface">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="32dp">
+                    <!-- Green checkmark circle -->
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_circle_green"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_check_success"
+                        app:tint="@color/on_primary"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+                    <!-- Dynamic Thank you title -->
+                    <TextView
+                        android:id="@+id/tv_thank_you_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center"
+                        android:textColor="@color/secondary_blue"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        tools:text="Thank you for upvoting\n&quot;Burst Pipe&quot;" />
+                    <!-- Subtitle -->
+                    <!-- Go to Dashboard button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_go_dashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:text="Go to Dashboard"
+                        android:backgroundTint="@color/primary_green"
+                        app:cornerRadius="8dp"
+                        android:minHeight="56dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

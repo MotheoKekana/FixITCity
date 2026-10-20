@@ -10,11 +10,15 @@
     <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/surface">&gt;
+        android:background="@color/surface"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:minHeight="64dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">&gt;
 
         <ImageView
             android:id="@+id/iv_logo"
@@ -27,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" />
         <TextView
             android:id="@+id/tvAppName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/app_name"
@@ -36,23 +40,34 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivNotifications"
+            android:layout_marginEnd="8dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
         <ImageView
             android:id="@+id/ivNotifications"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@string/content_desc_notifications"
             android:src="@drawable/ic_notification"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/secondary_blue" />
+            app:tint="@color/secondary_blue"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,12 +80,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/track_report_subtitle"
-                android:textColor="@color/text_secondary" />
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,26 +107,23 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="FIX-2026-1234ABCD"
-                            android:inputType="text"
-                            android:imeOptions="actionSearch" />
+                            android:inputType="textCapCharacters|textNoSuggestions"
+                            android:imeOptions="actionSearch|flagNoExtractUi"
+                            android:singleLine="true" />
                     </com.google.android.material.textfield.TextInputLayout>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Use the reference number shown when the report was submitted."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_track"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="@string/track"
                         android:backgroundTint="@color/primary_green"
                         app:cornerRadius="8dp"
                         app:icon="@android:drawable/ic_media_next"
-                        app:iconGravity="textEnd" />
+                        app:iconGravity="textEnd"
+                        android:minHeight="60dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
             <!-- Recent History section -->
@@ -141,19 +147,24 @@
                     android:layout_centerVertical="true"
                     android:text="View All Archive"
                     android:textColor="@color/secondary_blue"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical"
+                    android:focusable="true" />
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
     <!-- Bottom Navigation (same as dashboard) -->
     <LinearLayout
         android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="72dp"
         android:orientation="horizontal"
         android:background="@color/surface"
         android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"

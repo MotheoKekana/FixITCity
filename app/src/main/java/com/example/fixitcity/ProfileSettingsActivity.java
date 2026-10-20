@@ -83,15 +83,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         }
 
         bindSettingsRow(R.id.settingsReportHistory, R.drawable.ic_report_24,
-                "Report history", "View your submitted and pending reports",
+                "Report history",
                 v -> startActivity(new Intent(this, ReportHistoryActivity.class)));
 
         bindSettingsRow(R.id.settingsTrackReport, R.drawable.ic_track_24,
-                "Track a report", "Look up a report by its reference number",
+                "Track a report",
                 v -> startActivity(new Intent(this, TrackReportSearchActivity.class)));
 
         bindSettingsRow(R.id.settingsNotifications, R.drawable.ic_bell_outline_24,
-                "Phone notifications", "Manage FixITCity notification permission",
+                "Phone notification settings",
                 v -> {
                     Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
                     intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
@@ -160,12 +160,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     }
 
     private void bindSettingsRow(int rowId, int iconRes, String title,
-                                 String subtitle, View.OnClickListener action) {
+                                 View.OnClickListener action) {
         View row = findViewById(rowId);
         ((ImageView) row.findViewById(R.id.iv_icon)).setImageResource(iconRes);
         ((TextView) row.findViewById(R.id.tv_title)).setText(title);
-        ((TextView) row.findViewById(R.id.tv_subtitle)).setText(subtitle);
-        row.setContentDescription(title + ". " + subtitle);
+        row.setContentDescription(title);
         row.setOnClickListener(action);
     }
 }

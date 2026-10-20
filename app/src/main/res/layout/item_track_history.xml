@@ -34,14 +34,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textColor="@color/secondary_blue"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/tv_status"
             app:layout_constraintStart_toEndOf="@id/iv_icon"
             app:layout_constraintTop_toTopOf="@id/iv_icon"
-            tools:text="Pothole" />
+            tools:text="Pothole"
+            app:layout_constraintEnd_toEndOf="parent" />
         <!-- Status badge -->
         <TextView
             android:id="@+id/tv_status"
@@ -53,9 +53,10 @@
             android:textColor="@color/status_pending_text"
             android:textSize="11sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_icon"
-            tools:text="Pending" />
+            tools:text="Pending"
+            app:layout_constraintStart_toStartOf="@id/tv_reference"
+            app:layout_constraintTop_toBottomOf="@id/tv_reference"
+            android:layout_marginTop="6dp" />
         <!-- Reference -->
         <TextView
             android:id="@+id/tv_reference"
@@ -65,10 +66,10 @@
             android:layout_marginTop="4dp"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@id/tv_status"
             app:layout_constraintStart_toEndOf="@id/iv_icon"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
-            tools:text="FIX-2026-A1B2C3D4" />
+            tools:text="FIX-2026-A1B2C3D4"
+            app:layout_constraintEnd_toEndOf="parent" />
         <!-- Divider -->
         <View
             android:id="@+id/divider"
@@ -78,7 +79,7 @@
             android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_icon" />
+            app:layout_constraintTop_toBottomOf="@id/report_row_header_bottom" />
         <!-- Date -->
         <TextView
             android:id="@+id/tv_date"
@@ -88,21 +89,28 @@
             android:layout_marginEnd="8dp"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
-            app:layout_constraintEnd_toStartOf="@id/tv_priority"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider"
-            tools:text="13 Oct 2026" />
+            tools:text="13 Oct 2026"
+            app:layout_constraintEnd_toEndOf="parent" />
         <!-- Priority -->
         <TextView
             android:id="@+id/tv_priority"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider"
-            tools:text="Score 60/100" />
+            app:layout_constraintTop_toBottomOf="@id/tv_date"
+            tools:text="Score 60/100"
+            app:layout_constraintStart_toStartOf="parent" />
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/report_row_header_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="iv_icon,tv_title,tv_reference,tv_status" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

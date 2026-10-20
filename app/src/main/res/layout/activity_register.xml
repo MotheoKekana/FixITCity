@@ -62,13 +62,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -79,7 +80,7 @@
                             android:id="@+id/etFullName"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="John Doe"
@@ -88,11 +89,15 @@
                             android:inputType="textPersonName"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
                             android:imeOptions="actionNext|flagNoExtractUi"
                             android:nextFocusForward="@id/etEmail"
-                            android:nextFocusDown="@id/etEmail" />
+                            android:nextFocusDown="@id/etEmail"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="name" />
                     </LinearLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -104,13 +109,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -121,7 +127,7 @@
                             android:id="@+id/etEmail"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="john@example.com"
@@ -130,11 +136,15 @@
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
                             android:imeOptions="actionNext|flagNoExtractUi"
                             android:nextFocusForward="@id/etPhone"
-                            android:nextFocusDown="@id/etPhone" />
+                            android:nextFocusDown="@id/etPhone"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="emailAddress" />
                     </LinearLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -146,13 +156,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -163,7 +174,7 @@
                             android:id="@+id/etPhone"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="+27 83 132 1144"
@@ -172,12 +183,23 @@
                             android:inputType="phone"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
                             android:imeOptions="actionNext|flagNoExtractUi"
                             android:nextFocusForward="@id/etPassword"
-                            android:nextFocusDown="@id/etPassword" />
+                            android:nextFocusDown="@id/etPassword"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="phoneNumber" />
                     </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/ui_registration_phone_hint"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -188,13 +210,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="8dp">
+                        android:paddingEnd="8dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -204,7 +227,7 @@
                         <EditText
                             android:id="@+id/etPassword"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
@@ -214,16 +237,20 @@
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
                             android:imeOptions="actionNext|flagNoExtractUi"
                             android:nextFocusForward="@id/etConfirmPassword"
-                            android:nextFocusDown="@id/etConfirmPassword" />
+                            android:nextFocusDown="@id/etConfirmPassword"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="newPassword" />
                         <ImageView
                             android:id="@+id/ivTogglePassword"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:padding="8dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:padding="12dp"
                             android:src="@android:drawable/ic_menu_view"
                             app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
@@ -234,6 +261,13 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/ui_registration_password_hint"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Confirm Password"
                         android:textColor="@color/text_primary"
@@ -241,13 +275,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="8dp">
+                        android:paddingEnd="8dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -257,7 +292,7 @@
                         <EditText
                             android:id="@+id/etConfirmPassword"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
@@ -267,14 +302,18 @@
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
-                            android:imeOptions="actionDone|flagNoExtractUi" />
+                            android:imeOptions="actionDone|flagNoExtractUi"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="newPassword" />
                         <ImageView
                             android:id="@+id/ivToggleConfirmPassword"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:padding="8dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:padding="12dp"
                             android:src="@android:drawable/ic_menu_view"
                             app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
@@ -305,7 +344,7 @@
                     <Button
                         android:id="@+id/btnRegister"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="REGISTER"
                         android:textColor="@color/on_primary"
@@ -316,11 +355,13 @@
                         app:backgroundTint="@null"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minHeight="0dp"
+                        android:minHeight="48dp"
                         android:gravity="center"
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

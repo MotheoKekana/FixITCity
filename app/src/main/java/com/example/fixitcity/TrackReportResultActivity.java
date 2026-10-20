@@ -84,22 +84,14 @@ public class TrackReportResultActivity extends AppCompatActivity {
             }
         }
 
-        // ---------- Share button ----------
+        // ---------- Share the same report summary as a branded image + caption ----------
         View btnShare = findViewById(R.id.btn_share_status);
         if (btnShare != null) {
-            final String shareRef    = reference;
-            final String shareStatus = status;
-            final String shareTitle  = title;
-            btnShare.setOnClickListener(v -> {
-                String msg = "FixITCity Report\n"
-                        + "Reference: " + (shareRef != null ? shareRef : "—") + "\n"
-                        + "Title: " + (shareTitle != null ? shareTitle : "Report") + "\n"
-                        + "Status: " + (shareStatus != null ? shareStatus : "Pending");
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, msg);
-                startActivity(Intent.createChooser(shareIntent, "Share report status"));
-            });
+            btnShare.setOnClickListener(v -> ReportShare.share(this, v,
+                    new ReportShareData(reference, title, status,
+                            getIntent().getBooleanExtra("pending_sync", false),
+                            getIntent().hasExtra("priority_score") ? priorityScore : null,
+                            java.time.ZonedDateTime.now())));
         }
 
         // Open the real notifications screen; alert delivery is managed server-side.

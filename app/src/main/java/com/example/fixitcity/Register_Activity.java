@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import com.example.fixitcity.data.SupabaseUsers;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class Register_Activity extends AppCompatActivity {
 
@@ -34,6 +36,7 @@ public class Register_Activity extends AppCompatActivity {
     private Button btnSignIn;
 
     private CheckBox cbTerms;
+    private boolean registrationInProgress;
 
     private ImageView ivTogglePassword;
     private ImageView ivToggleConfirmPassword;
@@ -154,69 +157,73 @@ public class Register_Activity extends AppCompatActivity {
     }
 
     private void attemptRegister() {
-        String fullName =
-                etFullName.getText().toString().trim();
+        if (registrationInProgress) return;
 
-        String email =
-                etEmail.getText().toString().trim();
+        etFullName.setError(null);
+        etEmail.setError(null);
+        etPhone.setError(null);
+        etPassword.setError(null);
+        etConfirmPassword.setError(null);
 
-        String phone =
-                etPhone.getText().toString().trim();
-
-        String password =
-                etPassword.getText().toString();
-
-        String confirmPassword =
-                etConfirmPassword
-                        .getText()
-                        .toString();
+        String fullName = etFullName.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString();
+        String confirmPassword = etConfirmPassword.getText().toString();
 
         if (fullName.isEmpty()) {
-            showMessage("Please enter your full name");
+            showFieldError(etFullName, "Please enter your full name.");
             return;
         }
-
         if (email.isEmpty()) {
-            showMessage("Please enter your email address");
+            showFieldError(etEmail, "Please enter your email address.");
+            return;
+        }
+        if (email.length() > RegistrationValidation.MAX_EMAIL_CHARACTERS
+                || !Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                || email.contains("..") || email.startsWith(".")
+                || email.substring(0, email.indexOf('@')).endsWith(".")) {
+            showFieldError(etEmail, "Enter a valid email address, such as name@example.com.");
             return;
         }
 
-        if (phone.isEmpty()) {
-            showMessage("Please enter your phone number");
+        final String phone;
+        try {
+            phone = RegistrationValidation.normalizeOptionalPhone(
+                    etPhone.getText().toString());
+        } catch (IllegalArgumentException invalidPhone) {
+            showFieldError(etPhone, invalidPhone.getMessage());
             return;
         }
 
-        if (password.isEmpty()) {
-            showMessage("Please enter a password");
+        String passwordError = RegistrationValidation.passwordError(password);
+        if (passwordError != null) {
+            showFieldError(etPassword, passwordError);
             return;
         }
-
-        if (password.length() < 6) {
-            showMessage(
-                    "Your password must contain "
-                            + "at least 6 characters"
-            );
+        if (confirmPassword.isEmpty()) {
+            showFieldError(etConfirmPassword, "Please enter your password again.");
             return;
         }
-
         if (!password.equals(confirmPassword)) {
-            showMessage("Passwords do not match");
+            showFieldError(etConfirmPassword, "Passwords do not match.");
             return;
         }
-
         if (!cbTerms.isChecked()) {
-            showMessage(
-                    "Please accept the terms and conditions"
-            );
+            showMessage("Please accept the terms and conditions.");
             return;
         }
 
-        NameParts nameParts =
-                splitFullName(fullName);
+        NameParts nameParts = splitFullName(fullName);
+        if (nameParts.firstName.codePointCount(0, nameParts.firstName.length()) > 100
+                || nameParts.lastName.codePointCount(0, nameParts.lastName.length()) > 100) {
+            showFieldError(etFullName, "Your first name and surname must each be 100 characters or fewer.");
+            return;
+        }
 
         setLoading(true);
 
         new Thread(() -> {
+            boolean accountCreated = false;
             try {
                 String signupResponse =
                         SupabaseAuth.register(
@@ -267,6 +274,8 @@ public class Register_Activity extends AppCompatActivity {
                     );
                 }
 
+                accountCreated = true;
+
                 String accessToken =
                         signupJson.optString(
                                 "access_token",
@@ -305,14 +314,21 @@ public class Register_Activity extends AppCompatActivity {
                         exception
                 );
 
+                final boolean created = accountCreated;
+                final String error = created
+                        ? "Your account was created, but we could not finish signing you in. "
+                          + "Please sign in instead of registering again."
+                        : getReadableError(exception);
                 runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
                     setLoading(false);
-
-                    Toast.makeText(
-                            this,
-                            getReadableError(exception),
-                            Toast.LENGTH_LONG
-                    ).show();
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                    if (created) {
+                        Intent intent = new Intent(this, Login_Activity.class);
+                        intent.putExtra("registered_email", email);
+                        startActivity(intent);
+                        finish();
+                    }
                 });
             }
         }).start();
@@ -469,13 +485,23 @@ public class Register_Activity extends AppCompatActivity {
     }
 
     private void setLoading(boolean loading) {
+        registrationInProgress = loading;
         btnRegister.setEnabled(!loading);
+        btnSignIn.setEnabled(!loading);
+        etFullName.setEnabled(!loading);
+        etEmail.setEnabled(!loading);
+        etPhone.setEnabled(!loading);
+        etPassword.setEnabled(!loading);
+        etConfirmPassword.setEnabled(!loading);
+        cbTerms.setEnabled(!loading);
+        ivTogglePassword.setEnabled(!loading);
+        ivToggleConfirmPassword.setEnabled(!loading);
+        btnRegister.setText(loading ? "Creating account..." : "REGISTER");
+    }
 
-        btnRegister.setText(
-                loading
-                        ? "Creating account..."
-                        : "REGISTER"
-        );
+    private void showFieldError(EditText field, String message) {
+        field.setError(message);
+        field.requestFocus();
     }
 
     private void showMessage(String message) {
@@ -487,35 +513,49 @@ public class Register_Activity extends AppCompatActivity {
     }
 
     private String getReadableError(Exception exception) {
-        String message = exception.getMessage();
-
-        if (message == null || message.trim().isEmpty()) {
+        String raw = exception.getMessage();
+        if (raw == null || raw.trim().isEmpty()) {
             return "Registration failed. Please try again.";
         }
 
-        String lower = message.toLowerCase();
-
-        if (lower.contains("already registered")
-                || lower.contains("user already exists")) {
-
-            return "An account already exists "
-                    + "for this email address.";
+        String code = "";
+        String serverMessage = null;
+        int jsonStart = raw.indexOf('{');
+        if (jsonStart >= 0) {
+            try {
+                JSONObject error = new JSONObject(raw.substring(jsonStart));
+                code = error.optString("error_code", error.optString("code", ""));
+                serverMessage = error.optString("msg", error.optString("message", ""));
+            } catch (Exception ignored) {
+                // Network exceptions do not have an Auth JSON response.
+            }
         }
-
+        String lower = (code + " " + raw).toLowerCase(Locale.ROOT);
+        if (lower.contains("already registered") || lower.contains("user already exists")
+                || lower.contains("user_already_exists") || lower.contains("email_exists")) {
+            return "An account already exists for this email address. Please sign in.";
+        }
+        if (lower.contains("rate_limit") || lower.contains("rate limit")
+                || raw.contains("(429)")) {
+            return "Too many attempts. Please wait a while before trying again.";
+        }
+        if (lower.contains("email_address_invalid") || lower.contains("email address is invalid")) {
+            return "Please use a valid email address that can receive email.";
+        }
         if (lower.contains("password")) {
-            return "The password does not meet "
-                    + "the security requirements.";
+            // Show Supabase's actual rule when the project requires a stronger
+            // password than the app's baseline. Never change the entered password.
+            if (serverMessage != null && !serverMessage.trim().isEmpty()
+                    && serverMessage.length() <= 400) return serverMessage;
+            return "Supabase rejected this password. Try a longer, unique password "
+                    + "with uppercase and lowercase letters, numbers and a symbol.";
         }
-
-        if (lower.contains("unable to resolve host")
-                || lower.contains("failed to connect")
-                || lower.contains("timeout")) {
-
-            return "Could not connect. Check your "
-                    + "internet connection.";
+        if (lower.contains("unable to resolve host") || lower.contains("failed to connect")
+                || lower.contains("timeout") || lower.contains("timed out")) {
+            return "Could not connect. Check your internet connection.";
         }
-
-        return "Registration failed: " + message;
+        return "Registration could not be completed. Please try again. "
+                + "If this continues, contact support.";
     }
 
     private static class NameParts {

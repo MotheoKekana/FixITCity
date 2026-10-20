@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +56,13 @@ public class TrackReportSearchActivity extends AppCompatActivity {
         }
 
         btnTrack.setOnClickListener(v -> attemptTrack());
+        etReference.setOnEditorActionListener((view, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
+                attemptTrack();
+                return true;
+            }
+            return false;
+        });
 
         View viewAll = findViewById(R.id.tv_view_all_archive);
         if (viewAll != null && !initialSession.isGuest()) {
@@ -111,6 +119,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
     }
 
     private void attemptTrack() {
+        if (!btnTrack.isEnabled()) return;
         String ref = etReference.getText() != null ? etReference.getText().toString().trim().toUpperCase(Locale.ROOT) : "";
 
         if (ref.isEmpty()) {

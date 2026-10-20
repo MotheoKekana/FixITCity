@@ -40,7 +40,7 @@ public class Dashboard_Activity extends AppCompatActivity {
     private static final int NEARBY_PREVIEW_LIMIT = 5;
     private static final int RECENT_PREVIEW_LIMIT = 5;   // max recent cards shown
 
-    private TextView tvWelcome, tvSubtitle, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
+    private TextView tvWelcome, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
     private RecyclerView rvRecentReports, rvNearbyReports;
 
     // ---- recent reports use the new card-based adapter ----
@@ -78,7 +78,6 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         // Views
         tvWelcome = findViewById(R.id.tvWelcome);
-        tvSubtitle = findViewById(R.id.tvSubtitle);
         tvReportCount = findViewById(R.id.tvReportCount);
         tvNearbyRadius = findViewById(R.id.tvNearbyRadius);
         tvSeeMoreNearby = findViewById(R.id.tvSeeMoreNearby);
@@ -89,7 +88,6 @@ public class Dashboard_Activity extends AppCompatActivity {
         String firstName = session.getFirstName();
         if (firstName == null || firstName.isEmpty()) firstName = "there";
         tvWelcome.setText("Hello, " + firstName);
-        tvSubtitle.setText("View your recent reports, track progress, and see nearby issues");
 
         // ---------- Recent reports RecyclerView (card layout) ----------
         rvRecentReports.setLayoutManager(new LinearLayoutManager(this));

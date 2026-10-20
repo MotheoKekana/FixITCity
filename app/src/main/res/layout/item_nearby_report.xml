@@ -28,7 +28,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary_green"
-            tools:src="@android:drawable/ic_menu_report_image" />
+            tools:src="@android:drawable/ic_menu_report_image"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no" />
         <!-- Title -->
         <TextView
             android:id="@+id/tv_title"
@@ -38,10 +40,12 @@
             android:textColor="@color/primary_green"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/tv_votes"
             app:layout_constraintStart_toEndOf="@+id/iv_icon"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Burst Water Pipe" />
+            tools:text="Burst Water Pipe"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:maxLines="2"
+            android:ellipsize="end" />
         <!-- Vote Count -->
         <TextView
             android:id="@+id/tv_votes"
@@ -54,19 +58,21 @@
             android:textColor="@color/warning_text"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="@id/tv_hint"
+            app:layout_constraintTop_toBottomOf="@id/tv_hint"
+            android:layout_marginTop="6dp" />
         <!-- Distance -->
         <TextView
             android:id="@+id/tv_distance"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@+id/tv_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_title"
-            tools:text="450m away" />
+            tools:text="450m away"
+            app:layout_constraintEnd_toEndOf="parent" />
         <!-- Reference + Status + Score -->
         <TextView
             android:id="@+id/tv_hint"

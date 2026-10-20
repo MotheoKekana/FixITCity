@@ -289,6 +289,7 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             Intent intent = new Intent(this, ReportSuccessActivity.class);
             intent.putExtra("reference_number", referenceNumber);
+            intent.putExtra("report_title", reportData.getCategory());
             if (priorityScore != null) intent.putExtra("priority_score", priorityScore);
             intent.putExtra("is_queued", reportQueued);
             intent.putExtra("photo_queued", photoQueued);

@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
     private ImageView ivPhotoPreview;
     private ImageView ivCameraIcon;
     private TextView tvTapHint;
-    private View continueButton;
+    private Button continueButton;
     private View cameraButton;
     private View galleryButton;
     private View removeButton;
@@ -66,6 +67,12 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         AppNavigation.bindNotificationBell(this);
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
+
+        TextView categoryBadge = findViewById(R.id.tv_category_badge);
+        String categoryName = reportData.getCategory();
+        categoryBadge.setText(categoryName != null ? categoryName : "");
+        categoryBadge.setVisibility(categoryName != null && !categoryName.trim().isEmpty()
+                ? View.VISIBLE : View.GONE);
 
         ivPhotoPreview = findViewById(R.id.iv_photo_preview);
         ivCameraIcon = findViewById(R.id.iv_camera_icon);
@@ -103,13 +110,8 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
             updatePhotos();
         });
 
-        findViewById(R.id.btn_skip).setOnClickListener(v -> {
-            if (processingPhoto) return;
-            reportData.clearPhotos();
-            if (!processingPhoto) startNextActivity(ReportFaultSummaryActivity.class);
-        });
-
         continueButton.setOnClickListener(v -> {
+            if (processingPhoto) return;
             startNextActivity(ReportFaultSummaryActivity.class);
         });
 
@@ -228,6 +230,8 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         if (count > 0) showPreviewFromBytes(reportData.getPhotos().get(count - 1));
         else clearPreview();
         photoCountLabel.setText(count + " of 3 photos added");
+        continueButton.setText(processingPhoto ? R.string.photo_action_processing
+                : count == 0 ? R.string.photo_action_skip : R.string.photo_action_continue);
         continueButton.setEnabled(!processingPhoto);
         cameraButton.setEnabled(!processingPhoto && count < 3);
         galleryButton.setEnabled(!processingPhoto && count < 3);

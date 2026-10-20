@@ -53,14 +53,6 @@
                         android:textSize="28sp"
                         android:textStyle="bold" />
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center"
-                        android:text="Sign in to report and track municipal\nissues."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp" />
-                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
@@ -70,13 +62,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -86,7 +79,7 @@
                         <EditText
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:id="@+id/etEmail"
                             android:background="@android:color/transparent"
@@ -96,11 +89,15 @@
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
                             android:imeOptions="actionNext|flagNoExtractUi"
                             android:nextFocusForward="@id/etPassword"
-                            android:nextFocusDown="@id/etPassword" />
+                            android:nextFocusDown="@id/etPassword"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="emailAddress" />
                     </LinearLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -112,13 +109,14 @@
                         android:textStyle="bold" />
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/grey_border"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="8dp">
+                        android:paddingEnd="8dp"
+                        android:minHeight="56dp">
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -127,7 +125,7 @@
                             android:contentDescription="Password Icon" />
                         <EditText
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
@@ -138,14 +136,18 @@
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no"
+                            android:importantForAutofill="yes"
                             android:singleLine="true"
-                            android:imeOptions="actionDone|flagNoExtractUi" />
+                            android:imeOptions="actionDone|flagNoExtractUi"
+                            android:minHeight="56dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:autofillHints="password" />
                         <ImageView
                             android:id="@+id/ivTogglePassword"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:padding="8dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:padding="12dp"
                             android:src="@android:drawable/ic_menu_view"
                             app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
@@ -158,15 +160,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:gravity="end"
+                        android:gravity="end|center_vertical"
                         android:text="Forgot Password?"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:minHeight="48dp"
+                        android:focusable="true" />
                     <Button
                         android:id="@+id/btnSignIn"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="SIGN IN"
                         android:textColor="@color/on_primary"
@@ -177,15 +181,17 @@
                         app:backgroundTint="@null"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minHeight="0dp"
+                        android:minHeight="48dp"
                         android:gravity="center"
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
                     <Button
                         android:id="@+id/btnGuest"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Continue as Guest"
                         android:textColor="@color/secondary_blue"
@@ -194,10 +200,12 @@
                         app:backgroundTint="@null"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minHeight="0dp"
+                        android:minHeight="48dp"
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
-                        android:layout_marginBottom="24dp" />
+                        android:layout_marginBottom="24dp"
+                        android:singleLine="false"
+                        android:maxLines="3" />
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
