@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
-
+    android:background="@color/background_main_light_blue"
+    android:focusableInTouchMode="true">
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/authScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background_main_light_blue"
+            android:orientation="vertical"
+            android:gravity="center"
             android:padding="24dp">
-
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/surface"
                 app:cardCornerRadius="32dp"
-                app:cardElevation="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,7 +37,6 @@
                     android:background="@drawable/grey_border"
                     android:orientation="vertical"
                     android:padding="24dp">
-
                     <ImageView
                         android:id="@+id/ivLogo"
                         android:layout_width="170dp"
@@ -44,7 +44,6 @@
                         android:layout_marginTop="8dp"
                         android:src="@drawable/app_logo_inside_gps_style"
                         android:contentDescription="FixITCity Logo" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -53,16 +52,14 @@
                         android:textColor="@color/text_primary"
                         android:textSize="28sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center"
                         android:text="Sign in to report and track municipal\nissues."
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="16sp" />
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -71,7 +68,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -81,29 +77,31 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_email"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Email Icon" />
-
                         <EditText
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
                             android:id="@+id/etEmail"
                             android:background="@android:color/transparent"
                             android:hint="citizen@example.com"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:nextFocusForward="@id/etPassword"
+                            android:nextFocusDown="@id/etPassword" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -112,7 +110,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -122,14 +119,12 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="8dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_lock_idle_lock"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Password Icon" />
-
                         <EditText
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -138,26 +133,26 @@
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
                             android:id="@+id/etPassword"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
-
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone|flagNoExtractUi" />
                         <ImageView
                             android:id="@+id/ivTogglePassword"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_view"
-                            app:tint="#6B7280"
+                            app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="Toggle password visibility"
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>
-
                     <TextView
                         android:id="@+id/tvForgotPassword"
                         android:layout_width="match_parent"
@@ -168,14 +163,13 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
-
                     <Button
                         android:id="@+id/btnSignIn"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="15dp"
                         android:text="SIGN IN"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/on_primary"
                         android:textAlignment="center"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -188,14 +182,13 @@
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
                         android:layout_marginBottom="16dp" />
-
                     <Button
                         android:id="@+id/btnGuest"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center"
                         android:text="Continue as Guest"
-                        android:textColor="#003366"
+                        android:textColor="@color/secondary_blue"
                         android:textSize="16sp"
                         android:background="@drawable/rounded_grey_border"
                         app:backgroundTint="@null"
@@ -205,19 +198,16 @@
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
                         android:layout_marginBottom="24dp" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Don't have an account? "
-                            android:textColor="#666666"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
-
                         <Button
                             style="@style/Widget.AppCompat.Button.Borderless"
                             android:layout_width="wrap_content"
@@ -231,10 +221,9 @@
                             android:padding="0dp"
                             android:minWidth="0dp"
                             android:minHeight="0dp" />
-
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

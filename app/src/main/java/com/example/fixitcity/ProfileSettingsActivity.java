@@ -10,9 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.NotificationTokenManager;
@@ -32,11 +29,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_profile_settings);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ScreenInsets.apply(this);
 
         session = new SessionManager(this);
 

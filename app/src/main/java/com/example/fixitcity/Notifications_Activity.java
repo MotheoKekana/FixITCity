@@ -10,9 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.NotificationDates;
 import com.example.fixitcity.data.SessionManager;
@@ -38,11 +35,7 @@ public class Notifications_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_notifications);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ScreenInsets.apply(this);
         notificationList = findViewById(R.id.notification_list);
         stateText = findViewById(R.id.tv_notification_state);
         refreshButton = findViewById(R.id.btn_refresh_notifications);

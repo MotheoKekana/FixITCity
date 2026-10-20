@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/onboard_community_impact"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
-
+    android:background="@color/background_light">
     <!-- Confirm GPS Card: Left-aligned content matching the design -->
     <androidx.cardview.widget.CardView
         android:id="@+id/gps_card"
@@ -14,56 +14,50 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="80dp"
         android:layout_marginEnd="24dp"
-        app:cardBackgroundColor="#F8FBF8"
+        app:cardBackgroundColor="@color/illustration_background"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="24dp">
-
             <!-- Yellow Location Icon Box -->
             <androidx.cardview.widget.CardView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                app:cardBackgroundColor="#FFD700"
+                app:cardBackgroundColor="@color/illustration_gold"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
-
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@android:drawable/ic_menu_mylocation"
-                    app:tint="#333333"
+                    app:tint="@color/illustration_ink"
                     android:contentDescription="GPS Pin Icon" />
             </androidx.cardview.widget.CardView>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Confirm GPS"
-                android:textColor="#1A1C1E"
+                android:textColor="@color/input_text"
                 android:textSize="22sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="The app automatically tags your location. Adjust if necessary for accuracy."
-                android:textColor="#44474E"
+                android:textColor="@color/text_secondary"
                 android:textSize="16sp"
                 android:lineSpacingExtra="4dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
     <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
@@ -73,13 +67,12 @@
         android:layout_marginEnd="40dp"
         android:gravity="center"
         android:text="Improve Your Community"
-        android:textColor="#003366"
+        android:textColor="@color/secondary_blue"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gps_card" />
-
     <TextView
         android:id="@+id/description"
         android:layout_width="0dp"
@@ -89,12 +82,11 @@
         android:layout_marginEnd="32dp"
         android:gravity="center"
         android:text="Your reports help municipalities prioritize repairs and allocate resources to the most critical infrastructure issues."
-        android:textColor="#666666"
+        android:textColor="@color/text_secondary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title" />
-
     <!-- Page Indicators -->
     <LinearLayout
         android:id="@+id/pageIndicator"
@@ -106,31 +98,25 @@
         app:layout_constraintBottom_toTopOf="@+id/btn_get_started"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:background="@drawable/dot_inactive" />
-
         <Space
             android:layout_width="7dp"
             android:layout_height="1dp" />
-
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:background="@drawable/dot_inactive" />
-
         <Space
             android:layout_width="7dp"
             android:layout_height="1dp" />
-
         <View
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:background="@drawable/dot_active" />
     </LinearLayout>
-
     <!-- Get Started Button -->
     <Button
         android:id="@+id/btn_get_started"
@@ -141,11 +127,10 @@
         app:backgroundTint="@null"
         android:text="Get Started"
         android:textAllCaps="false"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/on_primary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,22 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/cardview_light_background"
+        android:background="@color/surface"
         android:elevation="4dp"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -27,7 +24,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -40,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -54,7 +49,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -62,13 +56,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
-
             <!-- Welcome -->
             <TextView
                 android:id="@+id/tvWelcome"
@@ -78,7 +70,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/tvSubtitle"
                 android:layout_width="wrap_content"
@@ -87,7 +78,6 @@
                 android:text="Report a fault or track one using its reference number."
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
-
             <!-- Primary action: Report an Issue -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardReportIssue"
@@ -97,44 +87,39 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/primary_green"
+                app:cardBackgroundColor="@color/hero_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/grey_overlay"
+                    android:background="@color/hero_background"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp">
-
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:contentDescription="@null"
                         android:src="@drawable/report_symbol"
-                        app:tint="@color/white" />
-
+                        app:tint="@color/on_hero" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Report an Issue"
-                        android:textColor="@color/white"
+                        android:textColor="@color/on_hero"
                         android:textSize="22sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Tap here to start a new report"
-                        android:textColor="#E8F5E9"
+                        android:textColor="@color/on_hero_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- Section label -->
             <TextView
                 android:layout_width="wrap_content"
@@ -144,7 +129,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
             <!-- Track Report row -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTrackReport"
@@ -155,39 +139,35 @@
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
-
                     <!-- Icon badge -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        app:cardBackgroundColor="#FFF3E0"
+                        app:cardBackgroundColor="@color/surface_orange"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="0dp">
-
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:contentDescription="@string/content_desc_track_report_icon"
                             android:src="@drawable/track_report_symbol"
-                            app:tint="#FFA500" />
+                            app:tint="@color/warning_text" />
                     </com.google.android.material.card.MaterialCardView>
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -195,7 +175,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="16sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -204,7 +183,6 @@
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -214,7 +192,6 @@
                         android:textSize="24sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -222,13 +199,11 @@
                 android:text="Save the reference number shown after submitting a report. Use it here whenever you want to check the status."
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
-
             <!-- Pushes Log Out to the bottom on tall screens -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-
             <!-- Log Out: outlined, so it doesn't compete with the primary action -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
@@ -238,13 +213,11 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp"
                 android:text="End guest session"
-                android:textColor="#DC2626"
+                android:textColor="@color/danger_text"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="12dp"
-                app:strokeColor="#DC2626" />
-
+                app:strokeColor="@color/danger_text" />
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

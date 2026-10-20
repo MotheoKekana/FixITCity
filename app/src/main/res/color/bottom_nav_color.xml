@@ -6,7 +6,7 @@
         android:state_checked="true" />
 
     <item
-        android:color="#757575"
+        android:color="@color/icon_muted"
         android:state_checked="false" />
 
 

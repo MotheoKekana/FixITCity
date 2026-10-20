@@ -7,16 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- ================= Header ================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/cardview_light_background"
+        android:background="@color/surface"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -26,7 +24,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -39,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -50,9 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- ================= ScrollView ================= -->
     <ScrollView
         android:layout_width="match_parent"
@@ -60,13 +54,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -74,14 +66,12 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/within_radius"
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp" />
-
             <!-- ============ Filter dropdown ============ -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCategoryFilter"
@@ -90,16 +80,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Filter by category">
-
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/actCategoryFilter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
                     tools:ignore="LabelFor" />
-
             </com.google.android.material.textfield.TextInputLayout>
-
             <!-- ========== The list (wrapping so it fits all rows inside ScrollView) ========== -->
             <com.example.fixitcity.WrappingRecyclerView
                 android:id="@+id/rvNearbyReports"
@@ -111,7 +98,6 @@
                 android:overScrollMode="never"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_nearby_report" />
-
             <!-- Empty state -->
             <TextView
                 android:id="@+id/tvEmptyState"
@@ -124,21 +110,19 @@
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
-
             <!-- Priority legend -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="2dp">
-
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="12dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -146,18 +130,15 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="10sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
-
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
                             android:background="@drawable/bg_circle_red" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -166,18 +147,15 @@
                             android:textColor="@color/secondary_blue"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
-
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
                             android:background="@drawable/bg_circle_orange" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -186,18 +164,15 @@
                             android:textColor="@color/secondary_blue"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
-
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
                             android:background="@drawable/bg_circle_green_small" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -206,22 +181,18 @@
                             android:textColor="@color/secondary_blue"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
-
     <!-- ================= Bottom Navigation ================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
         <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
@@ -231,31 +202,27 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
             app:layout_constraintStart_toStartOf="parent">
-
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
                 android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                android:backgroundTint="@color/selection_background" />
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_home_24"
-                app:tint="#111827" />
-
+                app:tint="@color/input_text" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_home"
-                android:textColor="#111827"
+                android:textColor="@color/input_text"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
@@ -265,23 +232,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
             app:layout_constraintStart_toEndOf="@+id/navHome">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_report_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_report"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
@@ -291,23 +255,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
             app:layout_constraintStart_toEndOf="@+id/navReport">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_track_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_track"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
@@ -317,23 +278,19 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/navTrack">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_settings"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

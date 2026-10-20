@@ -24,9 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 import com.google.android.gms.location.CurrentLocationRequest;
@@ -81,11 +78,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_report_fault_gps);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return insets;
-        });
+        ScreenInsets.apply(this);
         if (session.isGuest()) findViewById(R.id.bottomNav).setVisibility(View.GONE);
         AppNavigation.bindNotificationBell(this);
         tvAddress = findViewById(R.id.tv_location_address);

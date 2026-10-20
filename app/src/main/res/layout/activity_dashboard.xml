@@ -2,22 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/cardview_light_background"
+        android:background="@color/surface"
         android:elevation="4dp"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -27,7 +24,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -40,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -53,9 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -63,13 +56,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-
             <!-- Welcome -->
             <TextView
                 android:id="@+id/tvWelcome"
@@ -79,7 +70,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/tvSubtitle"
                 android:layout_width="wrap_content"
@@ -87,36 +77,32 @@
                 android:layout_marginTop="4dp"
                 android:text="View your recent reports, track progress, and see nearby issues"
                 android:textColor="@color/text_secondary" />
-
             <!-- Stats + Track (side by side) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
-
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
-
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/surface">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="12dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="My Recent Reports"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp" />
-
                         <TextView
                             android:id="@+id/tvReportCount"
                             android:layout_width="wrap_content"
@@ -127,10 +113,8 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="20sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardTrackReport"
                     android:layout_width="0dp"
@@ -140,22 +124,20 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
-
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/surface">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="12dp">
-
                         <ImageView
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:contentDescription="@string/content_desc_track_report_icon"
                             android:src="@drawable/track_report_symbol"
-                            app:tint="#FFA500" />
-
+                            app:tint="@color/warning_text" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -164,33 +146,28 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="16sp"
                             android:textStyle="bold" />
-
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
             </LinearLayout>
-
             <!-- ===== Recent Reports section ===== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <!-- Section header: title left, action right -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -199,7 +176,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-
                         <!-- NEW id: wire a click listener to this -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSeeAllRecent"
@@ -210,12 +186,10 @@
                             android:textSize="11dp"
                             android:textColor="@color/secondary_blue" />
                     </LinearLayout>
-
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp" />
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvRecentReports"
                         android:layout_width="match_parent"
@@ -224,27 +198,24 @@
                         android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- ===== Nearby Reports section ===== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -253,7 +224,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-
                         <!-- Same id as before; visibility still controlled from code -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/tvSeeMoreNearby"
@@ -265,7 +235,6 @@
                             android:textColor="@color/secondary_blue"
                             android:visibility="gone" />
                     </LinearLayout>
-
                     <!-- Radius as a read-only chip (same id as before) -->
                     <com.google.android.material.chip.Chip
                         android:id="@+id/tvNearbyRadius"
@@ -277,12 +246,10 @@
                         android:text="@string/within_radius"
                         android:textColor="@color/secondary_blue"
                         android:textSize="12sp" />
-
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp" />
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvNearbyReports"
                         android:layout_width="match_parent"
@@ -291,19 +258,16 @@
                         android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
-
     <!-- Bottom Navigation (unchanged) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -312,31 +276,27 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
             app:layout_constraintStart_toStartOf="parent">
-
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
                 android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                android:backgroundTint="@color/selection_background" />
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_home_24"
-                app:tint="#111827" />
-
+                app:tint="@color/input_text" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_home"
-                android:textColor="#111827"
+                android:textColor="@color/input_text"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -345,23 +305,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
             app:layout_constraintStart_toEndOf="@+id/navHome">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_report_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_report"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -370,23 +327,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
             app:layout_constraintStart_toEndOf="@+id/navReport">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_track_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_track"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"
@@ -395,23 +349,19 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/navTrack">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_settings"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

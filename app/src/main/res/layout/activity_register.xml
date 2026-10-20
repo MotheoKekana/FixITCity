@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/register"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
-
+    android:background="@color/background_main_light_blue"
+    android:focusableInTouchMode="true">
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/authScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background_main_light_blue"
+            android:orientation="vertical"
+            android:gravity="center"
             android:padding="24dp">
-
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/surface"
                 app:cardCornerRadius="32dp"
-                app:cardElevation="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,7 +37,6 @@
                     android:background="@drawable/grey_border"
                     android:orientation="vertical"
                     android:padding="24dp">
-
                     <ImageView
                         android:id="@+id/ivLogo"
                         android:layout_width="150dp"
@@ -44,7 +44,6 @@
                         android:layout_marginTop="8dp"
                         android:src="@drawable/app_logo_inside_gps_style"
                         android:contentDescription="FixITCity Logo" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -53,7 +52,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="28sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -62,7 +60,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -72,29 +69,31 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_myplaces"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Name Icon" />
-
                         <EditText
                             android:id="@+id/etFullName"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="John Doe"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textPersonName"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:nextFocusForward="@id/etEmail"
+                            android:nextFocusDown="@id/etEmail" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -103,7 +102,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -113,29 +111,31 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_email"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Email Icon" />
-
                         <EditText
                             android:id="@+id/etEmail"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="john@example.com"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textEmailAddress"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:nextFocusForward="@id/etPhone"
+                            android:nextFocusDown="@id/etPhone" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -144,7 +144,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -154,29 +153,31 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/stat_sys_phone_call"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Phone Icon" />
-
                         <EditText
                             android:id="@+id/etPhone"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="match_parent"
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="+27 83 132 1144"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="phone"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:nextFocusForward="@id/etPassword"
+                            android:nextFocusDown="@id/etPassword" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -185,7 +186,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -195,14 +195,12 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="8dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_lock_idle_lock"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Password Icon" />
-
                         <EditText
                             android:id="@+id/etPassword"
                             android:layout_width="0dp"
@@ -211,26 +209,28 @@
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
-
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:nextFocusForward="@id/etConfirmPassword"
+                            android:nextFocusDown="@id/etConfirmPassword" />
                         <ImageView
                             android:id="@+id/ivTogglePassword"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_view"
-                            app:tint="#6B7280"
+                            app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="Toggle password visibility"
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -239,7 +239,6 @@
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -249,14 +248,12 @@
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="8dp">
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_revert"
-                            app:tint="#BCBCBC"
+                            app:tint="@color/icon_muted"
                             android:contentDescription="Confirm Icon" />
-
                         <EditText
                             android:id="@+id/etConfirmPassword"
                             android:layout_width="0dp"
@@ -265,56 +262,53 @@
                             android:layout_marginStart="12dp"
                             android:background="@android:color/transparent"
                             android:hint="* * * * * * * * * *"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/input_text"
+                            android:textColorHint="@color/text_hint"
                             android:inputType="textPassword"
                             android:textSize="16sp"
                             android:gravity="center_vertical"
-                            android:importantForAutofill="no" />
-
+                            android:importantForAutofill="no"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone|flagNoExtractUi" />
                         <ImageView
                             android:id="@+id/ivToggleConfirmPassword"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_view"
-                            app:tint="#6B7280"
+                            app:tint="@color/icon_muted"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="Toggle confirm password visibility"
                             android:clickable="true"
                             android:focusable="true" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
                         <CheckBox
                             android:id="@+id/cbTerms"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minWidth="0dp"
                             android:minHeight="0dp" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:text="I agree to the Terms of Service and\nPrivacy Policy."
-                            android:textColor="#666666"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
-
                     <Button
                         android:id="@+id/btnRegister"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="20dp"
                         android:text="REGISTER"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/on_primary"
                         android:textAlignment="center"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -327,19 +321,16 @@
                         android:paddingTop="0dp"
                         android:paddingBottom="0dp"
                         android:layout_marginBottom="16dp" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Already have an account? "
-                            android:textColor="#666666"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
-
                         <Button
                             android:id="@+id/btnSignIn"
                             style="@style/Widget.AppCompat.Button.Borderless"
@@ -353,10 +344,9 @@
                             android:padding="0dp"
                             android:minWidth="0dp"
                             android:minHeight="0dp" />
-
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

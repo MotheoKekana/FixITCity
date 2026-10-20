@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
     android:padding="24dp">
-
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardBackgroundColor="@color/surface">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="32dp">
-
             <!-- Green checkmark circle -->
             <ImageView
                 android:layout_width="80dp"
@@ -29,8 +28,7 @@
                 android:background="@drawable/bg_circle_green"
                 android:padding="16dp"
                 android:src="@drawable/ic_check_success"
-                app:tint="@color/white" />
-
+                app:tint="@color/on_primary" />
             <!-- Dynamic Thank you title -->
             <TextView
                 android:id="@+id/tv_thank_you_title"
@@ -42,7 +40,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 tools:text="Thank you for upvoting\n&quot;Burst Pipe&quot;" />
-
             <!-- Subtitle -->
             <TextView
                 android:layout_width="wrap_content"
@@ -52,7 +49,6 @@
                 android:text="Your voice matters – we'll prioritise this issue."
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp" />
-
             <!-- Go to Dashboard button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_go_dashboard"
@@ -62,8 +58,6 @@
                 android:text="Go to Dashboard"
                 android:backgroundTint="@color/primary_green"
                 app:cornerRadius="8dp" />
-
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

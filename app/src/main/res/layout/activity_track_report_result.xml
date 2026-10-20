@@ -7,16 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- ============== Header ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -26,7 +24,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -39,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -51,7 +47,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- ============== ScrollView ============== -->
     <ScrollView
         android:layout_width="match_parent"
@@ -59,13 +54,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
-
             <!-- Page title -->
             <TextView
                 android:id="@+id/tv_report_status_header"
@@ -75,27 +68,24 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/track_progress_result"
                 android:textColor="@color/text_secondary" />
-
             <!-- ============== Report detail card (kept) ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardCornerRadius="16dp">
-
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:id="@+id/tv_report_title"
                         android:layout_width="wrap_content"
@@ -104,7 +94,6 @@
                         android:textColor="@color/secondary_blue"
                         android:textSize="22sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/tv_current_report_reference"
                         android:layout_width="match_parent"
@@ -112,7 +101,6 @@
                         android:layout_marginTop="8dp"
                         android:textColor="@color/secondary_blue"
                         android:textSize="14sp" />
-
                     <TextView
                         android:id="@+id/tv_current_report_status"
                         android:layout_width="match_parent"
@@ -121,7 +109,6 @@
                         android:textColor="@color/secondary_blue"
                         android:textSize="16sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/tv_report_location"
                         android:layout_width="wrap_content"
@@ -129,7 +116,6 @@
                         android:layout_marginTop="8dp"
                         android:text="Location: "
                         android:textColor="@color/text_secondary" />
-
                     <TextView
                         android:id="@+id/tv_report_date"
                         android:layout_width="wrap_content"
@@ -137,7 +123,6 @@
                         android:layout_marginTop="4dp"
                         android:text="Reported: —"
                         android:textColor="@color/text_secondary" />
-
                     <TextView
                         android:id="@+id/tv_report_priority"
                         android:layout_width="wrap_content"
@@ -145,7 +130,6 @@
                         android:layout_marginTop="4dp"
                         android:text="Priority Score: 0/100"
                         android:textColor="@color/text_secondary" />
-
                     <TextView
                         android:id="@+id/tv_report_description"
                         android:layout_width="match_parent"
@@ -154,7 +138,6 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:visibility="gone" />
-
                     <TextView
                         android:id="@+id/tv_report_photos"
                         android:layout_width="match_parent"
@@ -164,20 +147,17 @@
                         android:textColor="@color/secondary_blue"
                         android:textStyle="bold"
                         android:visibility="gone" />
-
                     <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fillViewport="true">
-
                         <LinearLayout
                             android:id="@+id/report_photo_strip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal" />
                     </HorizontalScrollView>
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_share_status"
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -188,20 +168,18 @@
                         app:icon="@android:drawable/ic_menu_share" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- ============== Fault timeline ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp">
-
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -209,7 +187,6 @@
                         android:textColor="@color/secondary_blue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -217,7 +194,6 @@
                         android:text="Every status change on this report"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
-
                     <!-- Empty / loading state -->
                     <TextView
                         android:id="@+id/tv_history_empty"
@@ -228,7 +204,6 @@
                         android:text="Loading history…"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
-
                     <!-- Timeline list -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_status_history"
@@ -242,7 +217,6 @@
                         tools:listitem="@layout/item_status_history" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- Open the citizen's notifications after viewing the timeline -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_notifications"
@@ -252,23 +226,20 @@
                 android:layout_marginBottom="16dp"
                 android:text="View Notifications"
                 android:backgroundTint="@color/primary_green"
-                android:textColor="@color/white"
+                android:textColor="@color/on_primary"
                 app:cornerRadius="12dp"
                 app:icon="@android:drawable/ic_popup_reminder"
                 app:iconGravity="textStart" />
-
         </LinearLayout>
     </ScrollView>
-
     <!-- ============== Bottom Navigation (unchanged) ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
         <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
@@ -278,23 +249,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
             app:layout_constraintStart_toStartOf="parent">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_home_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_home"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
@@ -304,23 +272,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
             app:layout_constraintStart_toEndOf="@+id/navHome">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_report_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_report"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Track (selected) -->
         <LinearLayout
             android:id="@+id/navTrack"
@@ -330,31 +295,27 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
             app:layout_constraintStart_toEndOf="@+id/navReport">
-
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
                 android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                android:backgroundTint="@color/selection_background" />
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_track_24"
-                app:tint="#111827" />
-
+                app:tint="@color/input_text" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_track"
-                android:textColor="#111827"
+                android:textColor="@color/input_text"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
@@ -364,23 +325,19 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/navTrack">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280" />
-
+                app:tint="@color/icon_muted" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_settings"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

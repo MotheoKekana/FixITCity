@@ -8,9 +8,6 @@ import android.view.animation.AlphaAnimation;
 import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 
@@ -34,11 +31,7 @@ public class Onboard_Report_Faults_Activity extends AppCompatActivity {
         pages.setId(View.generateViewId());
         setContentView(pages);
 
-        ViewCompat.setOnApplyWindowInsetsListener(pages, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return insets;
-        });
+        ScreenInsets.apply(this);
 
         View reportPage = getLayoutInflater().inflate(
                 R.layout.activity_onboard_report_faults, pages, false);

@@ -1,30 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Shared colour roles; Android selects this palette from the phone theme. -->
     <color name="secondary_blue">#003366</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="primary_green">#2E7D32</color>
+    <color name="gold">#FFC107</color>
+    <color name="background_light">#F5F7FA</color>
+    <color name="background_main_light_blue">#DDEFFA</color>
     <color name="text_primary">#003366</color>
-    <color name="text_secondary">#666666</color>
-    <color name="status_in_progress">#FFA500</color>
-    <color name="status_completed">#008744</color>
-    <color name="status_unverified">#E32636</color>
-    <color name="divider">#DDDDDD</color>
-
-    <color name="primary_green">#2E7D32</color>   <!-- dark green -->
-    <color name="gold">#FFC107</color>            <!-- gold accent -->
-    <color name="background_light">#F5F5F5</color> <!-- existing -->
-
-    <!-- Severity badge colours -->
-    <color name="severity_high_bg">#FFEBEE</color>      <!-- light red -->
-    <color name="severity_high_text">#D32F2F</color>    <!-- dark red -->
-    <color name="severity_medium_bg">#FFF9C4</color>    <!-- light yellow -->
-    <color name="severity_medium_text">#F57F17</color>  <!-- dark orange -->
-    <color name="severity_low_bg">#E8F5E9</color>       <!-- light green -->
-    <color name="severity_low_text">#2E7D32</color>     <!-- dark green -->
-
-    <!-- Cohen colors -->
-    <color name="grey_overlay">#808080</color>
-    <color name="background_main_light_blue">#DDEFFA</color>    <!-- Faint blue used as background-->
-    <color name="faint_yellow">#FFF3D6</color>    <!-- Used on onboard Improve your community page-->
-    
+    <color name="text_secondary">#596674</color>
+    <color name="divider">#D6DEE6</color>
+    <color name="grey_overlay">#526F5B</color>
+    <color name="faint_yellow">#FFF3D6</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F0F4F8</color>
+    <color name="surface_blue">#E1F1FC</color>
+    <color name="surface_green">#EAF4EC</color>
+    <color name="surface_purple">#E8EFFF</color>
+    <color name="surface_orange">#FFF3E0</color>
+    <color name="field_background">#FFFFFF</color>
+    <color name="border">#ADB9C5</color>
+    <color name="input_text">#111827</color>
+    <color name="text_hint">#667383</color>
+    <color name="icon_muted">#617081</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="hero_background">#526F5B</color>
+    <color name="on_hero">#FFFFFF</color>
+    <color name="on_hero_secondary">#EFF9F1</color>
+    <color name="selection_background">#FFD600</color>
+    <color name="on_selection">#17212B</color>
+    <color name="illustration_background">#F8FBF8</color>
+    <color name="illustration_gold">#FFD700</color>
+    <color name="illustration_ink">#333333</color>
+    <color name="illustration_panel">#E7ECEC</color>
+    <color name="illustration_border">#B6C4C4</color>
+    <color name="dot_inactive">#99A9B7</color>
+    <color name="warning_text">#845000</color>
+    <color name="danger_text">#AB2533</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="status_in_progress">#C77900</color>
+    <color name="status_completed">#28763C</color>
+    <color name="status_unverified">#BE293A</color>
+    <color name="severity_high_bg">#FFEBEE</color>
+    <color name="severity_high_text">#A62635</color>
+    <color name="severity_medium_bg">#FFF3CD</color>
+    <color name="severity_medium_text">#795000</color>
+    <color name="severity_low_bg">#E8F5E9</color>
+    <color name="severity_low_text">#24662E</color>
+    <color name="status_pending_bg">#FFF1D6</color>
+    <color name="status_pending_text">#795100</color>
+    <color name="status_review_bg">#E0EEFF</color>
+    <color name="status_review_text">#145A8D</color>
+    <color name="status_success_bg">#E3F3E7</color>
+    <color name="status_success_text">#205D2A</color>
+    <color name="status_error_bg">#FFE9E9</color>
+    <color name="status_error_text">#9B2430</color>
+    <color name="status_progress_bg">#F1E7FA</color>
+    <color name="status_progress_text">#6A3985</color>
+    <color name="status_neutral_bg">#E7ECF0</color>
+    <color name="status_neutral_text">#42505C</color>
+    <color name="system_bar_background">#F5F7FA</color>
+    <color name="gps_gradient_start">#EFF7F2</color>
+    <color name="gps_gradient_end">#EAF3FA</color>
+    <color name="gps_ring_outer">#D1E2E4</color>
+    <color name="gps_ring_inner">#C2DCDD</color>
+    <color name="gps_ground">#E1EEE7</color>
+    <color name="gps_landmark_green">#A8C8C5</color>
+    <color name="gps_landmark_blue">#BDD3DF</color>
+    <color name="gps_path">#B5CDD3</color>
+    <color name="gps_shadow">#C6DDCF</color>
+    <color name="gps_pin">#2E7D32</color>
+    <color name="gps_pin_hole">#FFFFFF</color>
+    <color name="gps_highlight">#E8F3EA</color>
 </resources>

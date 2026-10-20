@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SessionManager;
 
@@ -17,11 +14,7 @@ public class Onboard_Track_Reports_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_onboard_track_reports);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.onboard_track_reports), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ScreenInsets.apply(this);
 
         findViewById(R.id.btn_next).setOnClickListener(v -> {
             startActivity(new Intent(this, Onboard_Community_Impact_Activity.class));

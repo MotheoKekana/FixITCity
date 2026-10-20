@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -24,7 +23,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -37,7 +35,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -49,7 +46,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- Progress -->
     <LinearLayout
         android:id="@+id/progress_container"
@@ -59,7 +55,6 @@
         android:paddingHorizontal="20dp"
         android:paddingTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <TextView
             android:id="@+id/tv_step_label"
             android:layout_width="wrap_content"
@@ -69,19 +64,16 @@
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Step 2 of 4" />
-
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_indicator"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginTop="8dp"
             android:progress="50"
-            app:trackColor="#E1F5FE"
+            app:trackColor="@color/surface_blue"
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
-
     </LinearLayout>
-
     <!-- Main Content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -89,13 +81,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintTop_toBottomOf="@id/progress_container">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,19 +94,17 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
-
             <!-- Location card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
                     <!-- GPS preview, using real coordinates without a map service. -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -124,7 +112,6 @@
                         android:background="@drawable/bg_gps_preview"
                         android:orientation="vertical"
                         android:padding="20dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -133,7 +120,6 @@
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.12" />
-
                         <TextView
                             android:id="@+id/tv_gps_badge"
                             android:layout_width="wrap_content"
@@ -146,12 +132,10 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="12sp"
                             android:textStyle="bold" />
-
                         <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="160dp"
                             android:layout_marginTop="4dp">
-
                             <com.google.android.material.progressindicator.CircularProgressIndicator
                                 android:id="@+id/gps_preview_progress"
                                 android:layout_width="148dp"
@@ -165,7 +149,6 @@
                                 app:trackThickness="2dp"
                                 app:trackColor="#00000000"
                                 app:indicatorColor="@color/primary_green" />
-
                             <ImageView
                                 android:id="@+id/iv_gps_preview"
                                 android:layout_width="match_parent"
@@ -175,7 +158,6 @@
                                 android:scaleType="fitCenter"
                                 android:src="@drawable/ic_gps_location_preview" />
                         </FrameLayout>
-
                         <TextView
                             android:id="@+id/tv_gps_preview_coordinates"
                             android:layout_width="match_parent"
@@ -186,7 +168,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="14sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:id="@+id/tv_gps_preview_caption"
                             android:layout_width="match_parent"
@@ -197,14 +178,12 @@
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
-
                     <!-- Address details -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="20dp">
-
                         <TextView
                             android:id="@+id/tv_location_address"
                             android:layout_width="wrap_content"
@@ -213,7 +192,6 @@
                             android:textSize="22sp"
                             android:textStyle="bold"
                             tools:text="Finding your location…" />
-
                         <TextView
                             android:id="@+id/tv_location_state"
                             android:accessibilityLiveRegion="polite"
@@ -222,7 +200,6 @@
                             android:layout_marginTop="12dp"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
-
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_location_action"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -232,14 +209,11 @@
                             android:layout_marginTop="8dp"
                             android:text="Retry location"
                             android:textColor="@color/secondary_blue" />
-
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
-
     <!-- Next Step Button -->
     <LinearLayout
         android:id="@+id/bottom_bar"
@@ -247,7 +221,6 @@
         android:layout_height="wrap_content"
         android:padding="20dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNav">
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_next"
             android:layout_width="match_parent"
@@ -257,18 +230,15 @@
             app:cornerRadius="30dp"
             app:icon="@android:drawable/ic_media_next"
             app:iconGravity="textEnd" />
-
     </LinearLayout>
-
     <!-- Bottom Navigation (highlighting "Report" tab) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
         <!-- Home (unselected) -->
         <LinearLayout
             android:id="@+id/navHome"
@@ -279,23 +249,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
             app:layout_constraintStart_toStartOf="parent">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_home"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Report (selected – highlighted with yellow pill) -->
         <LinearLayout
             android:id="@+id/navReport"
@@ -306,31 +273,27 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
             app:layout_constraintStart_toEndOf="@+id/navHome">
-
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
                 android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                android:backgroundTint="@color/selection_background" />
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
                 android:src="@drawable/ic_report_24"
-                app:tint="#111827"
+                app:tint="@color/input_text"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_report"
-                android:textColor="#111827"
+                android:textColor="@color/input_text"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <!-- Track (unselected) -->
         <LinearLayout
             android:id="@+id/navTrack"
@@ -341,23 +304,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
             app:layout_constraintStart_toEndOf="@+id/navReport">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_track_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_track"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Settings (unselected) -->
         <LinearLayout
             android:id="@+id/navSettings"
@@ -368,23 +328,19 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/navTrack">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_settings"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

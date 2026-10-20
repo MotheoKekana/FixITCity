@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-
     <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/iv_logo"
             android:layout_width="32dp"
@@ -24,7 +23,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
@@ -37,7 +35,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_logo"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/ivNotifications"
             android:layout_width="32dp"
@@ -49,7 +46,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- Progress -->
     <LinearLayout
         android:id="@+id/progress_container"
@@ -59,7 +55,6 @@
         android:paddingHorizontal="20dp"
         android:paddingTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/header">
-
         <TextView
             android:id="@+id/tv_step_label"
             android:layout_width="wrap_content"
@@ -69,18 +64,16 @@
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Step 4 of 4" />
-
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_indicator"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginTop="8dp"
             android:progress="100"
-            app:trackColor="#E1F5FE"
+            app:trackColor="@color/surface_blue"
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
     </LinearLayout>
-
     <!-- Content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -88,13 +81,11 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintTop_toBottomOf="@id/progress_container">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,19 +93,18 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-
             <!-- Summary Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardCornerRadius="12dp">
+                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <!-- Category -->
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -136,13 +126,11 @@
                             android:textStyle="bold"
                             tools:text="Pothole" />
                     </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="12dp"
                         android:background="@color/divider" />
-
                     <!-- Photo -->
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -164,13 +152,11 @@
                             android:textStyle="bold"
                             tools:text="1 Image Attached" />
                     </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="12dp"
                         android:background="@color/divider" />
-
                     <!-- Location -->
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -194,7 +180,6 @@
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- Details Input -->
             <TextView
                 android:layout_width="wrap_content"
@@ -203,7 +188,6 @@
                 android:text="@string/provide_details"
                 android:textColor="@color/secondary_blue"
                 android:textStyle="bold" />
-
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -218,13 +202,12 @@
                     android:hint="e.g., The pothole is in the right lane..."
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
-
             <!-- Disclaimer -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardBackgroundColor="#F4F6F8"
+                app:cardBackgroundColor="@color/surface_variant"
                 app:cardCornerRadius="12dp">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -246,10 +229,8 @@
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
-
     <!-- Bottom Bar (Submit Button) -->
     <LinearLayout
         android:id="@+id/bottom_bar"
@@ -257,7 +238,6 @@
         android:layout_height="wrap_content"
         android:padding="20dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNav">
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_submit"
             android:layout_width="match_parent"
@@ -268,16 +248,14 @@
             app:icon="@android:drawable/ic_menu_send"
             app:iconGravity="textEnd" />
     </LinearLayout>
-
     <!-- Bottom Navigation (custom, highlighting "Report") -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
         <!-- Home (unselected) -->
         <LinearLayout
             android:id="@+id/navHome"
@@ -288,23 +266,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navReport"
             app:layout_constraintStart_toStartOf="parent">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_home"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Report (selected – highlighted with yellow pill) -->
         <LinearLayout
             android:id="@+id/navReport"
@@ -315,31 +290,27 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navTrack"
             app:layout_constraintStart_toEndOf="@+id/navHome">
-
             <View
                 android:layout_width="48dp"
                 android:layout_height="32dp"
                 android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                android:backgroundTint="@color/selection_background" />
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="-28dp"
                 android:src="@drawable/ic_report_24"
-                app:tint="#111827"
+                app:tint="@color/input_text"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_report"
-                android:textColor="#111827"
+                android:textColor="@color/input_text"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <!-- Track (unselected) -->
         <LinearLayout
             android:id="@+id/navTrack"
@@ -350,23 +321,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/navSettings"
             app:layout_constraintStart_toEndOf="@+id/navReport">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_track_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_track"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
         <!-- Settings (unselected) -->
         <LinearLayout
             android:id="@+id/navSettings"
@@ -377,23 +345,19 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/navTrack">
-
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280"
+                app:tint="@color/icon_muted"
                 android:contentDescription="@null" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/nav_settings"
-                android:textColor="#6B7280"
+                android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

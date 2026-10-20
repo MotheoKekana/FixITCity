@@ -1,311 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_main_light_blue">
-
+    xmlns:ns0="http://schemas.android.com/apk/res/android"
+    xmlns:ns1="http://schemas.android.com/apk/res-auto"
+    xmlns:ns2="http://schemas.android.com/tools"
+    ns0:id="@+id/main"
+    ns0:layout_width="match_parent"
+    ns0:layout_height="match_parent"
+    ns0:background="@color/background_main_light_blue">
     <!-- ================= Header (same as report fault) ================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent">
-
+        ns0:id="@+id/header"
+        ns0:layout_width="match_parent"
+        ns0:layout_height="wrap_content"
+        ns0:background="@color/surface"
+        ns0:padding="16dp"
+        ns1:layout_constraintTop_toTopOf="parent">
         <ImageView
-            android:id="@+id/iv_logo"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:contentDescription="@string/content_desc_app_logo"
-            android:src="@drawable/app_logo"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            ns0:id="@+id/iv_logo"
+            ns0:layout_width="32dp"
+            ns0:layout_height="32dp"
+            ns0:contentDescription="@string/content_desc_app_logo"
+            ns0:src="@drawable/app_logo"
+            ns1:layout_constraintBottom_toBottomOf="parent"
+            ns1:layout_constraintStart_toStartOf="parent"
+            ns1:layout_constraintTop_toTopOf="parent" />
         <TextView
-            android:id="@+id/tvAppName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/app_name"
-            android:textColor="@color/secondary_blue"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_logo"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            ns0:id="@+id/tvAppName"
+            ns0:layout_width="wrap_content"
+            ns0:layout_height="wrap_content"
+            ns0:layout_marginStart="8dp"
+            ns0:text="@string/app_name"
+            ns0:textColor="@color/secondary_blue"
+            ns0:textSize="20sp"
+            ns0:textStyle="bold"
+            ns1:layout_constraintBottom_toBottomOf="parent"
+            ns1:layout_constraintStart_toEndOf="@id/iv_logo"
+            ns1:layout_constraintTop_toTopOf="parent" />
         <ImageView
-            android:id="@+id/ivNotifications"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:contentDescription="@string/content_desc_notifications"
-            android:src="@drawable/ic_notification"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/secondary_blue" />
+            ns0:id="@+id/ivNotifications"
+            ns0:layout_width="32dp"
+            ns0:layout_height="32dp"
+            ns0:contentDescription="@string/content_desc_notifications"
+            ns0:src="@drawable/ic_notification"
+            ns1:layout_constraintBottom_toBottomOf="parent"
+            ns1:layout_constraintEnd_toEndOf="parent"
+            ns1:layout_constraintTop_toTopOf="parent"
+            ns1:tint="@color/secondary_blue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- ================= Title ================= -->
     <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Report History"
-        android:textColor="@color/secondary_blue"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header" />
-
+        ns0:id="@+id/tv_title"
+        ns0:layout_width="wrap_content"
+        ns0:layout_height="wrap_content"
+        ns0:layout_marginStart="16dp"
+        ns0:layout_marginTop="16dp"
+        ns0:text="Report History"
+        ns0:textColor="@color/secondary_blue"
+        ns0:textSize="28sp"
+        ns0:textStyle="bold"
+        ns1:layout_constraintStart_toStartOf="parent"
+        ns1:layout_constraintTop_toBottomOf="@id/header" />
     <!-- Sync pending button (visible only when there are pending reports) -->
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_sync_pending"
+        ns0:id="@+id/btn_sync_pending"
         style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="⟳ Sync pending (0)"
-        android:textSize="13sp"
-        android:visibility="gone"
-        app:cornerRadius="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        tools:visibility="visible" />
-
+        ns0:layout_width="wrap_content"
+        ns0:layout_height="wrap_content"
+        ns0:layout_marginTop="8dp"
+        ns0:layout_marginEnd="16dp"
+        ns0:text="⟳ Sync pending (0)"
+        ns0:textSize="13sp"
+        ns0:visibility="gone"
+        ns1:cornerRadius="20dp"
+        ns1:layout_constraintEnd_toEndOf="parent"
+        ns1:layout_constraintTop_toBottomOf="@id/header"
+        ns2:visibility="visible" />
     <!-- ================= Filter chips ================= -->
     <HorizontalScrollView
-        android:id="@+id/filter_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/tv_title">
-
+        ns0:id="@+id/filter_scroll"
+        ns0:layout_width="match_parent"
+        ns0:layout_height="wrap_content"
+        ns0:layout_marginTop="16dp"
+        ns0:paddingStart="16dp"
+        ns0:paddingEnd="16dp"
+        ns0:scrollbars="none"
+        ns1:layout_constraintTop_toBottomOf="@id/tv_title">
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chip_group_filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true">
-
+            ns0:id="@+id/chip_group_filter"
+            ns0:layout_width="wrap_content"
+            ns0:layout_height="wrap_content"
+            ns1:singleSelection="true"
+            ns1:selectionRequired="true">
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_all"
+                ns0:id="@+id/chip_all"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:checked="true"
-                android:text="All"
-                android:textColor="@color/white"
-                app:chipBackgroundColor="@color/secondary_blue" />
-
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:checked="true"
+                ns0:text="All"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_pending"
+                ns0:id="@+id/chip_pending"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="Pending" />
-
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:text="Pending"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_under_review"
+                ns0:id="@+id/chip_under_review"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="Under Review" />
-
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:text="Under Review"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_accepted"
+                ns0:id="@+id/chip_accepted"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="Accepted" />
-
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:text="Accepted"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_in_progress"
+                ns0:id="@+id/chip_in_progress"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="In Progress" />
-
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:text="In Progress"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_fixed"
+                ns0:id="@+id/chip_fixed"
                 style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="Fixed" />
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:checkable="true"
+                ns0:text="Fixed"
+                ns0:textColor="@color/filter_chip_foreground"
+                ns1:chipBackgroundColor="@color/filter_chip_background"
+                ns1:checkedIconTint="@color/filter_chip_foreground"
+                ns1:chipStrokeColor="@color/border" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
-
     <!-- ================= Empty state ================= -->
     <TextView
-        android:id="@+id/tv_empty_state"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="48dp"
-        android:gravity="center"
-        android:text="You haven't submitted any reports yet."
-        android:textColor="@color/text_secondary"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_scroll"
-        tools:visibility="visible" />
-
+        ns0:id="@+id/tv_empty_state"
+        ns0:layout_width="0dp"
+        ns0:layout_height="wrap_content"
+        ns0:layout_marginHorizontal="24dp"
+        ns0:layout_marginTop="48dp"
+        ns0:gravity="center"
+        ns0:text="You haven't submitted any reports yet."
+        ns0:textColor="@color/text_secondary"
+        ns0:textSize="16sp"
+        ns0:visibility="gone"
+        ns1:layout_constraintEnd_toEndOf="parent"
+        ns1:layout_constraintStart_toStartOf="parent"
+        ns1:layout_constraintTop_toBottomOf="@id/filter_scroll"
+        ns2:visibility="visible" />
     <!-- ================= RecyclerView (cards) ================= -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_reports"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/filter_scroll"
-        tools:itemCount="4"
-        tools:listitem="@layout/item_track_history" />
-
+        ns0:id="@+id/rv_reports"
+        ns0:layout_width="match_parent"
+        ns0:layout_height="0dp"
+        ns0:layout_marginTop="8dp"
+        ns0:clipToPadding="false"
+        ns0:paddingStart="16dp"
+        ns0:paddingEnd="16dp"
+        ns0:paddingBottom="16dp"
+        ns1:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        ns1:layout_constraintTop_toBottomOf="@id/filter_scroll"
+        ns2:itemCount="4"
+        ns2:listitem="@layout/item_track_history" />
     <!-- ================= Bottom Navigation ================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:background="@color/white"
-        android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
+        ns0:id="@+id/bottom_nav"
+        ns0:layout_width="match_parent"
+        ns0:layout_height="72dp"
+        ns0:background="@color/surface"
+        ns0:elevation="8dp"
+        ns1:layout_constraintBottom_toBottomOf="parent">
         <!-- Home -->
         <LinearLayout
-            android:id="@+id/navHome"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navReport"
-            app:layout_constraintStart_toStartOf="parent">
-
+            ns0:id="@+id/navHome"
+            ns0:layout_width="0dp"
+            ns0:layout_height="match_parent"
+            ns0:gravity="center"
+            ns0:orientation="vertical"
+            ns1:layout_constraintEnd_toStartOf="@+id/navReport"
+            ns1:layout_constraintStart_toStartOf="parent">
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_home_24"
-                app:tint="#6B7280" />
-
+                ns0:layout_width="24dp"
+                ns0:layout_height="24dp"
+                ns0:contentDescription="@null"
+                ns0:src="@drawable/ic_home_24"
+                ns1:tint="@color/icon_muted" />
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/nav_home"
-                android:textColor="#6B7280"
-                android:textSize="12sp" />
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:layout_marginTop="4dp"
+                ns0:text="@string/nav_home"
+                ns0:textColor="@color/icon_muted"
+                ns0:textSize="12sp" />
         </LinearLayout>
-
         <!-- Report -->
         <LinearLayout
-            android:id="@+id/navReport"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navTrack"
-            app:layout_constraintStart_toEndOf="@+id/navHome">
-
+            ns0:id="@+id/navReport"
+            ns0:layout_width="0dp"
+            ns0:layout_height="match_parent"
+            ns0:gravity="center"
+            ns0:orientation="vertical"
+            ns1:layout_constraintEnd_toStartOf="@+id/navTrack"
+            ns1:layout_constraintStart_toEndOf="@+id/navHome">
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_report_24"
-                app:tint="#6B7280" />
-
+                ns0:layout_width="24dp"
+                ns0:layout_height="24dp"
+                ns0:contentDescription="@null"
+                ns0:src="@drawable/ic_report_24"
+                ns1:tint="@color/icon_muted" />
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/nav_report"
-                android:textColor="#6B7280"
-                android:textSize="12sp" />
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:layout_marginTop="4dp"
+                ns0:text="@string/nav_report"
+                ns0:textColor="@color/icon_muted"
+                ns0:textSize="12sp" />
         </LinearLayout>
-
         <!-- Track (selected) -->
         <LinearLayout
-            android:id="@+id/navTrack"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/navSettings"
-            app:layout_constraintStart_toEndOf="@+id/navReport">
-
+            ns0:id="@+id/navTrack"
+            ns0:layout_width="0dp"
+            ns0:layout_height="match_parent"
+            ns0:gravity="center"
+            ns0:orientation="vertical"
+            ns1:layout_constraintEnd_toStartOf="@+id/navSettings"
+            ns1:layout_constraintStart_toEndOf="@+id/navReport">
             <View
-                android:layout_width="48dp"
-                android:layout_height="32dp"
-                android:background="@drawable/bg_pill_white"
-                android:backgroundTint="#FFD600" />
-
+                ns0:layout_width="48dp"
+                ns0:layout_height="32dp"
+                ns0:background="@drawable/bg_pill_white"
+                ns0:backgroundTint="@color/selection_background" />
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="-28dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_track_24"
-                app:tint="#111827" />
-
+                ns0:layout_width="24dp"
+                ns0:layout_height="24dp"
+                ns0:layout_marginTop="-28dp"
+                ns0:contentDescription="@null"
+                ns0:src="@drawable/ic_track_24"
+                ns1:tint="@color/input_text" />
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/nav_track"
-                android:textColor="#111827"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:layout_marginTop="4dp"
+                ns0:text="@string/nav_track"
+                ns0:textColor="@color/input_text"
+                ns0:textSize="12sp"
+                ns0:textStyle="bold" />
         </LinearLayout>
-
         <!-- Settings -->
         <LinearLayout
-            android:id="@+id/navSettings"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/navTrack">
-
+            ns0:id="@+id/navSettings"
+            ns0:layout_width="0dp"
+            ns0:layout_height="match_parent"
+            ns0:gravity="center"
+            ns0:orientation="vertical"
+            ns1:layout_constraintEnd_toEndOf="parent"
+            ns1:layout_constraintStart_toEndOf="@+id/navTrack">
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_settings_24"
-                app:tint="#6B7280" />
-
+                ns0:layout_width="24dp"
+                ns0:layout_height="24dp"
+                ns0:contentDescription="@null"
+                ns0:src="@drawable/ic_settings_24"
+                ns1:tint="@color/icon_muted" />
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/nav_settings"
-                android:textColor="#6B7280"
-                android:textSize="12sp" />
+                ns0:layout_width="wrap_content"
+                ns0:layout_height="wrap_content"
+                ns0:layout_marginTop="4dp"
+                ns0:text="@string/nav_settings"
+                ns0:textColor="@color/icon_muted"
+                ns0:textSize="12sp" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

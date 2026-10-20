@@ -52,6 +52,9 @@ public class FaultReportAdapter extends RecyclerView.Adapter<FaultReportAdapter.
             holder.tvStatus.setText(status != null ? status : "Pending");
         }
 
+        ReportStatusColors.apply(holder.tvStatus,
+                report.isPendingSync() ? "Pending sync" : report.getStatus());
+
         String created = report.getCreatedAt();
         if (created != null && created.length() >= 10) {
             holder.tvDate.setText(created.substring(0, 10));

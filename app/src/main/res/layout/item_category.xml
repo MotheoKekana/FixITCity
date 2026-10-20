@@ -8,25 +8,23 @@
     android:layout_marginVertical="4dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    app:cardUseCompatPadding="true">
-
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="@color/surface">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
-
         <ImageView
             android:id="@+id/fault_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="#FFEBEE"
+            android:background="@color/severity_high_bg"
             android:padding="12dp"
             android:src="@android:drawable/ic_dialog_alert"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="#D32F2F"
+            app:tint="@color/danger_text"
             tools:src="@android:drawable/ic_menu_report_image" />
-
         <TextView
             android:id="@+id/fault_title"
             android:layout_width="0dp"
@@ -39,20 +37,18 @@
             app:layout_constraintStart_toEndOf="@id/fault_icon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Burst Water Pipe" />
-
         <TextView
             android:id="@+id/fault_severity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFEBEE"
+            android:background="@color/severity_high_bg"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            android:textColor="#D32F2F"
+            android:textColor="@color/danger_text"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="⚠ Severity 10" />
-
         <TextView
             android:id="@+id/fault_description"
             android:layout_width="0dp"
@@ -65,6 +61,5 @@
             app:layout_constraintStart_toStartOf="@id/fault_title"
             app:layout_constraintTop_toBottomOf="@id/fault_title"
             tools:text="Major water leak affecting pressure, flooding streets, or..." />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

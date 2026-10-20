@@ -2,9 +2,35 @@
 <resources>
     <style name="Theme.FixITCity" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/surface_green</item>
+        <item name="colorOnPrimaryContainer">@color/severity_low_text</item>
         <item name="colorSecondary">@color/secondary_blue</item>
-        <item name="android:windowBackground">@color/background_light</item>
-        <item name="android:statusBarColor">@color/primary_green</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorSecondaryContainer">@color/surface_blue</item>
+        <item name="colorOnSecondaryContainer">@color/secondary_blue</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorOutline">@color/border</item>
+        <item name="colorError">@color/danger_text</item>
+        <item name="colorOnError">@color/on_error</item>
+        <item name="colorErrorContainer">@color/severity_high_bg</item>
+        <item name="colorOnErrorContainer">@color/severity_high_text</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorControlNormal">@color/icon_muted</item>
+        <item name="colorControlActivated">@color/primary_green</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:windowBackground">@color/system_bar_background</item>
+        <item name="android:statusBarColor">@color/system_bar_background</item>
+        <item name="android:navigationBarColor">@color/system_bar_background</item>
+        <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/light_system_bars</item>
+        <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowAnimationStyle">@style/FixITCityActivityAnimation</item>
     </style>
 

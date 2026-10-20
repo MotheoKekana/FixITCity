@@ -1,6 +1,5 @@
 package com.example.fixitcity;
 
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,12 +75,10 @@ public class TrackHistoryAdapter
         // Status badge text + colour
         String status = r.getStatus() != null ? r.getStatus() : "Pending";
         holder.tvStatus.setText(status);
-        holder.tvStatus.setBackgroundTintList(
-                ColorStateList.valueOf(colorForStatus(status)));
+        ReportStatusColors.apply(holder.tvStatus, status);
 
         // Icon tint (optional — keeps default icon but colours per status)
-        holder.ivIcon.setBackgroundTintList(
-                ColorStateList.valueOf(colorForStatus(status)));
+        ReportStatusColors.applyIcon(holder.ivIcon, status);
 
         // Row click → open details
         holder.itemView.setOnClickListener(v -> {
@@ -129,20 +126,6 @@ public class TrackHistoryAdapter
         }
     }
 
-    private int colorForStatus(String status) {
-        switch (status) {
-            case "Pending":      return 0xFFFFA500;  // orange
-            case "Pending sync": return 0xFFFFA500;
-            case "Syncing":      return 0xFF2196F3;
-            case "Sync failed":  return 0xFFF44336;
-            case "Under Review": return 0xFF2196F3;  // blue
-            case "Accepted":     return 0xFF4CAF50;  // green
-            case "Rejected":     return 0xFFF44336;  // red
-            case "In Progress":  return 0xFF9C27B0;  // purple
-            case "Fixed":        return 0xFF4CAF50;  // green
-            default:             return 0xFF9E9E9E;  // grey
-        }
-    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivIcon;
