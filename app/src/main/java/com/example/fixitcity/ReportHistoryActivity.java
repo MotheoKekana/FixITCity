@@ -52,6 +52,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_report_history);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
@@ -391,6 +392,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (isFinishing() || !AppNavigation.requireCitizen(this)) return;
         loadReports();
     }
 }

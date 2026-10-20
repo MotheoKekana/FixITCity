@@ -14,6 +14,7 @@ public class Guest_Mode_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppNavigation.requireGuestSession(this)) return;
         setContentView(R.layout.activity_guest_mode);
 
         ViewCompat.setOnApplyWindowInsetsListener(

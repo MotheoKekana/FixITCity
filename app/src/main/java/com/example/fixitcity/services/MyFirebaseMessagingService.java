@@ -52,7 +52,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        Log.d(TAG, "Message received from: " + message.getFrom());
+        SessionManager session = new SessionManager(this);
+        String recipient = message.getData().get("recipient_user_id");
+        if (!session.isLoggedIn() || session.isGuest() || session.getUserIdBigint() <= 0
+                || (recipient != null && !recipient.equals(String.valueOf(session.getUserIdBigint())))) {
+            Log.d(TAG, "Ignored push: no matching signed-in citizen");
+            return;
+        }
+        Log.d(TAG, "Report push received");
 
         String title = "FixITCity";
         String body = "";
@@ -73,10 +80,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
 
-        showNotification(title, body);
+        showNotification(title, body, message.getData().get("notification_id"));
     }
 
-    private void showNotification(String title, String body) {
+    private void showNotification(String title, String body, String notificationId) {
         createNotificationChannel();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -106,8 +113,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentIntent(pendingIntent);
 
         try {
-            NotificationManagerCompat.from(this)
-                    .notify((int) System.currentTimeMillis(), builder.build());
+            if (notificationId != null && notificationId.matches("[1-9][0-9]{0,18}")) {
+                NotificationManagerCompat.from(this).notify("report-update-" + notificationId, 0,
+                        builder.build());
+            } else {
+                NotificationManagerCompat.from(this)
+                        .notify((int) System.currentTimeMillis(), builder.build());
+            }
         } catch (SecurityException e) {
             Log.e(TAG, "Failed to show notification: " + e.getMessage(), e);
         }

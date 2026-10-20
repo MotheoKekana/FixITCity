@@ -62,6 +62,7 @@ public class Dashboard_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_dashboard);
 
         session = new SessionManager(this);
@@ -381,6 +382,7 @@ public class Dashboard_Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (isFinishing() || !AppNavigation.requireCitizen(this)) return;
         loadMyReports();
     }
 }

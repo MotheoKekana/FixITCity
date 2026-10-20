@@ -81,6 +81,7 @@ public class NearbyReportsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_nearby_reports);
 
         // ---------- Bottom navigation ----------

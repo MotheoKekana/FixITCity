@@ -3,7 +3,6 @@ package com.example.fixitcity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +26,7 @@ public class Guest_Dashboard_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!AppNavigation.requireGuestSession(this)) return;
         setContentView(R.layout.activity_guest_dashboard);
 
         session = new SessionManager(this);
@@ -50,16 +50,6 @@ public class Guest_Dashboard_Activity extends AppCompatActivity {
             cardTrack.setOnClickListener(v ->
                     startActivity(new Intent(this, TrackReportSearchActivity.class)));
         }
-
-        View cardRecent = findViewById(R.id.cardRecentReports);
-        if (cardRecent != null) {
-            cardRecent.setOnClickListener(v ->
-                    startActivity(new Intent(this, ReportHistoryActivity.class)));
-        }
-
-        View cardNearby = findViewById(R.id.cardNearbyReports);
-        if (cardNearby != null) cardNearby.setOnClickListener(v ->
-                startActivity(new Intent(this, NearbyReportsActivity.class)));
 
         View btnLogout = findViewById(R.id.btnLogout);
         if (btnLogout != null) {

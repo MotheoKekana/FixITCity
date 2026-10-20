@@ -67,6 +67,11 @@ public class ProximityCheckActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (new SessionManager(this).isGuest()) {
+            startActivity(new Intent(this, ReportFaultPhotoActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_proximity_check);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {

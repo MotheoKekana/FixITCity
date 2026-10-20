@@ -13,14 +13,30 @@ public final class AppNavigation {
 
     public static void goHome(Activity activity) {
         SessionManager session = new SessionManager(activity);
-        Class<?> target = !session.isLoggedIn()
-                ? Login_Activity.class
-                : session.isGuest() && session.hasGuestAuthSession()
-                ? Guest_Dashboard_Activity.class : Dashboard_Activity.class;
+        Class<?> target;
+        if (!session.isLoggedIn() || (session.isGuest() && !session.hasGuestAuthSession())) {
+            target = Login_Activity.class;
+        } else {
+            target = session.isGuest() ? Guest_Dashboard_Activity.class : Dashboard_Activity.class;
+        }
         Intent intent = new Intent(activity, target);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         activity.startActivity(intent);
         activity.finish();
+    }
+
+    /** Restrict citizen screens even when opened from an older back stack. */
+    public static boolean requireCitizen(Activity activity) {
+        SessionManager session = new SessionManager(activity);
+        if (session.isLoggedIn() && !session.isGuest()) return true;
+        goHome(activity);
+        return false;
+    }
+
+    public static boolean requireGuestSession(Activity activity) {
+        if (new SessionManager(activity).hasGuestAuthSession()) return true;
+        goHome(activity);
+        return false;
     }
 
     public static void bindNotificationBell(Activity activity) {

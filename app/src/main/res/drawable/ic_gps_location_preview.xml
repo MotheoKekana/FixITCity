@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <!-- Schematic GPS rings; no invented roads or map details. -->
+    <path android:fillColor="#00000000" android:strokeColor="#D1E2E4" android:strokeWidth="1.5"
+        android:pathData="M160,14 A72,72 0,1 1,160,158 A72,72 0,1 1,160,14 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#C2DCDD" android:strokeWidth="1.5"
+        android:pathData="M160,33 A53,53 0,1 1,160,139 A53,53 0,1 1,160,33 Z" />
+    <path android:fillColor="#E1EEE7"
+        android:pathData="M160,50 A36,36 0,1 1,160,122 A36,36 0,1 1,160,50 Z" />
+    <path android:fillColor="#A8C8C5"
+        android:pathData="M58,47 A3,3 0,1 1,58,53 A3,3 0,1 1,58,47 Z M265,121 A3,3 0,1 1,265,127 A3,3 0,1 1,265,121 Z" />
+    <path android:fillColor="#BDD3DF"
+        android:pathData="M260,40 A2,2 0,1 1,260,44 A2,2 0,1 1,260,40 Z M69,129 A2,2 0,1 1,69,133 A2,2 0,1 1,69,129 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#B5CDD3" android:strokeWidth="2" android:strokeLineCap="round"
+        android:pathData="M54,90 L65,90 M59.5,84.5 L59.5,95.5 M252,82 L263,82 M257.5,76.5 L257.5,87.5" />
+    <path android:fillColor="#C6DDCF"
+        android:pathData="M133,139 A27,5 0,1 0,187,139 A27,5 0,1 0,133,139 Z" />
+    <path android:fillColor="#2E7D32"
+        android:pathData="M160,29 C138,29 122,45 122,66 C122,95 160,135 160,135 C160,135 198,95 198,66 C198,45 182,29 160,29 Z" />
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M160,51 A15,15 0,1 1,160,81 A15,15 0,1 1,160,51 Z" />
+    <path android:fillColor="#E8F3EA"
+        android:pathData="M160,58 A8,8 0,1 1,160,74 A8,8 0,1 1,160,58 Z" />
+</vector>

@@ -319,8 +319,8 @@ public class SupabaseReports {
         return reports != null ? reports : new ArrayList<>();
     }
 
-    /** Exposes only the limited fields returned by the database's guest tracking RPC. */
-    public static FaultReport trackExternalAsGuest(String reference, String accessToken)
+    /** Limited reference lookup, including this guest's own submitted reports. */
+    public static FaultReport trackAsGuest(String reference, String accessToken)
             throws IOException {
         org.json.JSONObject request = new org.json.JSONObject();
         try { request.put("p_reference", reference); }
@@ -330,6 +330,13 @@ public class SupabaseReports {
         Type type = new TypeToken<List<FaultReport>>() {}.getType();
         List<FaultReport> matches = gson.fromJson(response, type);
         return matches == null || matches.isEmpty() ? null : matches.get(0);
+    }
+
+    /** Compatibility with older nearby-report screens. */
+    @Deprecated
+    public static FaultReport trackExternalAsGuest(String reference, String accessToken)
+            throws IOException {
+        return trackAsGuest(reference, accessToken);
     }
 
     public static FaultReport getReportByReference(String referenceNumber, String accessToken) throws IOException {

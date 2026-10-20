@@ -71,8 +71,15 @@ public class TrackReportResultActivity extends AppCompatActivity {
         setTextSafe(R.id.tv_report_date,
                 "Reported: " + (createdAt != null ? createdAt : "—"));
 
-        setTextSafe(R.id.tv_report_priority,
-                "Priority Score: " + priorityScore + "/100");
+        setTextSafe(R.id.tv_current_report_reference,
+                "Reference: " + (reference != null ? reference : "Unavailable"));
+        setTextSafe(R.id.tv_current_report_status,
+                "Status: " + (status != null ? status : "Unavailable"));
+        setTextSafe(R.id.tv_report_priority, getIntent().hasExtra("priority_score")
+                ? "Priority Score: " + priorityScore + "/100" : "Priority Score: Not available yet");
+        if (new SessionManager(this).isGuest()) {
+            findViewById(R.id.tv_report_location).setVisibility(View.GONE);
+        }
 
         TextView tvDesc = findViewById(R.id.tv_report_description);
         if (tvDesc != null) {
@@ -132,11 +139,12 @@ public class TrackReportResultActivity extends AppCompatActivity {
         }
         if (rvStatusHistory != null) rvStatusHistory.setVisibility(View.GONE);
 
-        boolean externalGuest = getIntent().getBooleanExtra("external_guest", false)
-                && new SessionManager(this).isGuest();
+        boolean externalGuest = new SessionManager(this).isGuest();
         boolean summaryOnly = getIntent().getBooleanExtra("summary_only", false);
-        if (externalGuest || summaryOnly) {
-            showHistoryEmpty("Current status is shown above. Detailed history is available to the report owner.");
+        if (getIntent().getBooleanExtra("pending_sync", false)) {
+            showHistoryEmpty("Saved on this phone. Keep this guest session open until syncing finishes, then search the reference again.");
+        } else if (externalGuest || summaryOnly) {
+            showHistoryEmpty("Current status is shown above. Detailed history is available with a citizen account for your own reports.");
         } else if (reportId > 0) {
             loadStatusHistory(reportId);
             loadReportPhotos(reportId);

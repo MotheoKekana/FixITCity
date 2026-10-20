@@ -100,13 +100,15 @@ public class ReportSuccessActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        if (new SessionManager(this).isGuest() || isQueued) {
-            ((TextView) findViewById(R.id.btn_track_report)).setText(isQueued
-                    ? "View pending report" : "View my reports");
+        boolean guest = new SessionManager(this).isGuest();
+        if (guest) {
+            ((TextView) findViewById(R.id.btn_track_report)).setText("Track by reference");
+        } else if (isQueued) {
+            ((TextView) findViewById(R.id.btn_track_report)).setText("View pending report");
         }
 
         findViewById(R.id.btn_track_report).setOnClickListener(v -> {
-            if (new SessionManager(this).isGuest() || isQueued) {
+            if (!guest && isQueued) {
                 startActivity(new Intent(this, ReportHistoryActivity.class));
                 return;
             }

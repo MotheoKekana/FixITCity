@@ -107,7 +107,7 @@
                             android:id="@+id/et_reference"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="FIX-2024-001"
+                            android:hint="FIX-2026-1234ABCD"
                             android:inputType="text"
                             android:imeOptions="actionSearch" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -116,7 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="ⓘ You can find this number in your confirmation email."
+                        android:text="Use the reference number shown when the report was submitted."
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -135,6 +135,7 @@
 
             <!-- Recent History section -->
             <RelativeLayout
+                android:id="@+id/recent_history_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp">

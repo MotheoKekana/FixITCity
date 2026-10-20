@@ -105,7 +105,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Map Card -->
+            <!-- Location card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,33 +117,86 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Map placeholder -->
-                    <RelativeLayout
+                    <!-- GPS preview, using real coordinates without a map service. -->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="220dp"
-                        android:background="@color/divider">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@android:drawable/ic_menu_mapmode"
-                            tools:src="@android:drawable/ic_menu_mapmode" />
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_gps_preview"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_margin="16dp"
-                            android:background="@drawable/bg_pill_white"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="6dp"
-                            android:text="📡 GPS enabled"
+                            android:text="GPS LOCATION"
                             android:textColor="@color/secondary_blue"
+                            android:textSize="11sp"
                             android:textStyle="bold"
-                            android:elevation="2dp" />
+                            android:letterSpacing="0.12" />
 
-                    </RelativeLayout>
+                        <TextView
+                            android:id="@+id/tv_gps_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_pill_white"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:text="Location"
+                            android:textColor="@color/secondary_blue"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            android:layout_marginTop="4dp">
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/gps_preview_progress"
+                                android:layout_width="148dp"
+                                android:layout_height="148dp"
+                                android:layout_gravity="center"
+                                android:indeterminate="true"
+                                android:importantForAccessibility="no"
+                                android:visibility="gone"
+                                app:indicatorSize="140dp"
+                                app:indicatorInset="4dp"
+                                app:trackThickness="2dp"
+                                app:trackColor="#00000000"
+                                app:indicatorColor="@color/primary_green" />
+
+                            <ImageView
+                                android:id="@+id/iv_gps_preview"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_gps_location_preview" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tv_gps_preview_coordinates"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:gravity="center"
+                            android:text="Waiting for GPS…"
+                            android:textColor="@color/secondary_blue"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_gps_preview_caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:text="Location not captured yet"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                     <!-- Address details -->
                     <LinearLayout
@@ -159,8 +212,26 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="22sp"
                             android:textStyle="bold"
-                            tools:text=""
-                            android:hint="123 Main Street, Gqeberha"/>
+                            tools:text="Finding your location…" />
+
+                        <TextView
+                            android:id="@+id/tv_location_state"
+                            android:accessibilityLiveRegion="polite"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_location_action"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Retry location"
+                            android:textColor="@color/secondary_blue" />
 
                     </LinearLayout>
                 </LinearLayout>
