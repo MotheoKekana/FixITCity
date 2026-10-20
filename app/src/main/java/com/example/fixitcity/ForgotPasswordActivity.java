@@ -1,6 +1,7 @@
-package com.example.fixitcity; // use your actual package name
+package com.example.fixitcity;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -11,57 +12,59 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.fixitcity.data.SupabaseAuth;
-import com.example.fixitcity.data.SupabaseClient;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private int currentStep = 1;
     private String userEmail = "";
     private String accessToken = "";
+    private CountDownTimer countDownTimer;
 
-    // Containers
+    // Layout Containers
     private View stepEmail, stepCode, stepPassword, stepSuccess;
-    private CircularProgressIndicator progressIndicator;
-    private TextView tvSubtitle, tvBackToSignIn;
+    private View step1Bar, step2Bar, step3Bar;
+    private TextView tvTitle, tvSubtitle, tvRedirect;
 
     // Step 1
     private TextInputLayout tilEmail;
-    private TextInputEditText inputEmail;
+    private TextInputEditText etEmail;
     private MaterialButton btnSendCode;
 
     // Step 2
     private TextInputLayout tilCode;
-    private TextInputEditText inputCode;
+    private TextInputEditText etCode;
     private MaterialButton btnVerifyCode;
 
     // Step 3
     private TextInputLayout tilNewPassword, tilConfirmPassword;
-    private TextInputEditText inputNewPassword, inputConfirmPassword;
+    private TextInputEditText etNewPassword, etConfirmPassword;
     private MaterialButton btnResetPassword;
 
-    // Step 4
-    private MaterialButton btnBackToSignIn;
+    // Step 4 & Navigation
+    private MaterialButton btnGoToSignIn, btnBackToSignIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-        ScreenInsets.apply(this);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // Handle system back button
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -79,29 +82,39 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
+        // Containers
         stepEmail = findViewById(R.id.stepEmail);
         stepCode = findViewById(R.id.stepCode);
         stepPassword = findViewById(R.id.stepPassword);
         stepSuccess = findViewById(R.id.stepSuccess);
 
-        progressIndicator = findViewById(R.id.progressIndicator);
+        // Progress & Headers
+        step1Bar = findViewById(R.id.step1Bar);
+        step2Bar = findViewById(R.id.step2Bar);
+        step3Bar = findViewById(R.id.step3Bar);
+        tvTitle = findViewById(R.id.tvTitle);
         tvSubtitle = findViewById(R.id.tvSubtitle);
-        tvBackToSignIn = findViewById(R.id.tvBackToSignIn);
+        tvRedirect = findViewById(R.id.tvRedirect);
 
+        // Step 1
         tilEmail = findViewById(R.id.tilEmail);
-        inputEmail = findViewById(R.id.inputEmail);
+        etEmail = findViewById(R.id.etEmail);
         btnSendCode = findViewById(R.id.btnSendCode);
 
+        // Step 2
         tilCode = findViewById(R.id.tilCode);
-        inputCode = findViewById(R.id.inputCode);
+        etCode = findViewById(R.id.etCode);
         btnVerifyCode = findViewById(R.id.btnVerifyCode);
 
+        // Step 3
         tilNewPassword = findViewById(R.id.tilNewPassword);
-        inputNewPassword = findViewById(R.id.inputNewPassword);
+        etNewPassword = findViewById(R.id.etNewPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
-        inputConfirmPassword = findViewById(R.id.inputConfirmPassword);
+        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnResetPassword = findViewById(R.id.btnResetPassword);
 
+        // Step 4 & Navigation
+        btnGoToSignIn = findViewById(R.id.btnGoToSignIn);
         btnBackToSignIn = findViewById(R.id.btnBackToSignIn);
     }
 
@@ -109,46 +122,85 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         btnSendCode.setOnClickListener(v -> sendResetCode());
         btnVerifyCode.setOnClickListener(v -> verifyCode());
         btnResetPassword.setOnClickListener(v -> resetPassword());
-        btnBackToSignIn.setOnClickListener(v -> finish());
-        tvBackToSignIn.setOnClickListener(v -> finish());
 
-        inputEmail.addTextChangedListener(clearError(tilEmail));
-        inputCode.addTextChangedListener(clearError(tilCode));
-        inputNewPassword.addTextChangedListener(clearError(tilNewPassword));
-        inputConfirmPassword.addTextChangedListener(clearError(tilConfirmPassword));
+        btnGoToSignIn.setOnClickListener(v -> finish());
+        btnBackToSignIn.setOnClickListener(v -> finish());
+
+        // Clear errors on typing
+        etEmail.addTextChangedListener(clearError(tilEmail));
+        etCode.addTextChangedListener(clearError(tilCode));
+        etNewPassword.addTextChangedListener(clearError(tilNewPassword));
+        etConfirmPassword.addTextChangedListener(clearError(tilConfirmPassword));
     }
 
     private void showStep(int step) {
         currentStep = step;
-        stepEmail.setVisibility(step == 1 ? View.VISIBLE : View.GONE);
-        stepCode.setVisibility(step == 2 ? View.VISIBLE : View.GONE);
-        stepPassword.setVisibility(step == 3 ? View.VISIBLE : View.GONE);
-        stepSuccess.setVisibility(step == 4 ? View.VISIBLE : View.GONE);
 
-        int subtitleRes;
+        // 1. Hide all steps
+        stepEmail.setVisibility(View.GONE);
+        stepCode.setVisibility(View.GONE);
+        stepPassword.setVisibility(View.GONE);
+        stepSuccess.setVisibility(View.GONE);
+
+        // 2. Show correct step & update texts
         switch (step) {
-            case 2: subtitleRes = R.string.forgot_password_subtitle_code; break;
-            case 3: subtitleRes = R.string.forgot_password_subtitle_password; break;
-            case 4: subtitleRes = R.string.forgot_password_subtitle_success; break;
-            default: subtitleRes = R.string.forgot_password_subtitle_email; break;
+            case 1:
+                stepEmail.setVisibility(View.VISIBLE);
+                tvTitle.setText(R.string.fp_step1_title);
+                tvSubtitle.setText(R.string.fp_step1_subtitle);
+                break;
+            case 2:
+                stepCode.setVisibility(View.VISIBLE);
+                tvTitle.setText(R.string.fp_step2_title);
+                tvSubtitle.setText(R.string.fp_step2_subtitle);
+                break;
+            case 3:
+                stepPassword.setVisibility(View.VISIBLE);
+                tvTitle.setText(R.string.fp_step3_title);
+                tvSubtitle.setText(R.string.fp_step3_subtitle);
+                break;
+            case 4:
+                stepSuccess.setVisibility(View.VISIBLE);
+                tvTitle.setText(R.string.fp_step4_title);
+                tvSubtitle.setText(R.string.fp_step4_subtitle);
+                btnBackToSignIn.setVisibility(View.GONE);
+                startSuccessCountdown();
+                break;
         }
-        tvSubtitle.setText(subtitleRes);
-        tvBackToSignIn.setVisibility(step == 4 ? View.GONE : View.VISIBLE);
+
+        // 3. Update Progress Bars
+        step1Bar.setBackgroundResource(step >= 1 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
+        step2Bar.setBackgroundResource(step >= 2 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
+        step3Bar.setBackgroundResource(step >= 3 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
+
+        // 4. Show back button on steps 1-3
+        if (step < 4) {
+            btnBackToSignIn.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setLoading(boolean isLoading) {
-        progressIndicator.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         btnSendCode.setEnabled(!isLoading);
         btnVerifyCode.setEnabled(!isLoading);
         btnResetPassword.setEnabled(!isLoading);
+
+        if (isLoading) {
+            btnSendCode.setText("Please wait...");
+            btnVerifyCode.setText("Please wait...");
+            btnResetPassword.setText("Please wait...");
+        } else {
+            btnSendCode.setText(R.string.btn_send_code);
+            btnVerifyCode.setText(R.string.btn_verify_code);
+            btnResetPassword.setText(R.string.btn_reset_password);
+        }
     }
 
-    // ─── STEP 1 ─────────────────────────────────────────────────────────
-    // ─── STEP 1 ─────────────────────────────────────────────────────────
+    // ─── STEP 1: Send Code ───────────────────────────────────────────────
     private void sendResetCode() {
-        String email = inputEmail.getText() != null ? inputEmail.getText().toString().trim() : "";
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Please enter a valid email");
+            tilEmail.setError(getString(R.string.error_email_invalid));
             return;
         }
 
@@ -157,7 +209,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                // Call your Auth class (no return statement here!)
                 SupabaseAuth.sendRecoveryEmail(userEmail);
 
                 runOnUiThread(() -> {
@@ -169,16 +220,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 Log.e("FORGOT_PASS", "Error: " + e.getMessage(), e);
                 runOnUiThread(() -> {
                     setLoading(false);
-                    // Shows the error from Supabase (e.g., 500)
                     Toast.makeText(ForgotPasswordActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                 });
             }
         }).start();
     }
 
-    // ─── STEP 2 ─────────────────────────────────────────────────────────
+    // ─── STEP 2: Verify Code ─────────────────────────────────────────────
     private void verifyCode() {
-        String code = inputCode.getText() != null ? inputCode.getText().toString().trim() : "";
+        String code = etCode.getText() != null ? etCode.getText().toString().trim() : "";
+
+        if (code.isEmpty()) {
+            tilCode.setError(getString(R.string.error_code_required));
+            return;
+        }
         if (code.length() != 6) {
             tilCode.setError("Enter the 6-digit code");
             return;
@@ -189,8 +244,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 String responseStr = SupabaseAuth.verifyRecoveryCode(userEmail, code);
-
-                // Extract access_token from JSON
                 JSONObject json = new JSONObject(responseStr);
                 accessToken = json.getString("access_token");
 
@@ -207,18 +260,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }).start();
     }
 
-    // ─── STEP 3 ─────────────────────────────────────────────────────────
+    // ─── STEP 3: Reset Password ──────────────────────────────────────────
     private void resetPassword() {
-        String newPass = inputNewPassword.getText() != null ? inputNewPassword.getText().toString() : "";
-        String confirmPass = inputConfirmPassword.getText() != null ? inputConfirmPassword.getText().toString() : "";
+        String newPass = etNewPassword.getText() != null ? etNewPassword.getText().toString() : "";
+        String confirmPass = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString() : "";
 
-        String passwordError = RegistrationValidation.passwordError(newPass);
-        if (passwordError != null) {
-            tilNewPassword.setError(passwordError);
+        if (newPass.length() < 8) {
+            tilNewPassword.setError(getString(R.string.error_password_short));
             return;
         }
         if (!newPass.equals(confirmPass)) {
-            tilConfirmPassword.setError("Passwords do not match");
+            tilConfirmPassword.setError(getString(R.string.error_password_mismatch));
             return;
         }
 
@@ -232,6 +284,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     showStep(4);
                 });
             } catch (Exception e) {
+                Log.e("FORGOT_PASS", "Update failed: " + e.getMessage(), e);
                 runOnUiThread(() -> {
                     setLoading(false);
                     Toast.makeText(ForgotPasswordActivity.this, "Failed to reset password. Please try again.", Toast.LENGTH_LONG).show();
@@ -240,12 +293,38 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }).start();
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────
+    // ─── Helpers ─────────────────────────────────────────────────────────
+    private void startSuccessCountdown() {
+        if (countDownTimer != null) countDownTimer.cancel();
+
+        countDownTimer = new CountDownTimer(5000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int secondsLeft = (int) (millisUntilFinished / 1000);
+                tvRedirect.setText(getString(R.string.success_redirect, secondsLeft));
+            }
+
+            @Override
+            public void onFinish() {
+                tvRedirect.setText(getString(R.string.success_redirect, 0));
+                finish();
+            }
+        }.start();
+    }
+
     private TextWatcher clearError(TextInputLayout til) {
         return new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { til.setError(null); }
             @Override public void afterTextChanged(Editable s) {}
         };
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }

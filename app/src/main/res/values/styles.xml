@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Widget.App.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView" />
+    <style name="Widget.FixITCity.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/fixit_input_bg</item>
+        <item name="boxStrokeColor">@color/fixit_input_stroke</item>
+        <item name="boxStrokeErrorColor">@color/fixit_danger</item>
+        <item name="hintTextColor">@color/fixit_teal</item>
+        <item name="errorTextColor">@color/fixit_danger</item>
+        <item name="boxCornerRadiusTopStart">9dp</item>
+        <item name="boxCornerRadiusTopEnd">9dp</item>
+        <item name="boxCornerRadiusBottomStart">9dp</item>
+        <item name="boxCornerRadiusBottomEnd">9dp</item>
+    </style>
 
+    <!-- Primary teal button -->
+    <style name="Widget.FixITCity.Button" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/fixit_teal</item>
+        <item name="cornerRadius">9dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:minHeight">50dp</item>
+    </style>
+
+    <!-- Text button used for "Back to sign in" -->
+    <style name="Widget.FixITCity.TextButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/fixit_teal_dark</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="iconTint">@color/fixit_teal_dark</item>
+    </style>
 </resources>

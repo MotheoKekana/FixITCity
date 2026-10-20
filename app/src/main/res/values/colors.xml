@@ -74,4 +74,22 @@
     <color name="gps_pin">#2E7D32</color>
     <color name="gps_pin_hole">#FFFFFF</color>
     <color name="gps_highlight">#E8F3EA</color>
+
+
+    <color name="fixit_teal">#009688</color>
+    <color name="fixit_teal_dark">#00796B</color>
+    <color name="fixit_green">#2D9E6B</color>
+    <color name="fixit_mint">#B8F0E4</color>
+    <color name="fixit_ink">#183432</color>
+    <color name="fixit_muted">#657572</color>
+    <color name="fixit_label">#29423F</color>
+    <color name="fixit_border">#DBE6E3</color>
+    <color name="fixit_input_bg">#FBFDFC</color>
+    <color name="fixit_canvas">#F4F8F7</color>
+    <color name="fixit_danger">#B42318</color>
+    <color name="fixit_card_stroke">#1A1C534C</color>
+    <color name="fixit_success_bg">#EDF8F0</color>
+    <color name="fixit_success_border">#CCEBD5</color>
+    <color name="fixit_success_fg">#216E43</color>
+
 </resources>
