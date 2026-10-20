@@ -140,8 +140,9 @@ public class Login_Activity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e(TAG, "Guest sign-in failed", e);
                     runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
                         btnGuest.setEnabled(true);
-                        Toast.makeText(this, "Could not start guest mode. Check your connection and try again.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getReadableGuestError(e), Toast.LENGTH_LONG).show();
                     });
                 }
             }, "guest-sign-in").start();
@@ -155,6 +156,32 @@ public class Login_Activity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(view ->
                 startActivity(new Intent(this, ForgotPasswordActivity.class))
         );
+    }
+
+    private String getReadableGuestError(Exception error) {
+        String message = error.getMessage() == null ? "" : error.getMessage();
+        String lower = message.toLowerCase(java.util.Locale.ROOT);
+
+        if (lower.contains("anonymous") &&
+                (lower.contains("disabled") || lower.contains("not enabled"))) {
+            return "Guest access is disabled in Supabase Auth settings.";
+        }
+        if (lower.contains("database error saving new user")) {
+            return "Supabase could not create a guest account. Check the Auth logs and database trigger.";
+        }
+        if (lower.contains("http 429") || lower.contains("rate limit")) {
+            return "Guest sign-in is temporarily limited. Please try again later.";
+        }
+        if (lower.contains("unable to resolve host") || lower.contains("failed to connect")
+                || lower.contains("timeout")) {
+            return "Could not reach Supabase. Check your connection.";
+        }
+        int status = message.indexOf("HTTP ");
+        if (status >= 0 && message.length() >= status + 8) {
+            return "Guest mode failed (HTTP " + message.substring(status + 5, status + 8)
+                    + "). Check LoginActivity in Logcat.";
+        }
+        return "Guest mode failed. Check LoginActivity in Logcat.";
     }
 
     private void attemptLogin() {
