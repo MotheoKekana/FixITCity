@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fixitcity.data.SessionManager;
 import com.example.fixitcity.data.SupabaseReports;
+import com.example.fixitcity.data.NotificationDates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class TrackReportResultActivity extends AppCompatActivity {
                         ? addressLine : "Unknown location"));
 
         setTextSafe(R.id.tv_report_date,
-                "Reported: " + (createdAt != null ? createdAt : "—"));
+                "Reported: " + NotificationDates.format(createdAt));
 
         setTextSafe(R.id.tv_current_report_reference,
                 "Reference: " + (reference != null ? reference : "Unavailable"));
