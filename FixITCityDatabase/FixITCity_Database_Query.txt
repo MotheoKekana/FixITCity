@@ -1,0 +1,534 @@
+-- ============================================
+-- FIXITCITY DATABASE - SUPABASE
+-- Android Native + Web Dashboard
+-- ============================================
+
+-- ============================================
+-- 1. DROP TABLES
+-- ============================================
+DROP TABLE IF EXISTS device_tokens CASCADE;
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS report_feedback CASCADE;
+DROP TABLE IF EXISTS fault_status_history CASCADE;
+DROP TABLE IF EXISTS priority_scores CASCADE;
+DROP TABLE IF EXISTS duplicate_reports CASCADE;
+DROP TABLE IF EXISTS report_photos CASCADE;
+DROP TABLE IF EXISTS fault_reports CASCADE;
+DROP TABLE IF EXISTS service_areas CASCADE;
+DROP TABLE IF EXISTS essential_services CASCADE;
+DROP TABLE IF EXISTS fault_categories CASCADE;
+DROP TABLE IF EXISTS municipal_users CASCADE;
+DROP TABLE IF EXISTS citizen_profiles CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- ============================================
+-- 2. CREATE TABLES
+-- ============================================
+
+-- TABLE 1: Users
+CREATE TABLE users (
+    user_id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NULL,
+    supabase_user_id UUID NULL UNIQUE,
+    role VARCHAR(20) NOT NULL DEFAULT 'Citizen' CHECK (role IN ('Citizen', 'Municipal')),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_login TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_supabase_id ON users(supabase_user_id);
+CREATE INDEX idx_users_role ON users(role);
+
+-- TABLE 2: CitizenProfiles
+CREATE TABLE citizen_profiles (
+    citizen_profile_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20) NULL,
+    address_line VARCHAR(255) NULL,
+    city VARCHAR(100) NULL,
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL,
+    notification_preference VARCHAR(20) DEFAULT 'Push',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_citizen_profiles_user_id ON citizen_profiles(user_id);
+
+-- TABLE 3: MunicipalUsers
+CREATE TABLE municipal_users (
+    municipal_user_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE,
+    employee_id VARCHAR(50) NOT NULL UNIQUE,
+    department VARCHAR(100) NOT NULL,
+    position_title VARCHAR(100) NOT NULL,
+    hire_date DATE NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_municipal_users_user_id ON municipal_users(user_id);
+CREATE INDEX idx_municipal_users_employee ON municipal_users(employee_id);
+
+-- TABLE 4: FaultCategories
+CREATE TABLE fault_categories (
+    category_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255) NULL,
+    severity_weight DECIMAL(4,2) NOT NULL CHECK (severity_weight BETWEEN 1 AND 10),
+    estimated_fix_time INT NULL,
+    icon VARCHAR(50) NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- TABLE 5: EssentialServices
+CREATE TABLE essential_services (
+    service_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    service_type VARCHAR(50) NOT NULL CHECK (service_type IN ('School', 'Clinic', 'Hospital', 'Police', 'Fire Station')),
+    address_line VARCHAR(255) NULL,
+    latitude DECIMAL(10,7) NOT NULL,
+    longitude DECIMAL(10,7) NOT NULL,
+    ward_number VARCHAR(10) NULL,
+    contact_number VARCHAR(20) NULL
+);
+
+CREATE INDEX idx_essential_services_lat_long ON essential_services(latitude, longitude);
+
+-- TABLE 6: ServiceAreas
+CREATE TABLE service_areas (
+    area_id BIGSERIAL PRIMARY KEY,
+    area_name VARCHAR(50) NOT NULL UNIQUE,
+    ward_number VARCHAR(10) NOT NULL,
+    description VARCHAR(255) NULL,
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_service_areas_ward ON service_areas(ward_number);
+
+-- TABLE 7: FaultReports
+CREATE TABLE fault_reports (
+    report_id BIGSERIAL PRIMARY KEY,
+    citizen_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    area_id BIGINT NULL,
+    title VARCHAR(200) NOT NULL,
+    description VARCHAR(1000) NOT NULL,
+    latitude DECIMAL(10,7) NOT NULL,
+    longitude DECIMAL(10,7) NOT NULL,
+    address_line VARCHAR(255) NULL,
+    status VARCHAR(30) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Verified', 'InProgress', 'Resolved', 'Rejected')),
+    priority_score INT NULL CHECK (priority_score BETWEEN 0 AND 100),
+    reference_number VARCHAR(20) NOT NULL UNIQUE,
+    verified_by BIGINT NULL,
+    verified_at TIMESTAMP NULL,
+    assigned_to BIGINT NULL,
+    resolution_notes VARCHAR(500) NULL,
+    resolved_at TIMESTAMP NULL,
+    is_duplicate BOOLEAN DEFAULT FALSE,
+    is_offline BOOLEAN DEFAULT FALSE,
+    sync_status VARCHAR(20) DEFAULT 'Synced' CHECK (sync_status IN ('Pending', 'Synced', 'Failed')),
+    offline_id VARCHAR(50) NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (citizen_id) REFERENCES citizen_profiles(citizen_profile_id),
+    FOREIGN KEY (category_id) REFERENCES fault_categories(category_id),
+    FOREIGN KEY (area_id) REFERENCES service_areas(area_id),
+    FOREIGN KEY (verified_by) REFERENCES municipal_users(municipal_user_id),
+    FOREIGN KEY (assigned_to) REFERENCES municipal_users(municipal_user_id)
+);
+
+CREATE INDEX idx_fault_reports_citizen ON fault_reports(citizen_id);
+CREATE INDEX idx_fault_reports_category ON fault_reports(category_id);
+CREATE INDEX idx_fault_reports_status ON fault_reports(status);
+CREATE INDEX idx_fault_reports_created ON fault_reports(created_at);
+CREATE INDEX idx_fault_reports_reference ON fault_reports(reference_number);
+
+-- TABLE 8: ReportPhotos
+CREATE TABLE report_photos (
+    photo_id BIGSERIAL PRIMARY KEY,
+    report_id BIGINT NOT NULL,
+    photo_url VARCHAR(500) NOT NULL,
+    supabase_storage_path VARCHAR(500) NULL,
+    is_primary BOOLEAN DEFAULT FALSE,
+    is_offline BOOLEAN DEFAULT FALSE,
+    sync_status VARCHAR(20) DEFAULT 'Synced' CHECK (sync_status IN ('Pending', 'Synced', 'Failed')),
+    offline_photo_path VARCHAR(500) NULL,
+    uploaded_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (report_id) REFERENCES fault_reports(report_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_report_photos_report ON report_photos(report_id);
+
+-- TABLE 9: DuplicateReports
+CREATE TABLE duplicate_reports (
+    duplicate_link_id BIGSERIAL PRIMARY KEY,
+    original_report_id BIGINT NOT NULL,
+    duplicate_report_id BIGINT NOT NULL,
+    match_percentage DECIMAL(5,2) NOT NULL,
+    marked_by BIGINT NULL,
+    marked_at TIMESTAMP DEFAULT NOW(),
+    is_merged BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (original_report_id) REFERENCES fault_reports(report_id),
+    FOREIGN KEY (duplicate_report_id) REFERENCES fault_reports(report_id),
+    FOREIGN KEY (marked_by) REFERENCES municipal_users(municipal_user_id),
+    CONSTRAINT different_reports CHECK (original_report_id != duplicate_report_id)
+);
+
+CREATE INDEX idx_duplicate_original ON duplicate_reports(original_report_id);
+CREATE INDEX idx_duplicate_duplicate ON duplicate_reports(duplicate_report_id);
+
+-- TABLE 10: PriorityScores
+CREATE TABLE priority_scores (
+    score_id BIGSERIAL PRIMARY KEY,
+    report_id BIGINT NOT NULL UNIQUE,
+    total_score DECIMAL(6,2) NOT NULL CHECK (total_score BETWEEN 0 AND 100),
+    severity_factor DECIMAL(6,2) NOT NULL CHECK (severity_factor BETWEEN 0 AND 25),
+    proximity_factor DECIMAL(6,2) NOT NULL CHECK (proximity_factor BETWEEN 0 AND 35),
+    duplicate_factor DECIMAL(6,2) NOT NULL CHECK (duplicate_factor BETWEEN 0 AND 20),
+    age_factor DECIMAL(6,2) NOT NULL CHECK (age_factor BETWEEN 0 AND 20),
+    computed_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (report_id) REFERENCES fault_reports(report_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_priority_scores_report ON priority_scores(report_id);
+
+-- TABLE 11: FaultStatusHistory
+CREATE TABLE fault_status_history (
+    history_id BIGSERIAL PRIMARY KEY,
+    report_id BIGINT NOT NULL,
+    old_status VARCHAR(30) NULL,
+    new_status VARCHAR(30) NOT NULL,
+    changed_by BIGINT NOT NULL,
+    changed_at TIMESTAMP DEFAULT NOW(),
+    notes VARCHAR(255) NULL,
+    FOREIGN KEY (report_id) REFERENCES fault_reports(report_id) ON DELETE CASCADE,
+    FOREIGN KEY (changed_by) REFERENCES municipal_users(municipal_user_id)
+);
+
+CREATE INDEX idx_history_report ON fault_status_history(report_id);
+
+-- TABLE 12: ReportFeedback
+CREATE TABLE report_feedback (
+    feedback_id BIGSERIAL PRIMARY KEY,
+    report_id BIGINT NOT NULL UNIQUE,
+    citizen_id BIGINT NOT NULL,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment VARCHAR(500) NULL,
+    response_time INT NULL,
+    is_anonymous BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (report_id) REFERENCES fault_reports(report_id) ON DELETE CASCADE,
+    FOREIGN KEY (citizen_id) REFERENCES citizen_profiles(citizen_profile_id)
+);
+
+CREATE INDEX idx_feedback_report ON report_feedback(report_id);
+
+-- TABLE 13: Notifications
+CREATE TABLE notifications (
+    notification_id BIGSERIAL PRIMARY KEY,
+    citizen_id BIGINT NOT NULL,
+    report_id BIGINT NULL,
+    notification_type VARCHAR(50) CHECK (notification_type IN ('StatusUpdate', 'Assignment', 'Reminder', 'Alert')),
+    channel VARCHAR(20) DEFAULT 'Push' CHECK (channel IN ('Email', 'SMS', 'Push')),
+    subject VARCHAR(200) NOT NULL,
+    message VARCHAR(500) NOT NULL,
+    device_token VARCHAR(255) NULL,
+    fcm_message_id VARCHAR(100) NULL,
+    is_sent BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMP NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    read_at TIMESTAMP NULL,
+    is_delivered BOOLEAN DEFAULT FALSE,
+    delivered_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (citizen_id) REFERENCES citizen_profiles(citizen_profile_id),
+    FOREIGN KEY (report_id) REFERENCES fault_reports(report_id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_notifications_citizen ON notifications(citizen_id);
+
+-- TABLE 14: AuditLogs
+CREATE TABLE audit_logs (
+    log_id BIGSERIAL PRIMARY KEY,
+    municipal_user_id BIGINT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    table_affected VARCHAR(100) NOT NULL,
+    record_id BIGINT NOT NULL,
+    old_values TEXT NULL,
+    new_values TEXT NULL,
+    ip_address VARCHAR(45) NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (municipal_user_id) REFERENCES municipal_users(municipal_user_id)
+);
+
+CREATE INDEX idx_audit_user ON audit_logs(municipal_user_id);
+
+-- TABLE 15: DeviceTokens (Android Only - Simplified)
+CREATE TABLE device_tokens (
+    token_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    device_token VARCHAR(255) NOT NULL UNIQUE,
+    device_name VARCHAR(100) NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_used_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_device_tokens_user ON device_tokens(user_id);
+CREATE INDEX idx_device_tokens_token ON device_tokens(device_token);
+
+-- ============================================
+-- 3. ROW LEVEL SECURITY (RLS)
+-- ============================================
+
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE citizen_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE municipal_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fault_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE essential_services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_areas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fault_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE report_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE duplicate_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE priority_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fault_status_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE report_feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE device_tokens ENABLE ROW LEVEL SECURITY;
+
+-- ============================================
+-- 4. RLS POLICIES
+-- ============================================
+
+CREATE POLICY "Users can read own profile" ON users
+    FOR SELECT USING (supabase_user_id = auth.uid());
+
+CREATE POLICY "Citizens can manage own profile" ON citizen_profiles
+    FOR ALL USING (user_id IN (SELECT user_id FROM users WHERE supabase_user_id = auth.uid()));
+
+CREATE POLICY "Municipal can read all reports" ON fault_reports
+    FOR SELECT USING (EXISTS (SELECT 1 FROM users WHERE supabase_user_id = auth.uid() AND role = 'Municipal'));
+
+CREATE POLICY "Citizens can insert reports" ON fault_reports
+    FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM users WHERE supabase_user_id = auth.uid() AND role = 'Citizen'));
+
+CREATE POLICY "Citizens can read own reports" ON fault_reports
+    FOR SELECT USING (citizen_id IN (SELECT citizen_profile_id FROM citizen_profiles WHERE user_id IN (SELECT user_id FROM users WHERE supabase_user_id = auth.uid())));
+
+-- ============================================
+-- 5. FUNCTION: Generate Report Reference Number
+-- ============================================
+CREATE OR REPLACE FUNCTION generate_report_id()
+RETURNS VARCHAR(20) AS $$
+DECLARE
+    random_num INT;
+    result VARCHAR(20);
+BEGIN
+    random_num := floor(random() * 10000)::INT;
+    result := 'FIX-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || LPAD(random_num::TEXT, 4, '0');
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- 6. STORED PROCEDURE: Calculate Priority Score
+-- ============================================
+CREATE OR REPLACE PROCEDURE calculate_priority_score(p_report_id BIGINT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_severity DECIMAL(6,2);
+    v_proximity DECIMAL(6,2);
+    v_duplicate DECIMAL(6,2);
+    v_age DECIMAL(6,2);
+    v_total DECIMAL(6,2);
+    v_hours_old INT;
+BEGIN
+    SELECT fc.severity_weight * 2.5 INTO v_severity
+    FROM fault_reports fr
+    JOIN fault_categories fc ON fr.category_id = fc.category_id
+    WHERE fr.report_id = p_report_id;
+
+    v_proximity := 20.0;
+
+    SELECT CASE 
+        WHEN COUNT(*) > 0 THEN 20.0
+        ELSE 0.0
+    END INTO v_duplicate
+    FROM duplicate_reports
+    WHERE original_report_id = p_report_id OR duplicate_report_id = p_report_id;
+
+    SELECT EXTRACT(HOUR FROM (NOW() - created_at)) INTO v_hours_old
+    FROM fault_reports
+    WHERE report_id = p_report_id;
+    
+    v_age := CASE 
+        WHEN v_hours_old >= 48 THEN 20.0
+        WHEN v_hours_old >= 24 THEN 15.0
+        WHEN v_hours_old >= 12 THEN 10.0
+        WHEN v_hours_old >= 6 THEN 5.0
+        ELSE 0.0
+    END;
+
+    v_total := v_severity + v_proximity + v_duplicate + v_age;
+
+    INSERT INTO priority_scores (report_id, total_score, severity_factor, proximity_factor, duplicate_factor, age_factor)
+    VALUES (p_report_id, v_total, v_severity, v_proximity, v_duplicate, v_age)
+    ON CONFLICT (report_id) DO UPDATE SET
+        total_score = EXCLUDED.total_score,
+        severity_factor = EXCLUDED.severity_factor,
+        proximity_factor = EXCLUDED.proximity_factor,
+        duplicate_factor = EXCLUDED.duplicate_factor,
+        age_factor = EXCLUDED.age_factor,
+        computed_at = NOW();
+
+    UPDATE fault_reports SET priority_score = v_total WHERE report_id = p_report_id;
+END;
+$$;
+
+-- ============================================
+-- 7. SEED DATA
+-- ============================================
+
+-- Fault Categories
+INSERT INTO fault_categories (name, description, severity_weight, estimated_fix_time, icon, is_active)
+VALUES 
+('Burst Pipe', 'Water pipe burst causing flooding or water loss', 10, 6, 'pipe', TRUE),
+('Pothole', 'Road damage creating potholes', 7, 4, 'pothole', TRUE),
+('Streetlight Outage', 'Streetlight not working', 4, 8, 'streetlight', TRUE),
+('Electrical Outage', 'No electricity in an area', 8, 5, 'power', TRUE),
+('Sewage Leak', 'Sewage system leak or overflow', 9, 12, 'sewage', TRUE),
+('Pavement Crack', 'Cracked or damaged pavement', 2, 3, 'pavement', TRUE),
+('Fallen Tree', 'Tree fallen across road or property', 6, 5, 'tree', TRUE),
+('Traffic Light Outage', 'Traffic signals not working', 7, 6, 'traffic', TRUE),
+('Water Contamination', 'Contaminated water supply', 9, 24, 'water', TRUE),
+('Road Marker Damage', 'Damaged road signs or markers', 3, 2, 'marker', TRUE),
+('Illegal Dumping', 'Illegally dumped waste or rubble', 4, 3, 'dump', TRUE);
+
+-- Essential Services (Port Elizabeth)
+INSERT INTO essential_services (name, service_type, address_line, latitude, longitude, ward_number, contact_number)
+VALUES 
+('Pearson High School', 'School', 'La Roche Drive, Humewood', -33.97400, 25.65200, 'Ward 3', '+27-41-583-1000'),
+('Grey High School', 'School', 'Park Drive, Central', -33.95560, 25.59310, 'Ward 5', '+27-41-585-2000'),
+('Livingstone Hospital', 'Hospital', 'Stanford Road, Central', -33.94350, 25.59750, 'Ward 5', '+27-41-405-6000'),
+('Greenacres Clinic', 'Clinic', 'Ring Road, Greenacres', -33.95050, 25.58950, 'Ward 9', '+27-41-360-8000');
+
+-- Service Areas
+INSERT INTO service_areas (area_name, ward_number, description, latitude, longitude, is_active)
+VALUES 
+('Summerstrand', 'Ward 3', 'Coastal suburb, beachfront and hotel district', -33.98550, 25.67100, TRUE),
+('Humewood', 'Ward 3', 'Beachfront suburb near the Boardwalk precinct', -33.97350, 25.64950, TRUE),
+('Central', 'Ward 5', 'City centre, government and commercial hub', -33.95950, 25.60300, TRUE),
+('Walmer', 'Ward 7', 'Residential suburb south of the city centre', -33.99500, 25.60800, TRUE),
+('Greenacres', 'Ward 9', 'Residential and retail suburb near Cape Road', -33.95150, 25.59050, TRUE);
+
+-- Users (Test Accounts)
+INSERT INTO users (email, password_hash, role, is_active, created_at, last_login)
+VALUES 
+('admin@fixitcity.com', 'hashed_admin_pass', 'Municipal', TRUE, NOW(), NOW()),
+('citizen1@test.com', 'hashed_pass_1', 'Citizen', TRUE, NOW(), NOW()),
+('citizen2@test.com', 'hashed_pass_2', 'Citizen', TRUE, NOW(), NOW()),
+('citizen3@test.com', 'hashed_pass_3', 'Citizen', TRUE, NOW(), NOW());
+
+-- Municipal Users
+INSERT INTO municipal_users (user_id, employee_id, department, position_title, hire_date, is_active)
+VALUES (1, 'EMP-ADMIN-001', 'Port Elizabeth Municipal Services', 'System Administrator', '2024-01-15', TRUE);
+
+-- Citizen Profiles
+INSERT INTO citizen_profiles (user_id, first_name, last_name, phone_number, address_line, city, latitude, longitude, notification_preference)
+VALUES 
+(2, 'Motheo', 'Kekana', '+27-82-123-4567', '123 Main Rd', 'Central', -33.9608, 25.6022, 'Push'),
+(3, 'Malik', 'Ndayisaba', '+27-82-234-5678', '456 7th Ave', 'Walmer', -33.9817, 25.5840, 'Push'),
+(4, 'Cohen', 'Geswint', '+27-82-345-6789', '789 Cape Rd', 'Newton Park', -33.9644, 25.5627, 'Push');
+
+-- Device Tokens (Android Only)
+INSERT INTO device_tokens (user_id, device_token, device_name, is_active, created_at, last_used_at)
+VALUES 
+(2, 'fcm_device_token_001', 'Samsung Galaxy S23', TRUE, NOW(), NOW()),
+(3, 'fcm_device_token_002', 'Google Pixel 7', TRUE, NOW(), NOW()),
+(4, 'fcm_device_token_003', 'Samsung Galaxy A54', TRUE, NOW(), NOW());
+
+-- ============================================
+-- 8. TEST DATA - FAULT REPORTS
+-- ============================================
+
+INSERT INTO fault_reports (
+    citizen_id, category_id, area_id, title, description, 
+    latitude, longitude, address_line, status, 
+    reference_number, created_at,
+    is_offline, sync_status
+)
+VALUES 
+(1, 1, 3, 'Burst Pipe on Main Road', 'Water pipe burst on Main Road near the Post Office.', -33.9610, 25.6030, '123 Main Rd, Central', 'Pending', 'FIX-20250901-0001', NOW(), FALSE, 'Synced'),
+(2, 2, 4, 'Large Pothole on 8th Avenue', 'Large pothole on 8th Avenue near the Walmer Police Station.', -33.9825, 25.5915, '456 8th Ave, Walmer', 'Verified', 'FIX-20250901-0002', NOW() - INTERVAL '2 hours', FALSE, 'Synced'),
+(3, 4, 5, 'Power Outage on Cape Road', 'No electricity on Cape Road near Greenacres.', -33.9650, 25.5750, '789 Cape Rd, Newton Park', 'InProgress', 'FIX-20250901-0003', NOW() - INTERVAL '5 hours', FALSE, 'Synced'),
+(1, 5, 2, 'Sewage Leak on Beach Road', 'Sewage overflowing from manhole on Beach Road.', -33.9730, 25.6500, '123 Beach Rd, Humewood', 'Pending', 'FIX-20250901-0004', NOW() - INTERVAL '1 hour', TRUE, 'Pending'),
+(2, 7, 1, 'Fallen Tree on Marine Drive', 'Large tree fallen across Marine Drive near Summerstrand.', -33.9880, 25.6740, 'Marine Drive, Summerstrand', 'Verified', 'FIX-20250901-0005', NOW() - INTERVAL '8 hours', FALSE, 'Synced');
+
+-- Priority Scores
+INSERT INTO priority_scores (report_id, total_score, severity_factor, proximity_factor, duplicate_factor, age_factor, computed_at)
+VALUES 
+(1, 80.0, 25.0, 30.0, 5.0, 20.0, NOW()),
+(2, 70.0, 20.0, 25.0, 10.0, 15.0, NOW()),
+(3, 65.0, 22.0, 20.0, 5.0, 18.0, NOW()),
+(4, 85.0, 23.0, 32.0, 10.0, 20.0, NOW()),
+(5, 60.0, 18.0, 22.0, 5.0, 15.0, NOW());
+
+-- Status History
+INSERT INTO fault_status_history (report_id, old_status, new_status, changed_by, changed_at, notes)
+VALUES 
+(2, 'Pending', 'Verified', 1, NOW() - INTERVAL '2 hours', 'Verified by admin - Walmer area'),
+(3, 'Pending', 'Verified', 1, NOW() - INTERVAL '4 hours', 'Verified by admin - Newton Park'),
+(3, 'Verified', 'InProgress', 1, NOW() - INTERVAL '3 hours', 'Assigned to electrical team');
+
+-- Report Feedback
+INSERT INTO report_feedback (report_id, citizen_id, rating, comment, response_time, is_anonymous, created_at)
+VALUES 
+(2, 2, 4, 'Report was verified quickly. Waiting for repair.', 2, FALSE, NOW() - INTERVAL '1 day');
+
+-- Notifications (Android Push Only)
+INSERT INTO notifications (citizen_id, report_id, notification_type, channel, subject, message, device_token, is_sent, sent_at, is_read, is_delivered)
+VALUES 
+(2, 2, 'StatusUpdate', 'Push', 'Pothole Report Verified', 'Your pothole report in Walmer has been verified.', 'fcm_device_token_001', TRUE, NOW() - INTERVAL '2 hours', TRUE, TRUE),
+(3, 3, 'StatusUpdate', 'Push', 'Power Outage Verified', 'Your power outage report has been verified.', 'fcm_device_token_002', TRUE, NOW() - INTERVAL '4 hours', TRUE, TRUE);
+
+-- Audit Logs
+INSERT INTO audit_logs (municipal_user_id, action, table_affected, record_id, old_values, new_values, ip_address, created_at)
+VALUES 
+(1, 'Verify Report', 'fault_reports', 2, '{"status":"Pending"}', '{"status":"Verified"}', '192.168.1.1', NOW() - INTERVAL '2 hours'),
+(1, 'Update Status', 'fault_reports', 3, '{"status":"Verified"}', '{"status":"InProgress"}', '192.168.1.1', NOW() - INTERVAL '3 hours');
+
+-- ============================================
+-- 9. VERIFICATION
+-- ============================================
+SELECT 
+    (SELECT COUNT(*) FROM users) AS Users,
+    (SELECT COUNT(*) FROM citizen_profiles) AS Citizens,
+    (SELECT COUNT(*) FROM municipal_users) AS Municipal,
+    (SELECT COUNT(*) FROM fault_categories) AS Categories,
+    (SELECT COUNT(*) FROM essential_services) AS Services,
+    (SELECT COUNT(*) FROM service_areas) AS Areas,
+    (SELECT COUNT(*) FROM fault_reports) AS Reports,
+    (SELECT COUNT(*) FROM priority_scores) AS Scores,
+    (SELECT COUNT(*) FROM fault_status_history) AS History,
+    (SELECT COUNT(*) FROM report_feedback) AS Feedback,
+    (SELECT COUNT(*) FROM notifications) AS Notifications,
+    (SELECT COUNT(*) FROM audit_logs) AS Audit,
+    (SELECT COUNT(*) FROM device_tokens) AS DeviceTokens;
+
+SELECT '✅ ALL DONE! Database is ready!' AS Status;

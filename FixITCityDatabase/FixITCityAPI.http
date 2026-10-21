@@ -1,0 +1,6 @@
+@FixITCityAPI_HostAddress = http://localhost:5283
+
+GET {{FixITCityAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
