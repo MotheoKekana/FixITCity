@@ -33,6 +33,8 @@ namespace FixITCity_Dashboard.Pages
         }
 
         // ---- Properties shown on the page ----
+        public string? FaultTitle { get; private set; }
+        public string? FaultDescription { get; private set; }
         public List<string> PhotoUrls { get; private set; } = new();
         public bool HasPhoto => PhotoUrls.Count > 0;
 
@@ -103,6 +105,8 @@ namespace FixITCity_Dashboard.Pages
                 }
 
                 // ---- Real data from database ----
+                FaultTitle = dto.Title;
+                FaultDescription = dto.Description;
                 Latitude = dto.Latitude;
                 Longitude = dto.Longitude;
                 PriorityScore = dto.PriorityScore;

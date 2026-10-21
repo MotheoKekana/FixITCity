@@ -80,7 +80,7 @@ namespace FixITCity_Dashboard.Pages
             SearchTerm = searchTerm;
             StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "All" : statusFilter;
             CategoryFilter = string.IsNullOrWhiteSpace(categoryFilter) ? "All" : categoryFilter;
-            DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Newest" : dateSort;
+            DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Priority" : dateSort;
             CurrentPage = pageNumber ?? 1;
 
             var allReports = await FetchAllReportsAsync();
@@ -97,10 +97,23 @@ namespace FixITCity_Dashboard.Pages
 
             var filtered = ApplyFilters(allReports);
 
-            var ordered = DateSort == "Oldest"
-                ? filtered.OrderBy(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList()
-                : filtered.OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList();
+            var ordered = DateSort switch
+            {
+                "Oldest" => filtered
+                    .OrderBy(r => r.CreatedAt)
+                    .ThenByDescending(r => r.PriorityScore ?? 0)
+                    .ToList(),
 
+                "Newest" => filtered
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ThenByDescending(r => r.PriorityScore ?? 0)
+                    .ToList(),
+
+                _ => filtered
+                    .OrderByDescending(r => r.PriorityScore ?? 0)
+                    .ThenByDescending(r => r.CreatedAt)
+                    .ToList()
+            };
             TotalPages = (int)Math.Ceiling(ordered.Count / (double)PageSize);
             if (TotalPages < 1) TotalPages = 1;
             if (CurrentPage < 1) CurrentPage = 1;
@@ -135,14 +148,28 @@ namespace FixITCity_Dashboard.Pages
             SearchTerm = searchTerm;
             StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "All" : statusFilter;
             CategoryFilter = string.IsNullOrWhiteSpace(categoryFilter) ? "All" : categoryFilter;
-            DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Newest" : dateSort;
+            DateSort = string.IsNullOrWhiteSpace(dateSort) ? "Priority" : dateSort;
 
             var allReports = await FetchAllReportsAsync();
-            var matchingReports = ApplyFilters(allReports);
+            var filtered = ApplyFilters(allReports);
 
-            var ordered = DateSort == "Oldest"
-                ? matchingReports.OrderBy(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList()
-                : matchingReports.OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.PriorityScore ?? 0).ToList();
+            var ordered = DateSort switch
+            {
+                "Oldest" => filtered
+                    .OrderBy(r => r.CreatedAt)
+                    .ThenByDescending(r => r.PriorityScore ?? 0)
+                    .ToList(),
+
+                "Newest" => filtered
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ThenByDescending(r => r.PriorityScore ?? 0)
+                    .ToList(),
+
+                _ => filtered
+                    .OrderByDescending(r => r.PriorityScore ?? 0)
+                    .ThenByDescending(r => r.CreatedAt)
+                    .ToList()
+            };
 
             var rows = ordered.Select(report => new ReportExportRow
             {
@@ -195,16 +222,18 @@ namespace FixITCity_Dashboard.Pages
 
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                var search = SearchTerm.Trim().ToLower();
+                var search = SearchTerm.Trim();
+
                 filtered = filtered.Where(r =>
-                    (r.Title ?? "").ToLower().Contains(search) ||
-                    (r.CategoryName ?? "").ToLower().Contains(search) ||
-                    (r.Status ?? "").ToLower().Contains(search) ||
-                    (r.AreaName ?? "").ToLower().Contains(search) ||
-                    (r.StreetName ?? "").ToLower().Contains(search) ||
-                    (r.SuburbName ?? "").ToLower().Contains(search) ||
-                    (r.CityName ?? "").ToLower().Contains(search) ||
-                    r.ReportId.ToString().Contains(search));
+                    (r.ReferenceNumber ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.Title ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.CategoryName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.Status ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.AreaName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.StreetName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.SuburbName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (r.CityName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    r.ReportId.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
             }
 
             return filtered.ToList();

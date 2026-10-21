@@ -141,7 +141,7 @@
             <table class="reports-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>Reference Number</th>
                         <th>Priority</th>
                         <th>Title</th>
                         <th>Category</th>
@@ -157,7 +157,7 @@
                     {
                         <tr>
                             <td>
-                                <strong>#@report.ReportId</strong>
+                                <strong>@(string.IsNullOrWhiteSpace(report.ReferenceNumber) ? "—" : report.ReferenceNumber)</strong>
                             </td>
 
                             <td>

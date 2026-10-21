@@ -928,3 +928,67 @@ html[data-theme="dark"] .reports-container .filter-group select {
     background: #263342 !important;
     color: #e5e7eb !important;
 }
+
+/* Reports pagination in dark mode */
+html[data-theme="dark"] .reports-container .pagination-container,
+html[data-theme="dark"] .reports-container .pagination-info,
+html[data-theme="dark"] .reports-container .pagination-buttons {
+    background: #1e2935 !important;
+    color: #e5e7eb !important;
+    border-color: #465365 !important;
+}
+
+html[data-theme="dark"] .reports-container .btn-pagination,
+html[data-theme="dark"] .reports-container .page-number {
+    background: #263342 !important;
+    color: #e5e7eb !important;
+    border-color: #465365 !important;
+}
+
+html[data-theme="dark"] .reports-container .page-number.active {
+    background: #009688 !important;
+    color: #ffffff !important;
+    border-color: #009688 !important;
+}
+
+html[data-theme="dark"] .reports-container .btn-pagination:hover,
+html[data-theme="dark"] .reports-container .page-number:not(.active):hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+/* Keep the reports table readable when it has many columns. */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.reports-table {
+    width: 100%;
+    min-width: 1050px;
+    table-layout: auto;
+}
+
+.reports-table th,
+.reports-table td {
+    vertical-align: middle;
+}
+
+.reports-table .reference-number-column,
+.reports-table .reference-number-value {
+    min-width: 155px;
+    max-width: 200px;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.reports-table .reference-number-value {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.9rem;
+}
+
+html[data-theme="dark"] .reports-table .reference-number-value {
+    color: inherit;
+}

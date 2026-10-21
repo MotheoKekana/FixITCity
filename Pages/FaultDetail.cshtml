@@ -16,6 +16,14 @@
         <p class="text-muted">View and manage the full details of this fault</p>
     </div>
 
+    <!-- Fault title and description -->
+    <section class="fault-summary card mb-3" aria-labelledby="fault-title">
+        <div class="card-body">
+            <h3 class="card-title" id="fault-title">@Model.FaultTitle</h3>
+            <p class="card-text">@Model.FaultDescription</p>
+        </div>
+    </section>
+
     <!-- Report Content -->
     <div class="fault-content">
 
