@@ -19,14 +19,14 @@ The FixITCity Dashboard provides municipal operators with a centralized view of 
 ## 🛠️ Technology Stack
 
 **Frontend (This Repository)**
-*   ASP.NET Core Razor Pages (.NET 10)
+*   ASP.NET Core Razor Pages (.NET 8)
 *   HTML5 / CSS3 / Vanilla JavaScript
 *   Bootstrap 5 (Layout & Components)
 *   Leaflet.js (Maps)
 *   FontAwesome (Icons)
 
 **Backend & Infrastructure**
-*   ASP.NET Core Web API (.NET 8) *(Separate Repository)*
+*   ASP.NET Core Web API (.NET 10) *(Separate Repository)*
 *   Entity Framework Core (ORM)
 *   PostgreSQL (Hosted on Supabase)
 *   Resend (Transactional Email API)
