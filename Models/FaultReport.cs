@@ -9,7 +9,7 @@ public partial class FaultReport
     public int ReportId { get; set; }
 
     [Column("citizen_id")]
-    public int CitizenId { get; set; }
+    public int? CitizenId { get; set; }
 
     [Column("category_id")]
     public int CategoryId { get; set; }
