@@ -6,8 +6,9 @@ This repository contains the FixITCity API, the staff dashboard, and SQL scripts
 
 ## Projects
 
-- **FixITCityAPI** — ASP.NET Core Web API that provides data and services to the dashboard.
+- **FixITCityDatabase** — ASP.NET Core Web API that provides data and services to the dashboard.
 - **FixITCity_Dashboard** — ASP.NET Core Razor Pages dashboard for municipal staff.
+- **FixITCity_guest** - Android app for ciizens
 - **database** — SQL scripts for setting up and managing the Supabase database.
 
 ## Repository structure
