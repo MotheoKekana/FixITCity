@@ -42,6 +42,10 @@ namespace FixITCity_Dashboard.Pages
         public decimal? Latitude { get; private set; }
         public decimal? Longitude { get; private set; }
         public int? PriorityScore { get; private set; }
+        public decimal? ProximityScore { get; private set; }
+        public decimal? SeverityScore { get; private set; }
+        public decimal? AgeScore { get; private set; }
+        public decimal? DuplicateScore { get; private set; }
         public string? ErrorMessage { get; private set; }
         public List<AuditLogEntry> AuditLogs { get; private set; } = new();
 
@@ -111,6 +115,14 @@ namespace FixITCity_Dashboard.Pages
                 Longitude = dto.Longitude;
                 PriorityScore = dto.PriorityScore;
                 AddressLine = dto.AddressLine;
+
+                if (dto.PriorityBreakdown != null)
+                {
+                    ProximityScore = dto.PriorityBreakdown.ProximityFactor;
+                    SeverityScore = dto.PriorityBreakdown.SeverityFactor;
+                    AgeScore = dto.PriorityBreakdown.AgeFactor;
+                    DuplicateScore = dto.PriorityBreakdown.DuplicateFactor;
+                }
 
                 // All photos: primary first, then in the order they were uploaded
                 PhotoUrls = (dto.ReportPhotos ?? new())
@@ -307,10 +319,19 @@ namespace FixITCity_Dashboard.Pages
         public DateTime? ReportedAt { get; set; }
         public string? PhotoUrl { get; set; }
 
+        public PriorityBreakdownDto? PriorityBreakdown { get; set; }
+
         public List<ReportPhotoDto> ReportPhotos { get; set; } = new();
         public List<AuditLogDto> AuditLogs { get; set; } = new();
     }
 
+    public class PriorityBreakdownDto
+    {
+        public decimal? ProximityFactor { get; set; }
+        public decimal? SeverityFactor { get; set; }
+        public decimal? AgeFactor { get; set; }
+        public decimal? DuplicateFactor { get; set; }
+    }
     public class ReportPhotoDto
     {
         public long PhotoId { get; set; }

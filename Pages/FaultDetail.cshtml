@@ -104,29 +104,31 @@
             }
         </div>
 
-        <!-- Priority Breakdown -->
+               <!-- Priority Breakdown -->
         <div class="priority-breakdown">
             <h4>Priority Score Breakdown</h4>
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between">
-                    Proximity to essential services <span>35%</span>
+                    Proximity to essential services (35%) 
+                    <span>@(Model.ProximityScore?.ToString("0.##") ?? "—") pts</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
-                    Vote count <span>20%</span>
+                    Category severity (25%) 
+                    <span>@(Model.SeverityScore?.ToString("0.##") ?? "—") pts</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
-                    Category severity <span>25%</span>
+                    Elapsed time (20%) 
+                    <span>@(Model.AgeScore?.ToString("0.##") ?? "—") pts</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
-                    Elapsed time <span>20%</span>
+                    Vote count / Duplicates (20%) 
+                    <span>@(Model.DuplicateScore?.ToString("0.##") ?? "—") pts</span>
                 </li>
             </ul>
             <div class="priority-total">
-                <strong>Total Score:</strong> @Model.PriorityScore
+                <strong>Total Score:</strong> @(Model.PriorityScore?.ToString("0.##") ?? "Not Calculated")
             </div>
         </div>
-    </div>
-
     <!-- Actions -->
     <div class="fault-actions">
         <form method="post" class="d-flex flex-column gap-3">
