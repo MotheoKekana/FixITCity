@@ -1,0 +1,138 @@
+﻿.privacy-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+}
+
+.privacy-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+    .privacy-header h2 {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #183432;
+        margin-bottom: 0.25rem;
+    }
+
+    .privacy-header .text-muted {
+        color: #657572;
+        font-size: 0.9rem;
+    }
+
+.privacy-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dbe6e3;
+    padding: 2.5rem;
+}
+
+.privacy-section {
+    margin-bottom: 2rem;
+}
+
+    .privacy-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .privacy-section h3 {
+        font-size: 1.15rem;
+        font-weight: 650;
+        color: #183432;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .privacy-section h3 i {
+            color: #009688;
+            font-size: 1rem;
+        }
+
+    .privacy-section p {
+        color: #4a5c59;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
+    }
+
+    .privacy-section ul {
+        margin: 0.5rem 0 1rem 1.25rem;
+        color: #4a5c59;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .privacy-section li {
+        margin-bottom: 0.4rem;
+    }
+
+.contact-box {
+    background: #f4f8f7;
+    border: 1px solid #dbe6e3;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+}
+
+    .contact-box p {
+        margin: 0.2rem 0;
+        color: #183432;
+    }
+
+body.dark-mode .privacy-card {
+    background: #123d3a !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark-mode .privacy-header h2,
+body.dark-mode .privacy-section h3,
+body.dark-mode .contact-box p {
+    color: #f4fbfa !important;
+}
+
+body.dark-mode .privacy-header .text-muted,
+body.dark-mode .privacy-section p,
+body.dark-mode .privacy-section ul {
+    color: #b9ceca !important;
+}
+
+body.dark-mode .contact-box {
+    background: #102f2e !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+/* Privacy page: dark mode */
+html[data-theme="dark"] .privacy-container {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .privacy-header h2,
+html[data-theme="dark"] .privacy-section h3 {
+    color: #f3f4f6;
+}
+
+html[data-theme="dark"] .privacy-header .text-muted {
+    color: #aeb8c4 !important;
+}
+
+html[data-theme="dark"] .privacy-card,
+html[data-theme="dark"] .privacy-section,
+html[data-theme="dark"] .contact-box {
+    background: #1e2935;
+    color: #e5e7eb;
+    border-color: #465365;
+}
+
+html[data-theme="dark"] .privacy-section p,
+html[data-theme="dark"] .privacy-section li,
+html[data-theme="dark"] .contact-box p {
+    color: #d5dce5;
+}
+
+html[data-theme="dark"] .privacy-section strong,
+html[data-theme="dark"] .contact-box strong {
+    color: #ffffff;
+}
