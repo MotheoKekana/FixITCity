@@ -1,0 +1,416 @@
+﻿@page "{id:long}"
+@model FixITCity_Dashboard.Pages.FaultDetailModel
+@{
+    ViewData["Title"] = "Fault Detail";
+    Layout = "_SidebarLayout";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="~/css/FaultDetail.css" />
+
+<div class="fault-detail-container">
+
+    <!-- Header -->
+    <div class="fault-header">
+        <h2>Fault Report Detail</h2>
+        <p class="text-muted">View and manage the full details of this fault</p>
+    </div>
+
+    <!-- Fault title and description -->
+    <section class="fault-summary card mb-3" aria-labelledby="fault-title">
+        <div class="card-body">
+            <h3 class="card-title" id="fault-title">@Model.FaultTitle</h3>
+            <p class="card-text">@Model.FaultDescription</p>
+        </div>
+    </section>
+
+    <!-- Report Content -->
+    <div class="fault-content">
+
+        <!-- Submitted Photos -->
+        <div class="fault-photo">
+            @if (Model.HasPhoto)
+            {
+                var count = Model.PhotoUrls.Count;
+                var shown = Math.Min(count, 4);
+                var extra = count - shown;
+                var galleryClass = $"photo-gallery photo-count-{shown}";
+
+                <div id="photo-gallery" class="@galleryClass">
+                    @for (var i = 0; i < count; i++)
+                    {
+                        var tileClass = i >= shown ? "photo-tile is-hidden" : "photo-tile";
+                        var isLastShown = extra > 0 && i == shown - 1;
+
+                        <button type="button"
+                                class="@tileClass"
+                                data-index="@i"
+                                aria-label="View photo @(i + 1) of @count">
+                            <img src="@Model.PhotoUrls[i]"
+                                 alt="Fault photo @(i + 1) of @count"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/unavailable_icon.png';this.classList.add('is-broken');" />
+                            @if (isLastShown)
+                            {
+                                <span class="photo-more">+@extra</span>
+                            }
+                        </button>
+                    }
+                </div>
+
+                <p class="photo-caption">
+                    @count @(count == 1 ? "photo" : "photos") &middot; click to enlarge
+                </p>
+
+                <dialog id="photo-lightbox" class="photo-lightbox" aria-label="Photo viewer">
+                    <button type="button" class="lb-close" aria-label="Close">&times;</button>
+                    <button type="button" class="lb-nav lb-prev" aria-label="Previous photo">&#10094;</button>
+                    <img id="lb-image" alt="" />
+                    <button type="button" class="lb-nav lb-next" aria-label="Next photo">&#10095;</button>
+                    <div id="lb-counter" class="lb-counter"></div>
+                </dialog>
+            }
+            else
+            {
+                <div class="fault-photo-empty">
+                    <i class="fas fa-image" aria-hidden="true"></i>
+                    <p>No photo was submitted with this report.</p>
+                </div>
+            }
+        </div>
+
+        <!-- GPS Location -->
+        <div class="fault-map">
+            @if (Model.HasCoordinates)
+            {
+                <div id="fault-map"
+                     class="fault-map-canvas"
+                     data-lat="@Model.LatitudeText"
+                     data-lng="@Model.LongitudeText"
+                     data-address="@Model.AddressLine"></div>
+
+                <div class="fault-map-footer">
+                    <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i> @Model.CoordinatesText</span>
+                    <a href="@Model.GoogleMapsUrl" target="_blank" rel="noopener">
+                        Open in Google Maps <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="fault-map-empty">
+                    No GPS coordinates are available for this report.
+                </div>
+            }
+        </div>
+
+               <!-- Priority Breakdown -->
+        <div class="priority-breakdown">
+            <h4>Priority Score Breakdown</h4>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                    Proximity to essential services (35%) 
+                    <span>@(Model.ProximityScore?.ToString("0.##") ?? "—") pts</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    Category severity (25%) 
+                    <span>@(Model.SeverityScore?.ToString("0.##") ?? "—") pts</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    Elapsed time (20%) 
+                    <span>@(Model.AgeScore?.ToString("0.##") ?? "—") pts</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    Vote count / Duplicates (20%) 
+                    <span>@(Model.DuplicateScore?.ToString("0.##") ?? "—") pts</span>
+                </li>
+            </ul>
+            <div class="priority-total">
+                <strong>Total Score:</strong> @(Model.PriorityScore?.ToString("0.##") ?? "Not Calculated")
+            </div>
+        </div>
+    <!-- Actions -->
+    <div class="fault-actions">
+        <form method="post" class="d-flex flex-column gap-3">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mb-0 py-2">
+                    <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <button type="submit" asp-page-handler="Verify" class="btn btn-success">
+                    <i class="fas fa-check"></i> Verify Report
+                </button>
+
+                <select name="statusUpdate" id="statusUpdateDropdown" class="form-select w-auto" onchange="toggleReasonBox()">
+                    <option value="Pending">Pending</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Fixed">Fixed</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+
+                <button type="submit" asp-page-handler="UpdateStatus" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Update Status
+                </button>
+            </div>
+
+            <!-- Reason Input (Hidden by default, shows when 'Rejected' is selected) -->
+            <div id="reasonContainer" style="display: none;">
+                <label for="reasonInput" class="form-label text-danger fw-bold">Reason for Rejection <span class="text-muted fw-normal">(Required)</span></label>
+                <textarea name="reason" id="reasonInput" class="form-control" rows="2" placeholder="Explain why this report is being rejected..."></textarea>
+            </div>
+        </form>
+    </div>
+
+    <!-- Audit Log -->
+    <div class="audit-log">
+        <h4>Audit Log</h4>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Admin</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.AuditLogs.Count == 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-muted">No activity recorded yet.</td>
+                    </tr>
+                }
+                @foreach (var log in Model.AuditLogs)
+                {
+                    <tr>
+                        <td>@log.Summary</td>
+                        <td>@log.AdminName</td>
+                        <td>@log.Timestamp.ToString("dd MMM yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back to Reports -->
+    <div class="mt-3">
+        <a asp-page="/Reports" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // ─── Photo viewer (Lightbox with Swipe, Zoom & Pan) ───
+        (function () {
+            const gallery = document.getElementById('photo-gallery');
+            const dialog = document.getElementById('photo-lightbox');
+            if (!gallery || !dialog) return;
+
+            const image = document.getElementById('lb-image');
+            const counter = document.getElementById('lb-counter');
+            const sources = () =>
+                Array.from(gallery.querySelectorAll('.photo-tile img'))
+                     .map(img => img.getAttribute('src'));
+
+            let current = 0;
+
+            // Zoom, Pan & Touch state variables
+            let scale = 1;
+            let panning = false;
+            let startX = 0, startY = 0;
+            let translateX = 0, translateY = 0;
+            let startDist = 0;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchStartTime = 0;
+
+            function resetTransform() {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                image.style.transform = `translate(0px, 0px) scale(1)`;
+            }
+
+            function updateTransform() {
+                image.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
+
+            function show(index) {
+                const photos = sources();
+                current = (index + photos.length) % photos.length;
+                resetTransform();
+                image.src = photos[current];
+                image.alt = 'Fault photo ' + (current + 1) + ' of ' + photos.length;
+                counter.textContent = (current + 1) + ' / ' + photos.length;
+            }
+
+            if (sources().length < 2) dialog.classList.add('single');
+
+            gallery.addEventListener('click', function (e) {
+                const tile = e.target.closest('.photo-tile');
+                if (!tile) return;
+                show(Number(tile.dataset.index));
+                dialog.showModal();
+            });
+
+            dialog.querySelector('.lb-close').addEventListener('click', () => dialog.close());
+            dialog.querySelector('.lb-prev').addEventListener('click', () => { resetTransform(); show(current - 1); });
+            dialog.querySelector('.lb-next').addEventListener('click', () => { resetTransform(); show(current + 1); });
+
+            // Click on the dark backdrop closes the viewer (only if not zoomed in)
+            dialog.addEventListener('click', e => { 
+                if (e.target === dialog && scale === 1) dialog.close(); 
+            });
+
+            // Keyboard Navigation
+            dialog.addEventListener('keydown', e => {
+                if (e.key === 'ArrowLeft') { resetTransform(); show(current - 1); }
+                if (e.key === 'ArrowRight') { resetTransform(); show(current + 1); }
+                if (e.key === 'Escape') dialog.close();
+            });
+
+            // ─── Touch & Gesture Handlers ───
+            image.addEventListener('touchstart', e => {
+                if (e.touches.length === 1) {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    touchStartTime = Date.now();
+
+                    if (scale > 1) {
+                        panning = true;
+                        startX = e.touches[0].clientX - translateX;
+                        startY = e.touches[0].clientY - translateY;
+                    }
+                } else if (e.touches.length === 2) {
+                    panning = false;
+                    startDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+
+            image.addEventListener('touchmove', e => {
+                if (e.touches.length === 1 && scale > 1 && panning) {
+                    translateX = e.touches[0].clientX - startX;
+                    translateY = e.touches[0].clientY - startY;
+                    updateTransform();
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const factor = dist / startDist;
+                    startDist = dist;
+                    scale = Math.min(Math.max(1, scale * factor), 4);
+                    if (scale === 1) { translateX = 0; translateY = 0; }
+                    updateTransform();
+                }
+            }, { passive: true });
+
+            image.addEventListener('touchend', e => {
+                panning = false;
+                if (e.touches.length === 0 && scale === 1) {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const distX = touchEndX - touchStartX;
+                    const distY = touchEndY - touchStartY;
+                    const elapsedTime = Date.now() - touchStartTime;
+
+                    // Swipe pagination trigger (>50px horizontal flick)
+                    if (Math.abs(distX) > 50 && Math.abs(distX) > Math.abs(distY) && elapsedTime < 500) {
+                        if (distX > 0) {
+                            show(current - 1);
+                        } else {
+                            show(current + 1);
+                        }
+                    }
+                }
+            });
+
+            // Double tap to quick-zoom toggle
+            let lastTap = 0;
+            image.addEventListener('click', e => {
+                const now = Date.now();
+                if (now - lastTap < 300) {
+                    if (scale > 1) {
+                        resetTransform();
+                    } else {
+                        scale = 2.5;
+                        updateTransform();
+                    }
+                }
+                lastTap = now;
+            });
+        })();
+
+        // ─── Map ──────────────────────────────────────────────
+        (function () {
+            const el = document.getElementById('fault-map');
+            if (!el || typeof L === 'undefined') return;
+
+            const lat = parseFloat(el.dataset.lat);
+            const lng = parseFloat(el.dataset.lng);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+            const map = L.map(el, { scrollWheelZoom: false }).setView([lat, lng], 16);
+
+            const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            });
+
+            const satellite = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                maxNativeZoom: 18,
+                attribution: 'Tiles &copy; Esri'
+            });
+
+            street.addTo(map);
+            L.control.layers({ 'Street': street, 'Satellite': satellite }).addTo(map);
+            L.control.scale({ imperial: false }).addTo(map);
+
+            const popup = document.createElement('div');
+            const title = document.createElement('strong');
+            title.textContent = 'Fault location';
+            popup.appendChild(title);
+            if (el.dataset.address) {
+                popup.appendChild(document.createElement('br'));
+                popup.appendChild(document.createTextNode(el.dataset.address));
+            }
+
+            L.marker([lat, lng]).addTo(map).bindPopup(popup).openPopup();
+
+            map.on('click', () => map.scrollWheelZoom.enable());
+            map.on('mouseout', () => map.scrollWheelZoom.disable());
+
+            new ResizeObserver(() => map.invalidateSize()).observe(el);
+        })();
+    </script>
+
+    <script>
+        function toggleReasonBox() {
+            var dropdown = document.getElementById('statusUpdateDropdown');
+            var reasonContainer = document.getElementById('reasonContainer');
+            var reasonInput = document.getElementById('reasonInput');
+
+            if (dropdown.value === 'Rejected') {
+                reasonContainer.style.display = 'block';
+                reasonInput.setAttribute('required', 'required');
+            } else {
+                reasonContainer.style.display = 'none';
+                reasonInput.removeAttribute('required');
+            }
+        }
+    </script>
+}

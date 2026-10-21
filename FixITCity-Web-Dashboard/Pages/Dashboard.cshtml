@@ -1,0 +1,226 @@
+@page
+@model FixITCity_Dashboard.Pages.DashboardModel
+@using System.Linq
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_SidebarLayout";
+
+    var stats = Model.DashboardData.Statistics;
+    var categories = Model.DashboardData.Categories.ReportsByCategory;
+    var activity = Model.DashboardData.Activity.ReportsByDay;
+    var alerts = Model.DashboardData.Alerts;
+    var map = Model.DashboardData.Map;
+
+    var maxCategory = categories.Count > 0 ? Math.Max(1, categories.Values.Max()) : 1;
+    var maxActivity = activity.Count > 0 ? Math.Max(1, activity.Values.Max()) : 1;
+
+    var mapPointsJson = JsonSerializer.Serialize(map.MapPoints.Select(point => new
+    {
+        latitude = point.Latitude,
+        longitude = point.Longitude,
+        title = point.Title,
+        description = point.Description,
+    }));
+}
+
+<link rel="preconnect" href="https://unpkg.com" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+
+<div class="dashboard-shell">
+    <main class="dashboard-main">
+        <header class="dashboard-header" id="overview">
+            <div>
+                <p class="eyebrow">Operations overview</p>
+                <h1>Good day, @(ViewContext.HttpContext.Session.GetString("Username") ?? "Admin")</h1>
+                  </div>
+
+            <div class="header-actions">
+                <div class="last-updated">
+                    <span>Last updated</span>
+                    <strong>@DateTime.Now.ToString("dd MMM yyyy, HH:mm")</strong>
+                </div>
+                <button class="refresh-button" type="button" onclick="window.location.reload()">
+                    <span aria-hidden="true">↻</span>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        @if (alerts.Any())
+        {
+            <section class="alert-strip" aria-label="Dashboard alerts">
+                @foreach (var alert in alerts.Take(3))
+                {
+                    var alertType = (alert.Type ?? "info").ToLowerInvariant();
+                    var normalizedType = alertType == "danger" || alertType == "warning" ? alertType : "info";
+                    <div class="dashboard-alert dashboard-alert--@normalizedType">
+                        <span class="alert-indicator" aria-hidden="true"></span>
+                        <span>@alert.Message</span>
+                    </div>
+                }
+            </section>
+        }
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- STAT CARDS (now 3 columns, not 4)               -->
+        <!-- ═══════════════════════════════════════════════ -->
+       <section class="stats-grid" aria-label="Report statistics">
+    <a class="stat-card stat-card--total stat-card-link" href="/Reports">
+        <div class="stat-card-top">
+            <span class="stat-label">Total Reports</span>
+        </div>
+        <strong class="stat-value">@stats.Total.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--pending stat-card-link" href="/Reports?statusFilter=Pending">
+        <div class="stat-card-top">
+            <span class="stat-label">Pending</span>
+        </div>
+        <strong class="stat-value">@stats.Pending.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--review stat-card-link" href="/Reports?statusFilter=Under%20Review">
+        <div class="stat-card-top">
+            <span class="stat-label">Under Review</span>
+        </div>
+        <strong class="stat-value">@stats.UnderReview.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--accepted stat-card-link" href="/Reports?statusFilter=Accepted">
+        <div class="stat-card-top">
+            <span class="stat-label">Accepted</span>
+        </div>
+        <strong class="stat-value">@stats.Accepted.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--progress stat-card-link" href="/Reports?statusFilter=In%20Progress">
+        <div class="stat-card-top">
+            <span class="stat-label">In Progress</span>
+        </div>
+        <strong class="stat-value">@stats.InProgress.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--fixed stat-card-link" href="/Reports?statusFilter=Fixed">
+        <div class="stat-card-top">
+            <span class="stat-label">Fixed</span>
+        </div>
+        <strong class="stat-value">@stats.Fixed.ToString("N0")</strong>
+    </a>
+
+    <a class="stat-card stat-card--rejected stat-card-link" href="/Reports?statusFilter=Rejected">
+        <div class="stat-card-top">
+            <span class="stat-label">Rejected</span>
+        </div>
+        <strong class="stat-value">@stats.Rejected.ToString("N0")</strong>
+    </a>
+</section>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- MAP (now full width, no emergency panel)        -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <section class="dashboard-map-section">
+            <article class="panel map-panel" id="map-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Live overview</p>
+                        <h2>Reported issues map</h2>
+                    </div>
+                    <div class="map-legend" aria-label="Map legend">
+                        <span><i class="legend-dot legend-dot--standard"></i>Reported issue</span>
+                    </div>
+                </div>
+
+                <div id="issuesMap"
+                     class="issues-map"
+                     data-center-lat="@map.CenterLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-center-lng="@map.CenterLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-points="@mapPointsJson">
+                    <div class="map-fallback">
+                        <strong>Issue map</strong>
+                        <span>Map data will appear here when the map service is available.</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- ANALYTICS GRID                                  -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <section class="dashboard-grid" aria-label="Dashboard analytics">
+            <article class="panel" id="categories-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Report mix</p>
+                        <h2>Reports by category</h2>
+                    </div>
+                    <span class="panel-meta">@categories.Values.Sum().ToString("N0") total</span>
+                </div>
+
+                @if (categories.Any())
+                {
+                    <div class="category-list">
+                        @foreach (var item in categories.OrderByDescending(x => x.Value))
+                        {
+                            var width = Math.Max(4, (int)Math.Round(item.Value * 100.0 / maxCategory));
+                            <div class="category-row">
+                                <div class="category-copy">
+                                    <span>@item.Key</span>
+                                    <strong>@item.Value</strong>
+                                </div>
+                                <div class="progress-track" aria-label="@item.Key: @item.Value reports">
+                                    <span class="progress-fill" style="width: @width%"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <strong>No category data yet</strong>
+                        <p>Category statistics will appear once reports are available.</p>
+                    </div>
+                }
+            </article>
+
+            <article class="panel" id="activity-section">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-kicker">Recent volume</p>
+                        <h2>Reporting activity</h2>
+                    </div>
+                    <span class="panel-meta">Last @activity.Count day@(activity.Count == 1 ? "" : "s")</span>
+                </div>
+
+                @if (activity.Any())
+                {
+                    <div class="activity-chart" role="img" aria-label="Reports by day bar chart">
+                        @foreach (var item in activity)
+                        {
+                            var height = Math.Max(8, (int)Math.Round(item.Value * 100.0 / maxActivity));
+                            <div class="activity-column">
+                                <span class="activity-value">@item.Value</span>
+                                <div class="activity-bar-shell">
+                                    <span class="activity-bar" style="height: @height%"></span>
+                                </div>
+                                <span class="activity-label">@item.Key</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <strong>No activity data yet</strong>
+                        <p>Daily report volume will appear here as reports are submitted.</p>
+                    </div>
+                }
+            </article>
+        </section>
+    </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="~/js/dashboard.js" asp-append-version="true"></script>

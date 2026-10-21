@@ -1,0 +1,166 @@
+
+@page
+@model SettingsModel
+
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "_SidebarLayout";
+}
+<link rel="stylesheet" href="~/css/settings.css" />
+
+<div class="settings-container">
+    <header class="settings-header">
+        <h1>Settings</h1>
+        <p>Manage your account details and dashboard preferences.</p>
+    </header>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="settings-alert settings-alert-success" role="status">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="settings-alert settings-alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="settings-alert settings-alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span>@Model.ErrorMessage</span>
+        </div>
+    }
+
+    <!-- ===== PROFILE SECTION ===== -->
+    <div class="settings-card">
+        <div class="card-header">
+            <h5><i class="fas fa-user"></i> Profile Information</h5>
+            <p class="text-muted">Update your personal information</p>
+        </div>
+
+        <div class="card-body">
+            <form method="post" asp-page-handler="UpdateProfile">
+                <div class="form-group">
+                    <label asp-for="Input.FullName">Full Name</label>
+                    <input asp-for="Input.FullName" class="form-control" placeholder="Enter your full name" />
+                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                </div>
+                <i class="fa-regular fa-user settings-section-icon"
+                   aria-hidden="true"></i>
+            </div>
+
+            <div class="settings-card-body">
+                <div class="settings-field">
+                    <label asp-for="Input.FullName">Full name</label>
+                    <input asp-for="Input.FullName"
+                           class="form-control"
+                           placeholder="Enter your full name"
+                           autocomplete="name" />
+                    <span asp-validation-for="Input.FullName"
+                          class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+<!-- ===== APPEARANCE SECTION ===== -->
+<div class="settings-card">
+    <div class="card-header">
+        <h5><i class="fas fa-moon"></i> Appearance</h5>
+        <p class="text-muted">Choose how the dashboard looks</p>
+    </div>
+
+    <div class="card-body">
+        <div class="appearance-option">
+            <div>
+                <label for="darkModeToggle" class="appearance-title">
+                    Dark mode
+                </label>
+                <p class="appearance-description">
+                    Use a darker colour scheme across the dashboard.
+                </p>
+            </div>
+
+            <label class="theme-switch">
+                <input type="checkbox"
+                       id="darkModeToggle"
+                       role="switch"
+                       aria-label="Turn dark mode on or off">
+                <span class="theme-slider"></span>
+            </label>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+    .settings-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+                <div class="settings-field">
+                    <label asp-for="Input.PreferredLanguage">Language</label>
+                    <select asp-for="Input.PreferredLanguage"
+                            class="form-select">
+                        <option value="en">English</option>
+                        <option value="af">Afrikaans</option>
+                        <option value="xh">isiXhosa</option>
+                    </select>
+                    <span asp-validation-for="Input.PreferredLanguage"
+                          class="text-danger"></span>
+                </div>
+            </div>
+        </section>
+
+        <div class="settings-actions">
+            <button type="submit" class="btn settings-save-button">
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                Save changes
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (() => {
+            const selector = document.getElementById("themeSelector");
+
+            if (!selector || !window.FixITCityTheme) {
+                return;
+            }
+
+            // Preview the selected theme immediately without saving it.
+            selector.addEventListener("change", () => {
+                window.FixITCityTheme.applyPreference(selector.value);
+            });
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />   
+<script>
+    const darkModeToggle = document.getElementById("darkModeToggle");
+
+    darkModeToggle.checked =
+        document.documentElement.dataset.theme === "dark";
+
+    darkModeToggle.addEventListener("change", function () {
+        const theme = this.checked ? "dark" : "light";
+
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem("fixitcity-theme", theme);
+    });
+</script>
+}

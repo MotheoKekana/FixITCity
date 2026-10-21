@@ -1,0 +1,83 @@
+﻿@page
+@model FixITCity_Dashboard.Pages.PrivacyModel
+@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "_SidebarLayout";
+}
+<link rel="stylesheet" href="~/css/privacy.css" />
+<div class="privacy-container">
+    <div class="privacy-header">
+        <h2>Privacy Policy & Data Governance</h2>
+        <p class="text-muted">Last updated: October 2026</p>
+    </div>
+
+    <div class="privacy-card">
+        <div class="privacy-section">
+            <h3><i class="fas fa-shield-alt"></i> 1. Introduction</h3>
+            <p>
+                Welcome to <strong>FixITCity</strong>. We are committed to protecting your personal information and respecting your privacy. 
+                This Privacy Policy explains how our municipal service portal collects, uses, discloses, and safeguards your information when 
+                you use our dashboard and fault-reporting platform.
+            </p>
+            <p>
+                We process personal information in accordance with applicable data protection legislation, including the 
+                <strong>Protection of Personal Information Act (POPIA)</strong>.
+            </p>
+        </div>
+
+        <div class="privacy-section">
+            <h3><i class="fas fa-database"></i> 2. Information We Collect</h3>
+            <p>To effectively manage and track municipal infrastructure faults, we collect the following categories of information:</p>
+            <ul>
+                <li><strong>Account Details:</strong> Your full name, email address, and administrative role assigned by municipal management.</li>
+                <li><strong>Fault Report Data:</strong> Descriptions, categories, and timestamps of reported municipal issues.</li>
+                <li><strong>Media & Photos:</strong> Images uploaded by citizens or administrators depicting infrastructure faults.</li>
+                <li><strong>Geospatial Data:</strong> GPS coordinates and address lines automatically attached to fault reports to assist maintenance field teams.</li>
+            </ul>
+        </div>
+
+        <div class="privacy-section">
+            <h3><i class="fas fa-map-marked-alt"></i> 3. Use of Location & Media</h3>
+            <p>
+                GPS coordinates and submitted photographs are utilized exclusively for locating, verifying, and resolving municipal service disruptions 
+                (such as potholes, water leaks, or street light outages). Location data is not tracked continuously or used for unauthorized surveillance.
+            </p>
+        </div>
+
+        <div class="privacy-section">
+            <h3><i class="fas fa-lock"></i> 4. Data Security & Storage</h3>
+            <p>
+                We implement robust administrative, technical, and physical security measures—including encrypted database storage and secure cloud repositories (such as Supabase)—to 
+                protect your personal data against unauthorized access, accidental loss, or unlawful alteration.
+            </p>
+        </div>
+
+        <div class="privacy-section">
+            <h3><i class="fas fa-user-check"></i> 5. Your Rights Under POPIA</h3>
+            <p>You have the legal right to:</p>
+            <ul>
+                <li>Request access to the personal information we hold about you.</li>
+                <li>Request correction or deletion of inaccurate or outdated information.</li>
+                <li>Object to the processing of your personal information under specific circumstances.</li>
+            </ul>
+        </div>
+
+        <div class="privacy-section">
+            <h3><i class="fas fa-envelope-open-text"></i> 6. Contact Information</h3>
+            <p>
+                If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Information Officer:
+            </p>
+            <div class="contact-box">
+                <p><strong>Municipal Information Officer</strong></p>
+                <p><i class="fas fa-envelope"></i> privacy@fixitcity.gov.za</p>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-page="/Dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
