@@ -74,6 +74,18 @@ public class ReportsController : ControllerBase
             if (report == null)
                 return NotFound(new { message = "Report not found" });
 
+                    var priorityBreakdown = await _context.Set<PriorityScore>()
+            .Where(s => s.ReportId == report.ReportId)
+            .OrderByDescending(s => s.ComputedAt)
+            .Select(s => new
+            {
+                proximity = s.ProximityFactor,
+                severity = s.SeverityFactor,
+                duplicates = s.DuplicateFactor,
+                age = s.AgeFactor
+            })
+            .FirstOrDefaultAsync();
+
             return Ok(new
             {
                 reportId = report.ReportId,
@@ -87,6 +99,7 @@ public class ReportsController : ControllerBase
                 longitude = report.Longitude,
                 priorityScore = report.PriorityScore,
                 reportedAt = report.CreatedAt,
+                priorityBreakdown,
 
                 reportPhotos = report.ReportPhotos.Select(p => new
                 {
