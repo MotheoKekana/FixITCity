@@ -223,12 +223,6 @@ public class Login_Activity extends AppCompatActivity {
                 SyncScheduler.scheduleSync(getApplicationContext());
 
                 runOnUiThread(() -> {
-                    Toast.makeText(
-                            this,
-                            "Welcome back, " + profile.first_name,
-                            Toast.LENGTH_SHORT
-                    ).show();
-
                     startActivity(new Intent(this, Dashboard_Activity.class));
                     finish();
                 });

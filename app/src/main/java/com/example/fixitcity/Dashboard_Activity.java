@@ -171,12 +171,6 @@ public class Dashboard_Activity extends AppCompatActivity {
     }
 
     private void setupBottomNav() {
-        View navHome = findViewById(R.id.navHome);
-        if (navHome != null) {
-            navHome.setOnClickListener(v ->
-                    Toast.makeText(this, "You're on Home", Toast.LENGTH_SHORT).show());
-        }
-
         View navReport = findViewById(R.id.navReport);
         if (navReport != null) {
             navReport.setOnClickListener(v ->

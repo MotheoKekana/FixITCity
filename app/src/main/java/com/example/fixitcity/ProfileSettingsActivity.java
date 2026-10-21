@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -113,7 +112,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 NotificationTokenManager.deactivateOnLogout(
                         getApplicationContext(), session.getUserIdBigint(), session.getAccessToken());
                 session.logout();
-                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, Login_Activity.class));
                 finishAffinity();
             });
@@ -149,12 +147,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         if (navTrack != null) {
             navTrack.setOnClickListener(v ->
                     startActivity(new Intent(this, TrackReportSearchActivity.class)));
-        }
-
-        View navSettings = findViewById(R.id.navSettings);
-        if (navSettings != null) {
-            navSettings.setOnClickListener(v ->
-                    Toast.makeText(this, "You're already in Settings", Toast.LENGTH_SHORT).show());
         }
 
     }

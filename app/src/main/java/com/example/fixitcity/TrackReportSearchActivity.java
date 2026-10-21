@@ -92,12 +92,6 @@ public class TrackReportSearchActivity extends AppCompatActivity {
             });
         }
 
-        View navTrack = findViewById(R.id.navTrack);
-        if (navTrack != null) {
-            navTrack.setOnClickListener(v ->
-                    Toast.makeText(this, "You're on Track", Toast.LENGTH_SHORT).show());
-        }
-
         View navSettings = findViewById(R.id.navSettings);
         if (navSettings != null) {
             navSettings.setOnClickListener(v -> {

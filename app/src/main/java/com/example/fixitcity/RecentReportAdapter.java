@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fixitcity.data.NotificationDates;
+
 import java.util.List;
 
 public class RecentReportAdapter
@@ -41,7 +43,7 @@ public class RecentReportAdapter
         holder.tvTitle.setText(r.getTitle() != null ? r.getTitle() : "Report");
         holder.tvReference.setText(
                 r.getReferenceNumber() != null ? r.getReferenceNumber() : "—");
-        holder.tvDate.setText( (r.getCreatedAt() != null ? r.getCreatedAt() : "—"));
+        holder.tvDate.setText(NotificationDates.format(r.getCreatedAt()));
 
         int score = r.getPriorityScore() != null ? r.getPriorityScore() : 0;
         holder.tvPriority.setText("Score " + score + "/100");

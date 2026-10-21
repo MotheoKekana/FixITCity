@@ -92,9 +92,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
         // Bottom navigation
         findViewById(R.id.navHome).setOnClickListener(v -> AppNavigation.goHome(this));
 
-        findViewById(R.id.navReport).setOnClickListener(v ->
-                Toast.makeText(this, "You're already reporting", Toast.LENGTH_SHORT).show());
-
         findViewById(R.id.navTrack).setOnClickListener(v ->
                 startActivity(new Intent(this, TrackReportSearchActivity.class)));
 

@@ -406,12 +406,6 @@ public class Register_Activity extends AppCompatActivity {
         session.setHasCitizenProfile(true);
 
         runOnUiThread(() -> {
-            Toast.makeText(
-                    this,
-                    "Account created successfully",
-                    Toast.LENGTH_LONG
-            ).show();
-
             startActivity(
                     new Intent(
                             this,

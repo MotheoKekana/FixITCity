@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -157,12 +156,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
         if (navReport != null) {
             navReport.setOnClickListener(v ->
                     startActivity(new Intent(this, ReportFaultCategoryActivity.class)));
-        }
-
-        View navTrack = findViewById(R.id.navTrack);
-        if (navTrack != null) {
-            navTrack.setOnClickListener(v ->
-                    Toast.makeText(this, "You're on Track", Toast.LENGTH_SHORT).show());
         }
 
         View navSettings = findViewById(R.id.navSettings);
