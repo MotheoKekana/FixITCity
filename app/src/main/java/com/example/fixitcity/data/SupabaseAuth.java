@@ -12,7 +12,6 @@ import okhttp3.Response;
 
 public class SupabaseAuth {
 
-    /** Supabase Auth anonymous sign-in returns access_token, refresh_token and user.id. */
     public static String signInAnonymously() throws IOException {
         Request request = new Request.Builder()
                 .url(SupabaseClient.AUTH_URL + "/signup")
@@ -118,10 +117,6 @@ public class SupabaseAuth {
         }
     }
 
-    /**
-     * Refresh an expired access token using the stored refresh_token.
-     * Returns the full JSON response on success, or null on failure.
-     */
     public static String refreshToken(String refreshToken) throws IOException {
         JSONObject body = new JSONObject();
         try {
@@ -165,10 +160,8 @@ public class SupabaseAuth {
 
         OkHttpClient client = SupabaseClient.getHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            // Ignore
         }
     }
-    // ─── ADD THESE 3 METHODS TO SupabaseAuth.java ───────────────────────
 
     public static void sendRecoveryEmail(String email) throws IOException {
         JSONObject body = new JSONObject();
@@ -189,7 +182,6 @@ public class SupabaseAuth {
         try (Response response = SupabaseClient.getHttpClient().newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 String responseStr = response.body() != null ? response.body().string() : "";
-                // THIS IS WHERE WE PRINT THE 500 ERROR
                 android.util.Log.e("SUPABASE_500", "Error Body: " + responseStr);
                 throw new IOException("Recovery failed (" + response.code() + "): " + responseStr);
             }

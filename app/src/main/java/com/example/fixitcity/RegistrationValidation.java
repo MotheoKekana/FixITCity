@@ -1,23 +1,18 @@
 package com.example.fixitcity;
 
-/** Registration rules that do not depend on Android views or network access. */
 public final class RegistrationValidation {
     public static final int MIN_PASSWORD_CHARACTERS = 8;
     public static final int MAX_EMAIL_CHARACTERS = 255;
 
     private RegistrationValidation() { }
 
-    /**
-     * Blank is allowed. Local South African numbers become +27 numbers.
-     * International numbers need an explicit country code. This checks format,
-     * not whether a number is assigned or belongs to the person registering.
-     */
+    // Phone is optional. Convert local South African numbers to +27; require a country code for other numbers.
     public static String normalizeOptionalPhone(String input) {
         String value = input == null ? "" : input.trim();
         if (value.isEmpty()) return "";
         String number = value.replaceAll("[\\s\\p{Zs}().-]", "");
         if (number.isEmpty()) {
-            // Whitespace alone is blank; punctuation alone is an invalid number.
+            // Punctuation alone is not a valid optional phone number.
             if (value.codePoints().allMatch(c -> Character.isWhitespace(c)
                     || Character.isSpaceChar(c))) return "";
             throw new IllegalArgumentException(phoneError());
@@ -34,7 +29,6 @@ public final class RegistrationValidation {
                 + "starting with 0, or an international number starting with +.";
     }
 
-    /** Returns a useful error, or null when the local password rules pass. */
     public static String passwordError(String password) {
         if (password == null || password.isEmpty()
                 || password.codePoints().allMatch(c -> Character.isWhitespace(c)
@@ -51,8 +45,7 @@ public final class RegistrationValidation {
             if (codePoint >= 'a' && codePoint <= 'z') lower = true;
             if (codePoint >= 'A' && codePoint <= 'Z') upper = true;
             if (codePoint >= '0' && codePoint <= '9') digit = true;
-            // Supabase's allowed symbols are the printable ASCII punctuation characters.
-            // Spaces and non-ASCII characters do not satisfy its symbol requirement.
+            // Use the same ASCII symbol rule as Supabase Auth.
             if (codePoint >= '!' && codePoint <= '~'
                     && !((codePoint >= 'a' && codePoint <= 'z')
                     || (codePoint >= 'A' && codePoint <= 'Z')
@@ -62,7 +55,7 @@ public final class RegistrationValidation {
         if (!upper) return "Add at least one uppercase letter (A-Z).";
         if (!digit) return "Add at least one number (0-9).";
         if (!symbol) return "Add at least one symbol, such as ! or @.";
-        // Preserve the exact password; the server remains authoritative.
+        // Send the password unchanged; Supabase remains authoritative.
         return null;
     }
 }

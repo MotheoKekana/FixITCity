@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -73,7 +72,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-            <!-- Welcome -->
             <TextView
                 android:id="@+id/tvWelcome"
                 android:layout_width="wrap_content"
@@ -82,7 +80,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-            <!-- Stats + Track (side by side) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -154,7 +151,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-            <!-- ===== Recent Reports section ===== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -167,7 +163,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-                    <!-- Section header: title left, action right -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -181,7 +176,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-                        <!-- NEW id: wire a click listener to this -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSeeAllRecent"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -203,7 +197,6 @@
                         android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- ===== Nearby Reports section ===== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -229,7 +222,6 @@
                             android:textColor="@color/secondary_blue"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-                        <!-- Same id as before; visibility still controlled from code -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/tvSeeMoreNearby"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -243,7 +235,6 @@
                             android:gravity="center_vertical"
                             android:focusable="true" />
                     </LinearLayout>
-                    <!-- Radius as a read-only chip (same id as before) -->
                     <com.google.android.material.chip.Chip
                         android:id="@+id/tvNearbyRadius"
                         android:layout_width="wrap_content"
@@ -268,7 +259,6 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
-    <!-- Bottom Navigation (unchanged) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"

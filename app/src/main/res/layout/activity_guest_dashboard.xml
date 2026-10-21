@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -73,7 +72,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
-            <!-- Welcome -->
             <TextView
                 android:id="@+id/tvWelcome"
                 android:layout_width="wrap_content"
@@ -82,7 +80,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-            <!-- Primary action: Report an Issue -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardReportIssue"
                 android:layout_width="match_parent"
@@ -117,8 +114,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Section label -->
-            <!-- Track Report row -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTrackReport"
                 android:layout_width="match_parent"
@@ -136,7 +131,6 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
-                    <!-- Icon badge -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
@@ -181,12 +175,10 @@
                 android:text="@string/ui_guest_reference_reminder"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
-            <!-- Pushes Log Out to the bottom on tall screens -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-            <!-- Log Out: outlined, so it doesn't compete with the primary action -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

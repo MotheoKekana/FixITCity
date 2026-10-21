@@ -43,7 +43,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
 
         hideNavForGuests();
 
-        // ---------- Intent extras ----------
         long   reportId      = getIntent().getLongExtra("report_id", -1);
         String reference     = getIntent().getStringExtra("reference_number");
         String title         = getIntent().getStringExtra("title");
@@ -53,7 +52,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
         int    priorityScore = getIntent().getIntExtra("priority_score", 0);
         String createdAt     = getIntent().getStringExtra("created_at");
 
-        // ---------- Report detail card ----------
         setTextSafe(R.id.tv_report_title,
                 title != null && !title.isEmpty() ? title : "Report");
 
@@ -84,7 +82,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             }
         }
 
-        // ---------- Share the same report summary as a branded image + caption ----------
         View btnShare = findViewById(R.id.btn_share_status);
         if (btnShare != null) {
             btnShare.setOnClickListener(v -> ReportShare.share(this, v,
@@ -94,7 +91,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
                             java.time.ZonedDateTime.now())));
         }
 
-        // Open the real notifications screen; alert delivery is managed server-side.
         View btnNotifications = findViewById(R.id.btn_view_notifications);
         if (btnNotifications != null) {
             if (new SessionManager(this).isGuest()) {
@@ -105,7 +101,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             }
         }
 
-        // ---------- Status history timeline ----------
         rvStatusHistory = findViewById(R.id.rv_status_history);
         tvHistoryEmpty  = findViewById(R.id.tv_history_empty);
 
@@ -117,7 +112,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             rvStatusHistory.setAdapter(historyAdapter);
         }
 
-        // Show loading state while we fetch
         if (tvHistoryEmpty != null) {
             tvHistoryEmpty.setText("Loading history…");
             tvHistoryEmpty.setVisibility(View.VISIBLE);
@@ -137,7 +131,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
             showHistoryEmpty("No status history available.");
         }
 
-        // ---------- Bottom navigation ----------
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -251,7 +244,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
         }
     }
 
-    /** Fetch the report's status history and show a distinct error if it fails. */
     private void loadStatusHistory(long reportId) {
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
@@ -278,7 +270,6 @@ public class TrackReportResultActivity extends AppCompatActivity {
                 loadFailed = true;
             }
 
-            // Sort newest first
             fetched.sort((a, b) -> {
                 String da = a.changedAt != null ? a.changedAt : "";
                 String db = b.changedAt != null ? b.changedAt : "";

@@ -133,7 +133,6 @@ public class Login_Activity extends AppCompatActivity {
                 startActivity(new Intent(this, Register_Activity.class))
         );
 
-        // UPDATE: Launch the ForgotPasswordActivity
         tvForgotPassword.setOnClickListener(view ->
                 startActivity(new Intent(this, ForgotPasswordActivity.class))
         );
@@ -219,7 +218,7 @@ public class Login_Activity extends AppCompatActivity {
 
                 saveSession(accessToken, refreshToken, authUserId, userEmail, userId, profile);
                 NotificationTokenManager.registerAfterLogin(getApplicationContext(), userId, accessToken);
-                // Resume this citizen's queued reports if they signed back in later.
+                // Resume queued reports for this account after sign-in.
                 SyncScheduler.scheduleSync(getApplicationContext());
 
                 runOnUiThread(() -> {
@@ -253,7 +252,7 @@ public class Login_Activity extends AppCompatActivity {
     ) {
         SessionManager session = new SessionManager(this);
 
-        // Remove data belonging to a previous account.
+        // Clear the previous account's local data before saving this session.
         session.logout();
 
         session.saveSession(accessToken, authUserId, email, "citizen");

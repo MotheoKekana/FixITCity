@@ -2,12 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Camera feature (optional) -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -29,7 +27,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FixITCity">
 
-        <!-- Splash Screen (LAUNCHER) -->
         <activity
             android:name=".Splash_Activity"
             android:exported="true">
@@ -39,7 +36,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Onboarding -->
         <activity
             android:name=".Onboard_Report_Faults_Activity"
             android:exported="false" />
@@ -50,28 +46,23 @@
             android:name=".Onboard_Community_Impact_Activity"
             android:exported="false" />
 
-        <!-- Guest Mode (shown after Continue as Guest) -->
         <activity
             android:name=".Guest_Mode_Activity"
             android:exported="false" />
 
-        <!-- Main dashboards -->
         <activity android:name=".Dashboard_Activity" android:exported="false" />
         <activity android:name=".Guest_Dashboard_Activity" android:exported="false" />
         <activity android:name=".NearbyReportsActivity" android:exported="false" />
 
 
-         <!-- Reset Password -->
             <activity
                 android:name=".ForgotPasswordActivity"
                 android:exported="false"
                 android:theme="@style/Theme.FixITCity" />
-        <!-- Track / History -->
         <activity android:name=".TrackReportSearchActivity" android:exported="false" />
         <activity android:name=".TrackReportResultActivity" android:exported="false" />
         <activity android:name=".ReportHistoryActivity" android:exported="false" />
 
-        <!-- Auth screens -->
         <activity
             android:name=".Login_Activity"
             android:windowSoftInputMode="adjustResize" />
@@ -79,7 +70,6 @@
             android:name=".Register_Activity"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Report flow -->
         <activity android:name=".Notifications_Activity" android:exported="false" />
         <activity android:name=".ReportFaultCategoryActivity"
             android:windowSoftInputMode="adjustResize" />
@@ -96,11 +86,9 @@
         <activity android:name=".ProfileSettingsActivity"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Help & Guide -->
         <activity android:name=".HelpGuideActivity"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- FileProvider for camera photos -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.fixitcity.fileprovider"
@@ -111,7 +99,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Firebase Cloud Messaging service -->
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">

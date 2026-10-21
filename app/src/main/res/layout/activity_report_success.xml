@@ -33,7 +33,6 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp">
-                    <!-- Checkmark Icon -->
                     <ImageView
                         android:layout_width="80dp"
                         android:layout_height="80dp"
@@ -60,7 +59,6 @@
                         android:gravity="center"
                         android:text="Thank you for helping keep FixITCity safe and functional."
                         android:textColor="@color/text_secondary" />
-                    <!-- Details Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -73,7 +71,6 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
-                            <!-- Reference Number -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -101,7 +98,6 @@
                                 android:layout_height="1dp"
                                 android:layout_marginVertical="12dp"
                                 android:background="@color/divider" />
-                            <!-- Priority Score -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -125,7 +121,6 @@
                                     tools:text="92/100"
                                     android:layout_marginTop="6dp" />
                             </LinearLayout>
-                            <!-- Status -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -152,7 +147,6 @@
                             </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
-                    <!-- Copy & Share -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -177,7 +171,6 @@
                             android:text="Share"
                             app:icon="@android:drawable/ic_menu_share" />
                     </LinearLayout>
-                    <!-- Go to Dashboard -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_go_dashboard"
                         android:layout_width="match_parent"
@@ -189,7 +182,6 @@
                         android:minHeight="60dp"
                         android:singleLine="false"
                         android:maxLines="3" />
-                    <!-- Report Another Fault -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_report_another"
                         style="@style/Widget.Material3.Button.OutlinedButton"
@@ -203,7 +195,6 @@
                         android:minHeight="60dp"
                         android:singleLine="false"
                         android:maxLines="3" />
-                    <!-- Track Report -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_track_report"
                         style="@style/Widget.Material3.Button.OutlinedButton"

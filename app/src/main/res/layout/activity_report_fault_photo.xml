@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -58,7 +57,6 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Progress -->
     <LinearLayout
         android:id="@+id/progress_container"
         android:layout_width="0dp"
@@ -88,7 +86,6 @@
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
     </LinearLayout>
-    <!-- Content -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -128,7 +125,6 @@
                 android:text="Add up to 3 photos, or skip this step"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
-            <!-- Camera placeholder / preview -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/camera_placeholder"
                 android:layout_width="match_parent"
@@ -143,7 +139,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <!-- Photo preview (hidden until a photo is chosen) -->
                     <ImageView
                         android:id="@+id/iv_photo_preview"
                         android:layout_width="match_parent"
@@ -151,7 +146,6 @@
                         android:scaleType="centerCrop"
                         android:visibility="gone"
                         android:contentDescription="Photo preview" />
-                    <!-- Camera icon (hidden once a photo is chosen) -->
                     <ImageView
                         android:id="@+id/iv_camera_icon"
                         android:layout_width="80dp"
@@ -163,7 +157,6 @@
                         app:tint="@color/on_secondary"
                         android:contentDescription="@null"
                         android:importantForAccessibility="no" />
-                    <!-- Hint pill (text changes once a photo is chosen) -->
                     <TextView
                         android:id="@+id/tv_tap_hint"
                         android:layout_width="wrap_content"
@@ -193,7 +186,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal" />
-            <!-- Gallery / Retake buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -232,10 +224,8 @@
                     android:singleLine="false"
                     android:maxLines="3" />
             </LinearLayout>
-            <!-- Tips card -->
         </LinearLayout>
     </ScrollView>
-    <!-- Bottom bar (one action: Skip photos / Continue) -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
@@ -258,7 +248,6 @@
             android:singleLine="false"
             android:maxLines="3" />
     </LinearLayout>
-    <!-- Bottom Navigation (highlighting "Report" tab) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"

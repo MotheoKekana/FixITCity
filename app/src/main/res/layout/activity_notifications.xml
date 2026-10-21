@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Top App Bar: Consistent with Dashboard -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -34,7 +33,6 @@
             android:layout_marginEnd="8dp"
             android:maxLines="1"
             android:ellipsize="end" />
-        <!-- Notification Icon: Filled in for this page -->
         <ImageView
             android:id="@+id/ivNotification"
             android:layout_width="24dp"
@@ -100,7 +98,6 @@
                 android:orientation="vertical" />
         </LinearLayout>
     </ScrollView>
-    <!-- Bottom Navigation Bar: Same style but no active highlights -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -110,7 +107,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -136,7 +132,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -162,7 +157,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Track -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -188,7 +182,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

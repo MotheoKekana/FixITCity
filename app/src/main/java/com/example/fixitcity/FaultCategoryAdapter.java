@@ -57,7 +57,6 @@ public class FaultCategoryAdapter extends BaseAdapter {
         holder.title.setText(category.getName());
         holder.description.setText(category.getDescription());
 
-        // Hide the severity badge (user should not see it)
         holder.severity.setVisibility(View.GONE);
 
         return convertView;

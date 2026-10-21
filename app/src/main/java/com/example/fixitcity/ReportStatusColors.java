@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-/** Matching foreground/background pairs for report statuses in either theme. */
 public final class ReportStatusColors {
     private ReportStatusColors() { }
 

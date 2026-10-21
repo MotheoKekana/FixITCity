@@ -72,8 +72,7 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
                 return;
             }
 
-            // Persist the selection on ReportData so downstream screens can use it
-            reportData.setCategory(selected.getName());                 // used by getCategoryName()
+            reportData.setCategory(selected.getName());
             reportData.setCategoryId(realId);
             reportData.setCategoryDescription(selected.getDescription());
             reportData.setCategorySeverityWeight(selected.getSeverityWeight());
@@ -89,7 +88,6 @@ public class ReportFaultCategoryActivity extends AppCompatActivity {
             }
         });
 
-        // Bottom navigation
         findViewById(R.id.navHome).setOnClickListener(v -> AppNavigation.goHome(this));
 
         findViewById(R.id.navTrack).setOnClickListener(v ->

@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fixitcity.data.SessionManager;
 
-/** Shows all three onboarding pages within one activity. */
 public class Onboard_Report_Faults_Activity extends AppCompatActivity {
 
     private static final String STATE_PAGE = "onboarding_page";

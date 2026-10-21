@@ -41,7 +41,7 @@ public final class SupabaseNotifications {
         for (NotificationRow row : changed) {
             if (row.notification_id == notificationId && row.citizen_id == citizenId && row.is_read) return;
         }
-        // Another device may already have read it. Keep that first read timestamp.
+        // Preserve the first read time if another device marked it read.
         for (NotificationRow row : parseRows(SupabaseClient.getWithAuth(
                 ownership + "&select=notification_id,citizen_id,is_read&limit=1", accessToken))) {
             if (row.notification_id == notificationId && row.citizen_id == citizenId && row.is_read) return;
@@ -49,7 +49,6 @@ public final class SupabaseNotifications {
         throw new IOException("The notification could not be marked as read");
     }
 
-    /** Load the one owned report, rather than downloading the citizen's whole history. */
     public static FaultReport getReportForCitizen(long reportId, long citizenId,
                                                   String accessToken) throws IOException {
         if (reportId <= 0 || citizenId <= 0) return null;

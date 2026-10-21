@@ -31,25 +31,19 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StatusHistoryItem item = items.get(position);
 
-        // ----- Date (left column) -----
         holder.tvDate.setText(formatDate(item.changedAt));
 
-        // ----- Description (right column) -----
         holder.tvDescription.setText(buildDescription(item));
 
-        // ----- Timeline rail cosmetics -----
         boolean isFirst = position == 0;
         boolean isLast  = position == getItemCount() - 1;
 
-        // Hide line above the first dot and below the last dot so it doesn't
-        // extend past the ends of the list.
         ViewGroup.MarginLayoutParams lineLp =
                 (ViewGroup.MarginLayoutParams) holder.vLine.getLayoutParams();
         lineLp.topMargin    = isFirst ? dpToPx(holder.itemView, 23) : 0;
         lineLp.bottomMargin = isLast  ? dpToPx(holder.itemView, 9999) : 0;
         holder.vLine.setLayoutParams(lineLp);
 
-        // Emphasise the newest event (position 0) with a slightly bigger dot.
         float dotSizeDp = isFirst ? 18f : 14f;
         int   dotSizePx = dpToPx(holder.itemView, (int) dotSizeDp);
         ViewGroup.LayoutParams dotLp = holder.vDot.getLayoutParams();
@@ -63,10 +57,6 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
         return items.size();
     }
 
-    /**
-     * "Pending" for the very first event, otherwise "Old → New".
-     * If notes are present, they're appended on a new line.
-     */
     private String buildDescription(StatusHistoryItem item) {
         StringBuilder sb = new StringBuilder();
 
@@ -85,15 +75,10 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
         return sb.toString();
     }
 
-    /**
-     * Accepts Supabase timestamps in a few common shapes and returns
-     * a friendly "16 Sep 2026\n15:37" string. Falls back to the raw value.
-     */
     private String formatDate(String raw) {
         if (raw == null || raw.length() < 16) return raw != null ? raw : "—";
 
         try {
-            // Expect "YYYY-MM-DDTHH:MM..." or "YYYY-MM-DD HH:MM..."
             String datePart = raw.substring(0, 10);
             String timePart = raw.substring(11, 16);
 
@@ -123,7 +108,6 @@ public class StatusHistoryAdapter extends RecyclerView.Adapter<StatusHistoryAdap
         return Math.round(dp * density);
     }
 
-    // ------------------------------------------------------------------
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate;

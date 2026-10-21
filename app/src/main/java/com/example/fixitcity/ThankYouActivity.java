@@ -18,21 +18,17 @@ public class ThankYouActivity extends AppCompatActivity {
 
         ScreenInsets.apply(this);
 
-        // Get the report name passed from ProximityCheckActivity
         String reportName = getIntent().getStringExtra("report_name");
 
-        // Find the title TextView and update it dynamically
         TextView tvTitle = findViewById(R.id.tv_thank_you_title);
         if (tvTitle != null) {
             if (reportName != null && !reportName.isEmpty()) {
-                // This will display: Thank you for upvoting "Burst Pipe"
                 tvTitle.setText("Thank you for upvoting\n\"" + reportName + "\"");
             } else {
                 tvTitle.setText("Thank you for upvoting!");
             }
         }
 
-        // Route to the right dashboard based on real login state
         View btnGoDashboard = findViewById(R.id.btn_go_dashboard);
         if (btnGoDashboard != null) {
             btnGoDashboard.setOnClickListener(v -> {

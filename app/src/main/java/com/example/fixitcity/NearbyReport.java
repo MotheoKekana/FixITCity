@@ -38,16 +38,12 @@ public class NearbyReport {
     public int getVoteCount() { return voteCount; }
     public double getDistance() { return distance; }
 
-    /** Setter — used by the optimistic upvote UI. */
     public void setVoteCount(int voteCount) { this.voteCount = voteCount; }
 
-    /** Owner (creator) of the report — used to block self-upvote. */
     public long getOwnerCitizenId() { return ownerCitizenId; }
     public void setOwnerCitizenId(long id) { this.ownerCitizenId = id; }
 
-    /** Kept for backward compatibility — adapter calls getId(). */
     public int getId() { return (int) reportId; }
 
-    /** Kept for backward compatibility. */
     public void incrementVote() { this.voteCount++; }
 }

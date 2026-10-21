@@ -11,10 +11,6 @@ public class SupabaseUsers {
 
     private static final Gson gson = new Gson();
 
-    /**
-     * Finds the public.users row belonging to the authenticated
-     * Supabase Auth account.
-     */
     public static long findUserIdByAuthUuid(
             String authUuid,
             String accessToken
@@ -54,9 +50,6 @@ public class SupabaseUsers {
         return users.get(0).user_id;
     }
 
-    /**
-     * Loads the citizen profile belonging to a public.users row.
-     */
     public static CitizenProfileDTO findCitizenProfileByUserId(
             long userId,
             String accessToken
@@ -97,9 +90,6 @@ public class SupabaseUsers {
         return profiles.get(0);
     }
 
-    /**
-     * Kept for compatibility with existing code.
-     */
     public static long findCitizenProfileIdByUserId(
             long userId,
             String accessToken
@@ -118,11 +108,6 @@ public class SupabaseUsers {
         return profile.citizen_profile_id;
     }
 
-    /**
-     * Saves or refreshes an FCM device token.
-     *
-     * The required RLS policies will be added during the RLS phase.
-     */
     public static void saveDeviceToken(
             long userId,
             String token,
@@ -191,7 +176,7 @@ public class SupabaseUsers {
 
     }
 
-    /** Find the current user's device token without putting it into a request URL. */
+    // Look up device tokens without exposing them in a URL.
     private static long findDeviceTokenId(long userId, String token,
                                           String accessToken) throws IOException {
         String path = "/device_tokens?user_id=eq." + userId

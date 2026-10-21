@@ -37,9 +37,7 @@ public class Splash_Activity extends AppCompatActivity {
     private void restoreSession() {
         SessionManager session = new SessionManager(getApplicationContext());
 
-        // A user with a saved session must never be forced back through
-        // onboarding, including users affected by older versions that cleared
-        // the onboarding flag during login.
+        // A restored session skips onboarding, including after older versions cleared its flag.
         if (!session.hasSeenOnboarding() && !session.isLoggedIn()) {
             navigateAfterMinimumDelay(Onboard_Report_Faults_Activity.class);
             return;
@@ -78,7 +76,7 @@ public class Splash_Activity extends AppCompatActivity {
         }
 
         if (refreshResult == SessionRefresher.Result.REFRESHED) {
-            // Only contact Supabase/Firebase after the fresh token is stored.
+            // Register the device only after saving the refreshed session.
             registerDeviceToken(session);
         } else {
             Log.i(TAG, "Offline at startup; continuing with cached account data");
@@ -104,9 +102,6 @@ public class Splash_Activity extends AppCompatActivity {
         }, remaining);
     }
 
-    /**
-     * Save this device's FCM token after the Supabase session has been refreshed.
-     */
     private void registerDeviceToken(SessionManager session) {
         long userId = session.getUserIdBigint();
         String accessToken = session.getAccessToken();

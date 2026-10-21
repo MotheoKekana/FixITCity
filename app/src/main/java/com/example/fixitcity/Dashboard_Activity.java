@@ -38,12 +38,11 @@ public class Dashboard_Activity extends AppCompatActivity {
 
     private static final double PROXIMITY_RADIUS_M = 2000;
     private static final int NEARBY_PREVIEW_LIMIT = 5;
-    private static final int RECENT_PREVIEW_LIMIT = 5;   // max recent cards shown
+    private static final int RECENT_PREVIEW_LIMIT = 5;
 
     private TextView tvWelcome, tvReportCount, tvNearbyRadius, tvSeeMoreNearby;
     private RecyclerView rvRecentReports, rvNearbyReports;
 
-    // ---- recent reports use the new card-based adapter ----
     private RecentReportAdapter recentAdapter;
     private final List<FaultReport> recentReports = new ArrayList<>();
 
@@ -64,7 +63,6 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        // Redirect if not properly logged in
         if (session.isGuest() || !session.isLoggedIn() || session.getCitizenProfileId() <= 0) {
             Toast.makeText(this, "Please log in to view your dashboard", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, Login_Activity.class));
@@ -76,7 +74,6 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         requestNotificationPermissionIfNeeded();
 
-        // Views
         tvWelcome = findViewById(R.id.tvWelcome);
         tvReportCount = findViewById(R.id.tvReportCount);
         tvNearbyRadius = findViewById(R.id.tvNearbyRadius);
@@ -84,26 +81,21 @@ public class Dashboard_Activity extends AppCompatActivity {
         rvRecentReports = findViewById(R.id.rvRecentReports);
         rvNearbyReports = findViewById(R.id.rvNearbyReports);
 
-        // Welcome text
         String firstName = session.getFirstName();
         if (firstName == null || firstName.isEmpty()) firstName = "there";
         tvWelcome.setText("Hello, " + firstName);
 
-        // ---------- Recent reports RecyclerView (card layout) ----------
         rvRecentReports.setLayoutManager(new LinearLayoutManager(this));
         recentAdapter = new RecentReportAdapter(recentReports, this::onRecentReportClicked);
         rvRecentReports.setAdapter(recentAdapter);
 
-        // ---------- Nearby reports RecyclerView ----------
         rvNearbyReports.setLayoutManager(new LinearLayoutManager(this));
         nearbyAdapter = new NearbyReportAdapter(this, nearbyList,
                 (report, position) -> AppNavigation.openNearbySummary(this, report));
         rvNearbyReports.setAdapter(nearbyAdapter);
 
-        // Nearby radius label
         tvNearbyRadius.setText("Reports within 2 km of your current location");
 
-        // See all nearby reports link
         if (tvSeeMoreNearby != null) {
             tvSeeMoreNearby.setOnClickListener(v ->
                     startActivity(new Intent(this, NearbyReportsActivity.class)));
@@ -113,14 +105,12 @@ public class Dashboard_Activity extends AppCompatActivity {
         if (seeAllRecent != null) seeAllRecent.setOnClickListener(v ->
                 startActivity(new Intent(this, ReportHistoryActivity.class)));
 
-        // Notifications bell
         ImageView ivNotif = findViewById(R.id.ivNotifications);
         if (ivNotif != null) {
             ivNotif.setOnClickListener(v ->
                     startActivity(new Intent(this, Notifications_Activity.class)));
         }
 
-        // Quick action: Track Report
         View cardTrack = findViewById(R.id.cardTrackReport);
         if (cardTrack != null) {
             cardTrack.setOnClickListener(v ->
@@ -129,11 +119,9 @@ public class Dashboard_Activity extends AppCompatActivity {
 
         setupBottomNav();
 
-        // Location client + nearby reports
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         loadNearbyReports();
 
-        // My reports
         loadMyReports();
     }
 
@@ -207,14 +195,12 @@ public class Dashboard_Activity extends AppCompatActivity {
                         SupabaseReports.getUserReports(citizenProfileId, accessToken);
                 if (reports == null) reports = new ArrayList<>();
 
-                // Newest first (server already sorts, but be defensive)
                 reports.sort((a, b) -> {
                     String da = a.getCreatedAt() != null ? a.getCreatedAt() : "";
                     String db = b.getCreatedAt() != null ? b.getCreatedAt() : "";
                     return db.compareTo(da);
                 });
 
-                // Limit how many cards we show on the dashboard
                 int limit = Math.min(reports.size(), RECENT_PREVIEW_LIMIT);
                 final List<FaultReport> preview = reports.subList(0, limit);
                 final int total = reports.size();
@@ -234,9 +220,6 @@ public class Dashboard_Activity extends AppCompatActivity {
         }).start();
     }
 
-    // ------------------------------------------------------------------
-    // Recent report card tapped
-    // ------------------------------------------------------------------
     private void onRecentReportClicked(FaultReport report) {
         Intent intent = new Intent(this, TrackReportResultActivity.class);
         intent.putExtra("report_id", report.getReportId());
@@ -251,9 +234,6 @@ public class Dashboard_Activity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // ------------------------------------------------------------------
-    // Nearby reports
-    // ------------------------------------------------------------------
     private void loadNearbyReports() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -300,19 +280,17 @@ public class Dashboard_Activity extends AppCompatActivity {
             try {
                 String accessToken = session.getAccessToken();
 
-                // Category lookup
                 Map<Long, String> categoryNames = new HashMap<>();
                 List<FaultCategory> categories = SupabaseReports.getCategories(accessToken);
                 for (FaultCategory c : categories) {
                     categoryNames.put(c.getCategoryId(), c.getName());
                 }
 
-                // The database RPC restricts results to open reports within 2 km.
                 List<FaultReport> openReports = SupabaseReports.getNearbyReports(
                         userLat, userLng, accessToken);
                 Log.d(TAG, "Fetched " + openReports.size() + " nearby reports");
 
-                // Retain a local distance check for display and rounding at the boundary.
+                // Recheck distance locally for display near the 2 km boundary.
                 List<NearbyReport> fresh = new ArrayList<>();
                 for (FaultReport r : openReports) {
                     double distance = SupabaseReports.haversineMeters(
@@ -335,7 +313,6 @@ public class Dashboard_Activity extends AppCompatActivity {
                     }
                 }
 
-                // Sort nearest first
                 fresh.sort((a, b) -> Double.compare(a.getDistance(), b.getDistance()));
 
                 Log.d(TAG, "Filtered to " + fresh.size() + " reports within " + PROXIMITY_RADIUS_M + "m");
@@ -346,12 +323,10 @@ public class Dashboard_Activity extends AppCompatActivity {
                     tvNearbyRadius.setText("Reports within 2 km of your current location");
                     nearbyList.clear();
 
-                    // Show at most 5 on the dashboard
                     int limit = Math.min(totalCount, NEARBY_PREVIEW_LIMIT);
                     nearbyList.addAll(fresh.subList(0, limit));
                     nearbyAdapter.notifyDataSetChanged();
 
-                    // Show "See all" only when there are more than 5
                     if (tvSeeMoreNearby != null) {
                         tvSeeMoreNearby.setVisibility(
                                 totalCount > NEARBY_PREVIEW_LIMIT ? View.VISIBLE : View.GONE);

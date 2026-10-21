@@ -44,7 +44,6 @@ public class FaultReportAdapter extends RecyclerView.Adapter<FaultReportAdapter.
         String ref = report.getReferenceNumber();
         holder.tvReference.setText(ref != null ? ref : "#----");
 
-        // Status text: "⏳ Pending sync" for queued rows, normal status otherwise
         if (report.isPendingSync()) {
             holder.tvStatus.setText("⏳ Pending sync");
         } else {

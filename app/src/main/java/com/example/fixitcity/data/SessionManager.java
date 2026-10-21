@@ -45,11 +45,7 @@ public class SessionManager {
         editor.apply();
     }
 
-    /**
-     * Save a refreshed Supabase token pair in one preferences transaction.
-     * Supabase can rotate the refresh token, so both values must be persisted
-     * together before another authenticated request starts.
-     */
+    // Save both tokens together because Supabase may rotate the refresh token.
     public void saveAuthTokens(String accessToken, String refreshToken) {
         SharedPreferences.Editor tokenEditor = prefs.edit()
                 .putString(KEY_ACCESS_TOKEN, accessToken);
@@ -128,7 +124,6 @@ public class SessionManager {
         return "guest".equalsIgnoreCase(getRole());
     }
 
-    /** Older builds saved a placeholder token instead of a Supabase session. */
     public boolean hasGuestAuthSession() {
         return isGuest() && getUserId() != null && !"guest".equals(getUserId())
                 && getAccessToken() != null && !"guest".equals(getAccessToken())
@@ -153,9 +148,7 @@ public class SessionManager {
     }
 
     public void logout() {
-        // Onboarding is an app-level preference, not account data. Preserve it
-        // when clearing a signed-in or guest session so logout/login does not
-        // send the user through onboarding again.
+        // Keep the onboarding flag when clearing an account session.
         boolean seenOnboarding = hasSeenOnboarding();
         editor.clear();
         editor.putBoolean(KEY_SEEN_ONBOARDING, seenOnboarding);

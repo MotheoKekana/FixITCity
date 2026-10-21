@@ -23,13 +23,11 @@ public interface ReportDao {
     @Query("SELECT * FROM report_outbox ORDER BY created_at_local ASC")
     List<ReportEntity> getAll();
 
-    // A process can stop after SyncWorker marks a row Syncing. Include it on
-    // the next run so an interrupted upload is retried by reference number.
+    // Retry rows left Syncing after an interrupted worker run.
     @Query("SELECT * FROM report_outbox WHERE citizen_id = :citizenId AND sync_status IN ('Pending', 'Failed', 'Syncing') ORDER BY created_at_local ASC")
     List<ReportEntity> getPendingForCitizen(long citizenId);
 
-    // Guest offline IDs begin with the Supabase anonymous auth UUID.
-    // This scopes pending reports to the current guest session without a Room migration.
+    // Guest offline IDs include the anonymous auth UUID to isolate sessions.
     @Query("SELECT * FROM report_outbox WHERE citizen_id = -1 AND offline_id LIKE :guestPrefix || '%' AND sync_status IN ('Pending', 'Failed', 'Syncing') ORDER BY created_at_local ASC")
     List<ReportEntity> getPendingForGuest(String guestPrefix);
 

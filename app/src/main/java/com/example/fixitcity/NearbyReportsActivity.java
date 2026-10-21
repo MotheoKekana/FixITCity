@@ -32,11 +32,9 @@ public class NearbyReportsActivity extends AppCompatActivity {
     private static final String TAG = "NearbyReports";
     private static final int REQ_LOCATION = 1001;
 
-    /** Radius in meters — 2 km. */
     private static final double RADIUS_METERS = 2000.0;
 
 
-    /** Dropdown options. */
     private static final String FILTER_ALL   = "All Reports";
     private static final String FILTER_OTHER = "Other";
 
@@ -49,7 +47,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
             FILTER_OTHER
     };
 
-    /** Titles containing one of these are NOT "Other". */
     private static final String[] KNOWN_CATEGORIES = {
             "Burst Pipe",
             "Pothole",
@@ -63,10 +60,8 @@ public class NearbyReportsActivity extends AppCompatActivity {
 
     private NearbyReportAdapter adapter;
 
-    /** Full list within 2 km — source for filtering. */
     private final List<NearbyReport> allWithinRadius = new ArrayList<>();
 
-    /** Currently displayed list. */
     private final List<NearbyReport> nearbyList = new ArrayList<>();
 
     private String currentFilter = FILTER_ALL;
@@ -81,7 +76,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
         if (!AppNavigation.requireCitizen(this)) return;
         setContentView(R.layout.activity_nearby_reports);
 
-        // ---------- Bottom navigation ----------
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -120,12 +114,10 @@ public class NearbyReportsActivity extends AppCompatActivity {
             });
         }
 
-// ---------- Notification bell ----------
         AppNavigation.bindNotificationBell(this);
 
         ScreenInsets.apply(this);
 
-        // ---------- RecyclerView ----------
         rvNearbyReports = findViewById(R.id.rvNearbyReports);
         if (rvNearbyReports == null) {
             throw new IllegalStateException(
@@ -173,7 +165,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
 
         tvEmptyState = findViewById(R.id.tvEmptyState);
 
-        // ---------- Filter dropdown ----------
         actCategoryFilter = findViewById(R.id.actCategoryFilter);
 
         ArrayAdapter<String> filterAdapter = new ArrayAdapter<String>(
@@ -183,7 +174,7 @@ public class NearbyReportsActivity extends AppCompatActivity {
             @NonNull
             @Override
             public android.widget.Filter getFilter() {
-                // No-op filter: always show every option, regardless of current text.
+                // Keep every category visible in the dropdown while a filter is selected.
                 return new android.widget.Filter() {
                     @Override
                     protected FilterResults performFiltering(CharSequence c) {
@@ -212,7 +203,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
             }
         });
 
-        // ---------- Location ----------
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -276,7 +266,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 
-    /** Fetch open reports from Supabase and keep those within RADIUS_METERS. */
     private void loadAllNearbyReports() {
         SessionManager session = new SessionManager(this);
         String accessToken = session.getAccessToken();
@@ -315,7 +304,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
                         + " within " + RADIUS_METERS + "m of ("
                         + userLat + ", " + userLng + ")");
 
-                // Diagnostic — shows exactly what titles made it past the filter
                 for (NearbyReport n : fresh) {
                     android.util.Log.d(TAG, "  report title=\"" + n.getTitle() + "\"");
                 }
@@ -334,15 +322,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * Rebuild {@link #nearbyList} from {@link #allWithinRadius} based on
-     * {@link #currentFilter}.
-     *
-     *  - "All Reports" -> everything
-     *  - "Burst Pipe" / "Pothole" / "Water Leak" / "Streetlight"
-     *        -> title contains that keyword
-     *  - "Other"       -> title contains NONE of the known categories
-     */
     private void applyFilter() {
         nearbyList.clear();
 
@@ -379,7 +358,6 @@ public class NearbyReportsActivity extends AppCompatActivity {
                 + allWithinRadius.size());
     }
 
-    /** True if the report's title contains any of the four known keywords. */
     private boolean matchesAnyKnownCategory(NearbyReport report) {
         String title = report.getTitle() != null
                 ? report.getTitle().toLowerCase(Locale.ROOT) : "";

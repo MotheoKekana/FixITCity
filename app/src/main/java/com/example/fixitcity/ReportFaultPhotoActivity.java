@@ -276,7 +276,6 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 int orientation = ExifInterface.ORIENTATION_NORMAL;
-                // The platform InputStream constructor is available from API 24.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     try (InputStream exifStream = getContentResolver().openInputStream(uri)) {
                         if (exifStream == null) throw new IOException("Photo cannot be opened");
@@ -284,7 +283,7 @@ public class ReportFaultPhotoActivity extends AppCompatActivity {
                         orientation = exif.getAttributeInt(
                                 ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                     } catch (IOException exifError) {
-                        // Files without readable EXIF can still be decoded normally.
+                        // Decode images even when EXIF orientation is unavailable.
                         Log.w(TAG, "Photo orientation unavailable", exifError);
                     }
                 }

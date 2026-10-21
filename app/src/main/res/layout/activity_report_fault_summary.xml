@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -58,7 +57,6 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Progress -->
     <LinearLayout
         android:id="@+id/progress_container"
         android:layout_width="0dp"
@@ -88,7 +86,6 @@
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
     </LinearLayout>
-    <!-- Content -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -109,7 +106,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-            <!-- Summary Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,7 +117,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-                    <!-- Category -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -147,7 +142,6 @@
                         android:layout_height="1dp"
                         android:layout_marginVertical="12dp"
                         android:background="@color/divider" />
-                    <!-- Photo -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -173,7 +167,6 @@
                         android:layout_height="1dp"
                         android:layout_marginVertical="12dp"
                         android:background="@color/divider" />
-                    <!-- Location -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -196,7 +189,6 @@
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Details Input -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -218,10 +210,8 @@
                     android:hint="e.g., The pothole is in the right lane..."
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
-            <!-- Disclaimer -->
         </LinearLayout>
     </ScrollView>
-    <!-- Bottom Bar (Submit Button) -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
@@ -243,7 +233,6 @@
             android:singleLine="false"
             android:maxLines="3" />
     </LinearLayout>
-    <!-- Bottom Navigation (custom, highlighting "Report") -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -253,7 +242,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Home (unselected) -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -279,7 +267,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Report (selected – highlighted with yellow pill) -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -312,7 +299,6 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <!-- Track (unselected) -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -338,7 +324,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Settings (unselected) -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

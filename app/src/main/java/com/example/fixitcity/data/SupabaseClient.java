@@ -17,7 +17,6 @@ public class SupabaseClient {
 
     private static final String TAG = "SupabaseClient";
 
-    // Keep your existing Supabase project credentials here.
     public static final String SUPABASE_URL =
             "https://ubokqcaxsqsxyuwffagh.supabase.co";
 
@@ -49,7 +48,6 @@ public class SupabaseClient {
     private static OkHttpClient httpClient;
 
     private SupabaseClient() {
-        // Utility class
     }
 
     public static synchronized OkHttpClient getHttpClient() {
@@ -74,9 +72,6 @@ public class SupabaseClient {
         return httpClient;
     }
 
-    /**
-     * Creates a request using the anonymous Supabase key.
-     */
     public static Request.Builder baseRequest(
             String url
     ) {
@@ -96,10 +91,6 @@ public class SupabaseClient {
                 );
     }
 
-    /**
-     * Creates a request using the logged-in user's
-     * access token.
-     */
     public static Request.Builder userRequest(
             String url,
             String accessToken
@@ -129,9 +120,6 @@ public class SupabaseClient {
                 );
     }
 
-    // =================================================
-    // Anonymous requests
-    // =================================================
 
     public static String get(
             String path
@@ -219,9 +207,6 @@ public class SupabaseClient {
         );
     }
 
-    // =================================================
-    // Authenticated requests
-    // =================================================
 
     public static String getWithAuth(
             String path,
@@ -317,9 +302,6 @@ public class SupabaseClient {
         );
     }
 
-    // =================================================
-    // Supabase Storage
-    // =================================================
 
     public static String uploadToStorage(
             String bucketName,
@@ -406,9 +388,6 @@ public class SupabaseClient {
                 + storagePath;
     }
 
-    // =================================================
-    // Shared response handling
-    // =================================================
 
     private static String executeRequest(
             Request request,
@@ -425,8 +404,7 @@ public class SupabaseClient {
                             ? response.body().string()
                             : "";
 
-            // Paths can contain device tokens in query parameters; response bodies
-            // can contain private profile data. Log only the route and status.
+            // Log only routes and status codes; URLs and bodies may contain personal data.
             String safeOperation = operation.split("\\?", 2)[0];
             Log.d(TAG, safeOperation + " | HTTP " + response.code());
 
@@ -435,9 +413,8 @@ public class SupabaseClient {
                 try {
                     errorCode = new JSONObject(responseBody).optString("code", "");
                 } catch (Exception ignored) {
-                    // A non-JSON error still has an HTTP status for diagnosis.
                 }
-                // The upvote screen uses this constraint name to explain repeat votes.
+                // Keep the vote constraint name so the UI can identify repeat votes.
                 String voteConstraint = responseBody.contains("report_votes_unique_per_citizen")
                         ? " (report_votes_unique_per_citizen)" : "";
                 throw new IOException(

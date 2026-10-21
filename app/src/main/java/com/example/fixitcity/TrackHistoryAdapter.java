@@ -40,20 +40,16 @@ public class TrackHistoryAdapter
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FaultReport r = items.get(position);
 
-        // Title
         holder.tvTitle.setText(r.getTitle() != null ? r.getTitle() : "Report");
 
-        // Reference
         holder.tvReference.setText(
                 r.getReferenceNumber() != null ? r.getReferenceNumber() : "—");
 
-        // Date
         String readableDate = NotificationDates.format(r.getCreatedAt());
         holder.tvDate.setText(readableDate);
         holder.tvDate.setContentDescription((r.isPendingSync() ? "Saved on " : "Submitted on ")
                 + readableDate);
 
-        // Priority
         if (r.isPendingSync()) {
             holder.tvPriority.setText("Score after sync");
         } else if (r.getPriorityScore() != null) {
@@ -62,15 +58,12 @@ public class TrackHistoryAdapter
             holder.tvPriority.setText("Calculating score");
         }
 
-        // Status badge text + colour
         String status = r.getStatus() != null ? r.getStatus() : "Pending";
         holder.tvStatus.setText(status);
         ReportStatusColors.apply(holder.tvStatus, status);
 
-        // Icon tint (optional — keeps default icon but colours per status)
         ReportStatusColors.applyIcon(holder.ivIcon, status);
 
-        // Row click → open details
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(r);
         });

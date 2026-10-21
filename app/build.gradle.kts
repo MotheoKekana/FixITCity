@@ -34,34 +34,27 @@ android {
 }
 
 dependencies {
-    // UI
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
     implementation(libs.material)
 
-    // Location & Maps
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
 
-    // Networking (pure Java)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
 
-    // Room (offline)
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
 
-    // WorkManager (offline sync)
     implementation(libs.work.runtime)
 
-    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.analytics)
 
-    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)

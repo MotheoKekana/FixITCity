@@ -56,7 +56,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
     private ReportData reportData;
 
-    /** My own citizen id — used to exclude own reports and block self-upvote. */
     private long myCitizenId = -1;
 
     private final Set<Long> votedReportIds = new HashSet<>();
@@ -82,7 +81,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
 
         reportData = ((FixITCityApp) getApplication()).getReportData();
 
-        // Cache the citizen id once
         SessionManager session = new SessionManager(this);
         myCitizenId = session.getCitizenProfileId();
         Log.d(TAG, "myCitizenId=" + myCitizenId);
@@ -263,7 +261,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         String catLabel = categoryName != null ? categoryName.toLowerCase(Locale.US) + " " : "";
 
         if (withinRadius.isEmpty()) {
-            // Removed the "No similar reports found nearby" text as requested
             if (tvStatus != null) tvStatus.setText("");
             if (tvReportsCount != null) {
                 tvReportsCount.setText("0 " + catLabel + "reports within " + (int) RADIUS_METERS + "m");
@@ -312,7 +309,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
         }
         long reportId = report.getReportId();
 
-        // ---- Self-upvote guard (defensive — list should already exclude them) ----
         if (myCitizenId > 0 && report.getOwnerCitizenId() == myCitizenId) {
             Toast.makeText(this,
                     "You can't upvote your own report.",
@@ -335,7 +331,6 @@ public class ProximityCheckActivity extends AppCompatActivity {
             Toast.makeText(this, "Please log in to upvote", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Optimistic UI bump
         int oldCount = report.getVoteCount();
         report.setVoteCount(oldCount + 1);
         if (adapter != null) adapter.notifyItemChanged(position);
@@ -357,9 +352,7 @@ public class ProximityCheckActivity extends AppCompatActivity {
             final String failure = errorMessage;
             runOnUiThread(() -> {
                 if (failure == null) {
-                    // Success → open Thank You screen
                     Intent i = new Intent(this, ThankYouActivity.class);
-                    // Pass the actual category/title to Thank You
                     i.putExtra("report_name", report.getCategory());
                     startActivity(i);
                     finish();

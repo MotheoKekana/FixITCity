@@ -5,11 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 
-/**
- * Connectivity check for UI hints only. Do NOT use this to decide
- * whether a submission should be queued — always attempt Supabase
- * first and queue on actual network failure.
- */
+// Use connectivity for UI hints; queue only after an actual request fails.
 public class NetworkUtils {
 
     public static boolean isOnline(Context context) {

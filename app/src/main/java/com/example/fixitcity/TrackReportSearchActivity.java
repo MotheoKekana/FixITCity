@@ -174,7 +174,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
                 && ownerId != null && ownerId.equals(current.getUserId());
     }
 
-    /** Reference lookup supports this guest's pending outbox without a history screen. */
+    // A guest can look up a report still pending in the local outbox.
     private FaultReport findGuestReport(String reference, SessionManager session, String ownerId)
             throws IOException {
         ReportEntity queued = null;
@@ -185,7 +185,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
                 break;
             }
         }
-        // A local reference remains usable while the phone is offline.
+        // Keep local reference lookup available offline.
         if (queued != null && !NetworkUtils.isOnline(this)) return pendingGuestReport(queued);
         if (!ownerId.equals(session.getUserId()) || !session.hasGuestAuthSession()) {
             throw new IOException("Your guest session changed. Please try again.");
@@ -199,7 +199,7 @@ public class TrackReportSearchActivity extends AppCompatActivity {
         }
         try {
             FaultReport report = SupabaseReports.trackAsGuest(reference, session.getAccessToken());
-            // A photo can still be queued for a report that already exists online.
+            // A report can be online while its photo remains queued.
             if (report != null) return report;
         } catch (IOException e) {
             if (queued == null) throw e;

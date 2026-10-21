@@ -2,7 +2,6 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="320dp" android:height="180dp"
     android:viewportWidth="320" android:viewportHeight="180">
-    <!-- Schematic GPS rings; no invented roads or map details. -->
     <path android:fillColor="#00000000" android:strokeColor="@color/gps_ring_outer" android:strokeWidth="1.5"
         android:pathData="M160,14 A72,72 0,1 1,160,158 A72,72 0,1 1,160,14 Z" />
     <path android:fillColor="#00000000" android:strokeColor="@color/gps_ring_inner" android:strokeWidth="1.5"

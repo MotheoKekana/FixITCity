@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-/** Registers this installation for the signed-in citizen and removes it on logout. */
 public final class NotificationTokenManager {
     private static final String TAG = "NotificationTokens";
 
@@ -27,7 +26,7 @@ public final class NotificationTokenManager {
             Log.d(TAG, "FCM token fetched after citizen login");
             new Thread(() -> {
                 SessionManager current = new SessionManager(appContext);
-                // The callback can finish after the user has already logged out or switched accounts.
+                // Ignore the token callback if the account changed while it ran.
                 String currentAccessToken = current.getAccessToken();
                 if (current.isGuest() || current.getUserIdBigint() != userId
                         || currentAccessToken == null || currentAccessToken.isEmpty()) {
@@ -45,7 +44,7 @@ public final class NotificationTokenManager {
         });
     }
 
-    /** Best effort: logout remains available when Firebase or Supabase is offline. */
+    // Allow logout even if Firebase or Supabase is offline.
     public static void deactivateOnLogout(Context context, long userId, String accessToken) {
         if (userId <= 0 || accessToken == null || accessToken.isEmpty()) return;
 

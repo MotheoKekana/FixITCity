@@ -58,7 +58,6 @@ public class SupabaseReports {
         return results != null ? results : new ArrayList<>();
     }
 
-    /** Open reports within 2 km, including reports from other citizens. */
     public static List<FaultReport> getNearbyReports(
             double latitude, double longitude, String accessToken) throws IOException {
         if (Double.isNaN(latitude) || Double.isInfinite(latitude)
@@ -166,19 +165,18 @@ public class SupabaseReports {
             throw new IOException("Failed to create report");
         }
 
-        // The database trigger calculates priority after insert. The POST response
-        // can still contain the pre-trigger value, so reload once for display.
+        // Reload after insertion to read the priority set by the database trigger.
         try {
             FaultReport saved = getReportByReference(referenceNumber, accessToken);
             if (saved != null) return saved;
         } catch (IOException e) {
-            // The insert already succeeded. Do not retry it or queue a duplicate.
+            // Do not resubmit when only the priority reload fails.
             Log.w(TAG, "Created report, but could not reload its priority", e);
         }
         return created.get(0);
     }
 
-    /** Guest-owned report: RLS must enforce guest_auth_user_id = auth.uid(). */
+    // RLS must bind guest_auth_user_id to auth.uid().
     public static FaultReport submitGuestReport(String guestAuthId, long categoryId,
                                                 String referenceNumber, String title,
                                                 String description, double latitude,
@@ -244,7 +242,7 @@ public class SupabaseReports {
         SupabaseClient.postWithAuth("/report_photos", json, accessToken);
     }
 
-    /** Avoid inserting a second photo row after a retry or an uncertain response. */
+    // Check before inserting a photo row after an uncertain response.
     public static boolean photoExists(long reportId, String storagePath,
                                       String accessToken) throws IOException {
         String path = "/report_photos?report_id=eq." + reportId
@@ -258,7 +256,6 @@ public class SupabaseReports {
         return !response.trim().equals("[]");
     }
 
-    /** Photo rows for a report, with the primary photo first. */
     public static List<String> getPhotoUrls(long reportId, String accessToken) throws IOException {
         String response = SupabaseClient.getWithAuth("/report_photos?report_id=eq."
                         + reportId + "&select=photo_url,is_primary&order=is_primary.desc,supabase_storage_path.asc",
@@ -319,7 +316,6 @@ public class SupabaseReports {
         return reports != null ? reports : new ArrayList<>();
     }
 
-    /** Limited reference lookup, including this guest's own submitted reports. */
     public static FaultReport trackAsGuest(String reference, String accessToken)
             throws IOException {
         org.json.JSONObject request = new org.json.JSONObject();
@@ -332,7 +328,6 @@ public class SupabaseReports {
         return matches == null || matches.isEmpty() ? null : matches.get(0);
     }
 
-    /** Compatibility with older nearby-report screens. */
     @Deprecated
     public static FaultReport trackExternalAsGuest(String reference, String accessToken)
             throws IOException {
@@ -379,13 +374,6 @@ public class SupabaseReports {
         return results;
     }
 
-    // ==================================================================
-    // NEW: Category-filtered nearby reports
-    // ==================================================================
-    /**
-     * Fetches open reports of a specific category within radiusMeters of
-     * the given location. Returns a NearbyReport list sorted nearest-first.
-     */
     public static List<NearbyReport> getNearbyReportsForCategory(
             long categoryId,
             long currentCitizenId,
@@ -436,8 +424,7 @@ public class SupabaseReports {
         List<NearbyReport> out = new ArrayList<>();
         for (FaultReport r : reports) {
 
-            // NOTE: own reports are no longer filtered out — they're shown
-            // so the user can see them, but the app blocks upvoting them.
+            // Show the user's own nearby reports, but block self-upvotes.
 
             double d = haversineMeters(userLat, userLng, r.getLatitude(), r.getLongitude());
             if (d <= radiusMeters) {
@@ -458,15 +445,7 @@ public class SupabaseReports {
         return out;
     }
 
-    // ==================================================================
-    // NEW: Upvote
-    // ==================================================================
-    /**
-     * Inserts a row into report_votes. The bump_vote_count trigger on
-     * the DB side increments fault_reports.vote_count automatically.
-     * Let HTTP errors reach the caller so it can distinguish an existing vote
-     * from a connection or permissions problem.
-     */
+    // The database trigger updates vote_count; propagate HTTP errors to the caller.
     public static void upvoteReport(long reportId,
                                     long citizenProfileId,
                                     String accessToken) throws IOException {

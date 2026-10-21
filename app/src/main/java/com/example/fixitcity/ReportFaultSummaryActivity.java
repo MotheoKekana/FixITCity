@@ -151,7 +151,7 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
                         for (int i = 0; i < photos.size(); i++) {
                             String storagePath = "reports/" + created.getReportId() + "/"
                                     + referenceNumber + "-" + (i + 1) + ".jpg";
-                            // A retry may follow a partial upload or an uncertain response.
+                            // A retry can follow an uncertain photo upload response.
                             if (SupabaseReports.photoExists(created.getReportId(), storagePath, accessToken)) continue;
                             String publicUrl = SupabaseClient.uploadToStorage(
                                     SupabaseClient.REPORT_PHOTOS_BUCKET,
@@ -244,10 +244,9 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             row.longitude = reportData.getLongitude();
             row.address_line = reportData.getLocationAddress();
             row.reference_number = referenceNumber;
-            // The database calculates priority after this report syncs.
-            // Keep the Room column for existing installs, but do not invent a score.
+            // Priority is computed on sync; keep the Room column for older pending rows.
             row.priority_score = 0;
-            // JSON in the existing Room column avoids dropping older pending reports.
+            // Use the existing Room column to avoid losing older pending reports.
             row.photo_filename = photoFilenames.length() == 0 ? null : photoFilenames.toString();
             row.photo_mime_type = photoFilenames.length() == 0 ? null : "image/jpeg";
             row.sync_status = "Pending";
@@ -267,8 +266,7 @@ public class ReportFaultSummaryActivity extends AppCompatActivity {
             if (!rowInserted) for (File photo : savedPhotos) photo.delete();
             Log.e(TAG, "Offline queue failed: " + queueEx.getMessage(), queueEx);
             if (reportAlreadyOnline) {
-                // The report is already in Supabase. Never enable another submit
-                // that would create a second report just because its photo failed.
+                // A photo failure must not submit a second report.
                 showSuccess(referenceNumber,
                         created != null ? created.getPriorityScore() : null,
                         false, false, true);

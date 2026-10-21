@@ -15,15 +15,12 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-/** Keeps each activity's content inside the system bars, cutouts and keyboard. */
 public final class ScreenInsets {
     private ScreenInsets() { }
 
-    /** Call after setContentView, in place of an activity's own inset listener. */
     @SuppressWarnings("deprecation")
     public static void apply(Activity activity) {
         Window window = activity.getWindow();
-        // Use the same inset handling on Android 11+ and Android 15/16.
         WindowCompat.setDecorFitsSystemWindows(window, false);
         int inputMode = window.getAttributes().softInputMode;
         window.setSoftInputMode((inputMode & ~WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST)
@@ -32,8 +29,6 @@ public final class ScreenInsets {
         View content = activity.findViewById(android.R.id.content);
         if (content == null) return;
 
-        // The padded area also provides a matching backdrop on Android 15+,
-        // where status/navigation bars can be transparent.
         int barColor = ContextCompat.getColor(activity, R.color.system_bar_background);
         content.setBackgroundColor(barColor);
         window.setStatusBarColor(barColor);
@@ -44,7 +39,7 @@ public final class ScreenInsets {
         controller.setAppearanceLightStatusBars(lightBars);
         controller.setAppearanceLightNavigationBars(lightBars);
 
-        // Repeated calls must never count already-applied padding as original padding.
+        // Do not count padding added by a previous inset pass.
         if (content.getTag(R.id.screen_insets_state) instanceof PaddingState) {
             ViewCompat.requestApplyInsets(content);
             return;
@@ -56,8 +51,7 @@ public final class ScreenInsets {
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(content, (view, insets) -> {
-            // A union takes the largest inset on each edge: don't add the navigation
-            // bar height to the keyboard height, since they occupy the same space.
+            // Use the larger keyboard or navigation inset, not their sum.
             Insets safe = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout()
                     | WindowInsetsCompat.Type.ime());
@@ -70,12 +64,11 @@ public final class ScreenInsets {
                 state.revealFocusedInput = insets.isVisible(WindowInsetsCompat.Type.ime());
                 view.setPadding(left, top, right, bottom);
             }
-            // Content has handled these insets. Descendants must not add them again.
+            // Descendants should not apply these system insets again.
             return WindowInsetsCompat.CONSUMED;
         });
 
-        // Run after the smaller viewport has been laid out. ScrollView can then
-        // bring the focused field (and a little space around it) above the IME.
+        // Scroll only after the keyboard has resized the viewport.
         content.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             if (!state.revealFocusedInput) return;
             state.revealFocusedInput = false;

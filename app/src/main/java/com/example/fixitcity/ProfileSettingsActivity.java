@@ -32,7 +32,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        // ===== Populate profile header from session =====
         TextView tvName = findViewById(R.id.tv_profile_name);
         TextView tvEmail = findViewById(R.id.tv_profile_email);
         TextView tvPhone = findViewById(R.id.tv_profile_phone);
@@ -55,7 +54,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             tvPhone.setText(phone != null && !phone.isEmpty() ? phone : "No phone number saved");
         }
 
-        // ===== Load real report count =====
         if (tvReportsCount != null) {
             long citizenProfileId = session.getCitizenProfileId();
             String accessToken = session.getAccessToken();
@@ -98,7 +96,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 });
         if (session.isGuest()) findViewById(R.id.settingsNotifications).setVisibility(View.GONE);
 
-        // ===== Logout button =====
         View logoutBtn = findViewById(R.id.btnLogout);
         if (logoutBtn != null) {
             logoutBtn.setOnClickListener(v -> {
@@ -117,13 +114,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             });
         }
 
-        // ===== Back button (if it exists) =====
         View backBtn = findViewById(R.id.back_button);
         if (backBtn != null) {
             backBtn.setOnClickListener(v -> finish());
         }
 
-        // ===== Bottom navigation =====
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {

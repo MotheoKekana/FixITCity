@@ -4,7 +4,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-/** The report summary deliberately selected for the shared image and caption. */
 public final class ReportShareData {
     public final String reference;
     public final String title;

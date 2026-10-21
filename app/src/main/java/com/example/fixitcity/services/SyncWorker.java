@@ -46,8 +46,7 @@ public class SyncWorker extends Worker {
             return Result.success();
         }
 
-        // 1) Refresh before touching queued rows. This prevents an expired JWT
-        // from turning a temporary sync problem into a permanent failed report.
+        // Refresh before syncing so an expired token does not fail queued reports.
         SessionRefresher.Result refreshResult = SessionRefresher.refresh(session);
         if (refreshResult == SessionRefresher.Result.OFFLINE) {
             Log.d(TAG, "Cannot refresh while offline — retrying later");
@@ -72,7 +71,6 @@ public class SyncWorker extends Worker {
             return Result.success();
         }
 
-        // 2) Load pending rows
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         ReportDao dao = db.reportDao();
         List<ReportEntity> pending = guest
@@ -88,7 +86,7 @@ public class SyncWorker extends Worker {
         boolean anyTransientFailure = false;
 
         for (ReportEntity row : pending) {
-            // Stop if the account changed while this worker was running.
+            // Stop if the active account changes during sync.
             if (session.isGuest() != guest
                     || session.getCitizenProfileId() != citizenProfileId
                     || !authUserId.equals(session.getUserId())) {
@@ -103,7 +101,7 @@ public class SyncWorker extends Worker {
                 syncOne(row, dao, accessToken, guest ? authUserId : null);
             } catch (TransientException te) {
                 Log.w(TAG, "Transient sync failure for " + row.reference_number + ": " + te.getMessage());
-                row.sync_status = "Pending";  // will retry
+                row.sync_status = "Pending";
                 row.sync_error = te.getMessage();
                 dao.update(row);
                 anyTransientFailure = true;
@@ -125,8 +123,7 @@ public class SyncWorker extends Worker {
                          ReportDao dao,
                          String accessToken, String guestAuthId) throws Exception {
 
-        // A previous attempt may have inserted the report but failed to upload its photo.
-        // Reuse that server row rather than posting a duplicate or discarding the photo.
+        // Reuse an inserted report when only its photo upload failed.
         FaultReport created;
         try {
             created = SupabaseReports.getReportByReference(row.reference_number, accessToken);
@@ -146,7 +143,7 @@ public class SyncWorker extends Worker {
             throw new IOException("Report was saved without a valid report ID");
         }
 
-        // Keep the outbox row and files until every photo record exists on the server.
+        // Keep the outbox and local files until every photo exists remotely.
         if (row.photo_filename != null && !row.photo_filename.isEmpty()) {
             try {
                 boolean legacy = !row.photo_filename.startsWith("[");
@@ -165,13 +162,13 @@ public class SyncWorker extends Worker {
                 }
                 Log.d(TAG, "Photos synced for " + row.reference_number);
             } catch (FileNotFoundException photoEx) {
-                // A missing local file needs intervention; a network retry cannot restore it.
+                // A retry cannot restore a missing local photo.
                 throw photoEx;
             } catch (IOException photoEx) {
                 Log.w(TAG, "Photo sync will retry for " + row.reference_number, photoEx);
                 throw new TransientException(photoEx.getMessage());
             } catch (Exception photoEx) {
-                // Preserve the local photo and row even for an unexpected failure.
+                // Keep the local row and photo on unexpected failures.
                 throw photoEx;
             }
         }
@@ -202,7 +199,7 @@ public class SyncWorker extends Worker {
         List<String> filenames = new ArrayList<>();
         if (value == null || value.isEmpty()) return filenames;
         if (!value.startsWith("[")) {
-            filenames.add(value); // Existing single-photo outbox rows.
+            filenames.add(value);
             return filenames;
         }
         JSONArray array = new JSONArray(value);
@@ -232,7 +229,6 @@ public class SyncWorker extends Worker {
         }
     }
 
-    /** Marker for retryable failures (network hiccups). */
     private static class TransientException extends Exception {
         TransientException(String msg) { super(msg); }
     }

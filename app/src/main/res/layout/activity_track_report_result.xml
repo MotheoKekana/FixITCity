@@ -7,7 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- ============== Header ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -59,7 +58,6 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- ============== ScrollView ============== -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -73,7 +71,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
-            <!-- Page title -->
             <TextView
                 android:id="@+id/tv_report_status_header"
                 android:layout_width="wrap_content"
@@ -82,7 +79,6 @@
                 android:textColor="@color/secondary_blue"
                 android:textSize="28sp"
                 android:textStyle="bold" />
-            <!-- ============== Report detail card (kept) ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -176,7 +172,6 @@
                         app:icon="@android:drawable/ic_menu_share" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- ============== Fault timeline ============== -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -195,7 +190,6 @@
                         android:textColor="@color/secondary_blue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-                    <!-- Empty / loading state -->
                     <TextView
                         android:id="@+id/tv_history_empty"
                         android:layout_width="match_parent"
@@ -205,7 +199,6 @@
                         android:text="Loading history…"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
-                    <!-- Timeline list -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_status_history"
                         android:layout_width="match_parent"
@@ -218,7 +211,6 @@
                         tools:listitem="@layout/item_status_history" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Open the citizen's notifications after viewing the timeline -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_notifications"
                 android:layout_width="match_parent"
@@ -236,7 +228,6 @@
                 android:maxLines="3" />
         </LinearLayout>
     </ScrollView>
-    <!-- ============== Bottom Navigation (unchanged) ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
@@ -246,7 +237,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -271,7 +261,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Report -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -296,7 +285,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Track (selected) -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -328,7 +316,6 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <!-- Settings -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

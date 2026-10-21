@@ -16,9 +16,6 @@ public class Guest_Mode_Activity extends AppCompatActivity {
 
         ScreenInsets.apply(this);
 
-        // Continue button → guest dashboard
-        // NOTE: change R.id.btnContinue to match the actual button ID in
-        // activity_guest_mode.xml
         View btnContinue = findViewById(R.id.btnContinue);
         if (btnContinue != null) {
             btnContinue.setOnClickListener(v -> {

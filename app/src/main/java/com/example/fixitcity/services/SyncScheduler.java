@@ -16,13 +16,11 @@ public class SyncScheduler {
 
     private static final String UNIQUE_NAME = "fixitcity_sync_pending";
 
-    /** Observe the same unique job that both the app and the manual button enqueue. */
     public static LiveData<List<WorkInfo>> observeSync(Context context) {
         return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_NAME);
     }
 
-    /** Enqueue a unique sync job with a network constraint. Safe to call repeatedly. */
     public static void scheduleSync(Context context) {
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

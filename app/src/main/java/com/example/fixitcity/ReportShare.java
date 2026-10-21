@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/** Generates a report card locally and opens Android's share chooser. */
 public final class ReportShare {
     private static final String TAG = "ReportShare";
     private static final long CACHE_MAX_AGE_MS = 7L * 24 * 60 * 60 * 1000;
@@ -42,7 +41,7 @@ public final class ReportShare {
 
         final Bitmap bitmap;
         try {
-            // Inflating/measuring Android views stays on the UI thread.
+            // Measure Android views on the UI thread.
             bitmap = render(activity, data);
         } catch (RuntimeException | OutOfMemoryError error) {
             button.setEnabled(true);
@@ -66,7 +65,7 @@ public final class ReportShare {
                         throw new IOException("Could not create the report image");
                     }
                 } catch (IOException failure) {
-                    // Only this newly created incomplete file is removed.
+                    // Delete only the incomplete image created by this share attempt.
                     if (!file.delete()) Log.d(TAG, "Incomplete card retained in temporary cache");
                     throw failure;
                 }
@@ -104,8 +103,7 @@ public final class ReportShare {
     }
 
     private static Bitmap render(Activity activity, ReportShareData data) {
-        // A fixed export palette/density makes the image consistent in both app
-        // themes and independent of the sender's font-size/display-size settings.
+        // Use fixed export colours and density across app themes and display settings.
         Configuration configuration = new Configuration(activity.getResources().getConfiguration());
         configuration.uiMode = (configuration.uiMode & ~Configuration.UI_MODE_NIGHT_MASK)
                 | Configuration.UI_MODE_NIGHT_NO;

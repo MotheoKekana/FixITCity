@@ -16,20 +16,17 @@ public class ReportData {
     private int photoCount;
     private String additionalDetails;
 
-    // Photo (local)
     private String photoUri;
     private byte[] photoBytes;
     private String photoMimeType;
     private final List<byte[]> photos = new ArrayList<>();
 
-    // Upvote tracking
     private int upvotedReportId = -1;
     private boolean hasUpvoted = false;
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
-    /** Alias — callers can use either getCategory() or getCategoryName(). */
     public String getCategoryName() { return category; }
 
     public long getCategoryId() { return categoryId; }

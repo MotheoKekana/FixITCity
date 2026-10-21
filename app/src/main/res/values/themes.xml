@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ONLY ONE Theme.FixITCity block -->
     <style name="Theme.FixITCity" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary_green</item>
         <item name="colorOnPrimary">@color/on_primary</item>
@@ -34,7 +33,6 @@
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowAnimationStyle">@style/FixITCityActivityAnimation</item>
 
-        <!-- Added these here so your Forgot Password screen keeps its styling -->
         <item name="textInputStyle">@style/Widget.FixITCity.TextInputLayout</item>
         <item name="materialButtonStyle">@style/Widget.FixITCity.Button</item>
     </style>

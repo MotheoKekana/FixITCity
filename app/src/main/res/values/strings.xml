@@ -138,46 +138,36 @@
     <string name="forgot_password_brand_logo_cd">FixITCity logo</string>
     <string name="forgot_password_success_icon_cd">Success</string>
 
-    <!-- Brand -->
     <string name="brand_fixit">FixIT</string>
     <string name="brand_city">City</string>
     <string name="brand_tagline">Report, Rank, Repair</string>
     <string name="logo_description">FixITCity logo</string>
 
-    <!-- Step 1: email -->
     <string name="fp_step1_title">Forgot your password?</string>
     <string name="fp_step1_subtitle">Enter your email and we\'ll send you a reset code.</string>
-    <!-- Step 2: verification code -->
     <string name="fp_step2_title">Check your email</string>
     <string name="fp_step2_subtitle">Enter the 6-digit code we sent you.</string>
-    <!-- Step 3: new password -->
     <string name="fp_step3_title">Create a new password</string>
     <string name="fp_step3_subtitle">Choose a password with at least 8 characters.</string>
-    <!-- Step 4: success -->
     <string name="fp_step4_title">Password updated</string>
     <string name="fp_step4_subtitle">Your password has been changed successfully.</string>
 
-    <!-- Field hints -->
     <string name="hint_email">Email</string>
     <string name="hint_code">Verification code</string>
     <string name="hint_new_password">New password</string>
     <string name="hint_confirm_password">Confirm password</string>
     <string name="helper_password">At least 8 characters</string>
 
-    <!-- Buttons -->
     <string name="btn_send_code">Send reset code</string>
     <string name="btn_verify_code">Verify code</string>
     <string name="btn_reset_password">Reset password</string>
     <string name="btn_go_to_sign_in">Go to sign in now</string>
     <string name="btn_back_to_sign_in">Back to sign in</string>
 
-    <!-- Success -->
     <string name="success_redirect">Redirecting to sign in in %1$d seconds...</string>
 
-    <!-- Accessibility -->
     <string name="step_progress_description">Step %1$d of 3</string>
 
-    <!-- Validation messages (same wording as the web page) -->
     <string name="error_email_required">Email address is required.</string>
     <string name="error_email_invalid">Please enter a valid email address.</string>
     <string name="error_code_required">Please enter the verification code.</string>

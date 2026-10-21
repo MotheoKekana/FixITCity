@@ -32,7 +32,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
     private static final String TAG = "ReportHistory";
 
     private RecyclerView rvReports;
-    private TrackHistoryAdapter adapter;              // ← was FaultReportAdapter
+    private TrackHistoryAdapter adapter;
     private TextView tvEmptyState;
     private MaterialButton btnSyncPending;
     private int pendingSyncCount;
@@ -62,7 +62,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
 
-        // Card-based adapter — each report becomes its own MaterialCardView row
         adapter = new TrackHistoryAdapter(filteredReports, this::onReportClicked);
         rvReports.setAdapter(adapter);
 
@@ -200,7 +199,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
             showEmptyState("Loading reports…");
         }
 
-        // 1) Local pending rows first — always available offline
         new Thread(() -> {
             List<ReportEntity> pending = guest
                     ? AppDatabase.getInstance(getApplicationContext()).reportDao()
@@ -230,7 +228,6 @@ public class ReportHistoryActivity extends AppCompatActivity {
 
             int pendingCount = localAsReports.size();
 
-            // 2) Then Supabase
             List<FaultReport> serverReports;
             try {
                 serverReports = guest
@@ -254,7 +251,7 @@ public class ReportHistoryActivity extends AppCompatActivity {
             final int pendingFinal = pendingCount;
 
             runOnUiThread(() -> {
-                // An earlier load must not display another account's reports after sign-in changes.
+                // Ignore an earlier request after the signed-in account changes.
                 SessionManager current = new SessionManager(this);
                 if (current.isGuest() != guest
                         || (guest ? !guestAuthId.equals(current.getUserId())
@@ -265,13 +262,12 @@ public class ReportHistoryActivity extends AppCompatActivity {
                 }
                 allReports.clear();
                 for (FaultReport localReport : localAsReports) {
-                    // A queued photo belongs to an already submitted report.
-                    // Show the server report once, while keeping the sync button count.
+                    // Show the server report once even while its photo is still queued.
                     if (!onlineReferences.contains(localReport.getReferenceNumber())) {
                         allReports.add(localReport);
                     }
                 }
-                allReports.addAll(serverFinal);      // then server rows
+                allReports.addAll(serverFinal);
                 updateSyncButton(pendingFinal);
                 applyFilter();
             });
@@ -321,11 +317,9 @@ public class ReportHistoryActivity extends AppCompatActivity {
             if ("All".equalsIgnoreCase(currentFilter)) {
                 include = true;
             } else if ("Fixed".equalsIgnoreCase(currentFilter)) {
-                // Catch "Fixed" and any legacy "resolved" variants
                 String s = status.toLowerCase(Locale.US);
                 include = s.equals("fixed") || s.equals("resolved") || s.equals("completed") || s.equals("closed");
             } else {
-                // Direct match for Pending, Under Review, Accepted, In Progress
                 include = status.equalsIgnoreCase(currentFilter);
             }
 

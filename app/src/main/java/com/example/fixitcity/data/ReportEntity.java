@@ -4,10 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-/**
- * Outbox row — one queued report waiting to be synced to Supabase.
- * Rows are DELETED from Room after a successful sync.
- */
 @Entity(tableName = "report_outbox")
 public class ReportEntity {
 

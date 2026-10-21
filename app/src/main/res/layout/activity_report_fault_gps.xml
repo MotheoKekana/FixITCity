@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_main_light_blue">
-    <!-- Header (same as full dashboard) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -58,7 +57,6 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Progress -->
     <LinearLayout
         android:id="@+id/progress_container"
         android:layout_width="0dp"
@@ -88,7 +86,6 @@
             app:indicatorColor="@color/secondary_blue"
             app:trackCornerRadius="4dp" />
     </LinearLayout>
-    <!-- Main Content -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -110,7 +107,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
-            <!-- Location card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,7 +117,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    <!-- GPS preview, using real coordinates without a map service. -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -186,7 +181,6 @@
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
-                    <!-- Address details -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -222,7 +216,6 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
-    <!-- Next Step Button -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
@@ -244,7 +237,6 @@
             android:singleLine="false"
             android:maxLines="3" />
     </LinearLayout>
-    <!-- Bottom Navigation (highlighting "Report" tab) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -254,7 +246,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <!-- Home (unselected) -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -280,7 +271,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Report (selected – highlighted with yellow pill) -->
         <LinearLayout
             android:id="@+id/navReport"
             android:layout_width="0dp"
@@ -313,7 +303,6 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <!-- Track (unselected) -->
         <LinearLayout
             android:id="@+id/navTrack"
             android:layout_width="0dp"
@@ -339,7 +328,6 @@
                 android:textColor="@color/icon_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-        <!-- Settings (unselected) -->
         <LinearLayout
             android:id="@+id/navSettings"
             android:layout_width="0dp"

@@ -188,7 +188,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                 tvLocationState.setText("Allow precise location to place this fault accurately.");
                 tvGpsBadge.setText("Permission needed");
                 locationAction.setEnabled(false);
-                // Android 12+ expects coarse and fine to be requested together.
+                // Request coarse and fine location together on Android 12 and newer.
                 ActivityCompat.requestPermissions(this, new String[] {
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_PERMISSION_REQUEST);
@@ -300,7 +300,7 @@ public class ReportFaultGPSActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(String message) {
-                        // Keep usable coordinates when address lookup is unavailable.
+                        // Address lookup failure must not discard the coordinates.
                     }
                 });
             } catch (RuntimeException error) {

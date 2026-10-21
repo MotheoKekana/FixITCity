@@ -32,7 +32,6 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="32dp">
-                    <!-- Green checkmark circle -->
                     <ImageView
                         android:layout_width="80dp"
                         android:layout_height="80dp"
@@ -42,7 +41,6 @@
                         app:tint="@color/on_primary"
                         android:contentDescription="@null"
                         android:importantForAccessibility="no" />
-                    <!-- Dynamic Thank you title -->
                     <TextView
                         android:id="@+id/tv_thank_you_title"
                         android:layout_width="match_parent"
@@ -53,8 +51,6 @@
                         android:textSize="24sp"
                         android:textStyle="bold"
                         tools:text="Thank you for upvoting\n&quot;Burst Pipe&quot;" />
-                    <!-- Subtitle -->
-                    <!-- Go to Dashboard button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_go_dashboard"
                         android:layout_width="match_parent"

@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import com.example.fixitcity.data.SessionManager;
 
-/** Shared routes for controls repeated across report and tracking screens. */
 public final class AppNavigation {
     private AppNavigation() {}
 
@@ -25,7 +24,7 @@ public final class AppNavigation {
         activity.finish();
     }
 
-    /** Restrict citizen screens even when opened from an older back stack. */
+    // Check the session even when an old back stack opens a citizen screen.
     public static boolean requireCitizen(Activity activity) {
         SessionManager session = new SessionManager(activity);
         if (session.isLoggedIn() && !session.isGuest()) return true;

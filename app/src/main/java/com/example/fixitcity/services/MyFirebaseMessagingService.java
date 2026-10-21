@@ -94,7 +94,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
 
-        // Reuse the normal startup route so a signed-in citizen keeps their session.
         Intent intent = new Intent(this, Splash_Activity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("open_notifications", true);

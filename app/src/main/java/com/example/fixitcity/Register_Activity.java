@@ -249,8 +249,7 @@ public class Register_Activity extends AppCompatActivity {
                 JSONObject userJson =
                         signupJson.optJSONObject("user");
 
-                // Some Auth responses return the user
-                // directly instead of inside "user".
+                // Auth responses may contain the user at the top level.
                 if (userJson == null
                         && signupJson.has("id")) {
 
@@ -288,10 +287,7 @@ public class Register_Activity extends AppCompatActivity {
                                 null
                         );
 
-                /*
-                 * If email confirmation is enabled,
-                 * signup succeeds but no session is returned.
-                 */
+                // Confirmation can succeed without returning a session.
                 if (accessToken == null
                         || accessToken.isEmpty()) {
 
@@ -341,11 +337,7 @@ public class Register_Activity extends AppCompatActivity {
             String refreshToken
     ) throws IOException {
 
-        /*
-         * The database trigger should already have created
-         * public.users and citizen_profiles before the
-         * signup request returns.
-         */
+        // The signup trigger creates the user and citizen profile.
         long userId =
                 SupabaseUsers.findUserIdByAuthUuid(
                         authUserId,
@@ -521,7 +513,7 @@ public class Register_Activity extends AppCompatActivity {
                 code = error.optString("error_code", error.optString("code", ""));
                 serverMessage = error.optString("msg", error.optString("message", ""));
             } catch (Exception ignored) {
-                // Network exceptions do not have an Auth JSON response.
+                // A connection failure has no Auth error body.
             }
         }
         String lower = (code + " " + raw).toLowerCase(Locale.ROOT);
@@ -537,8 +529,7 @@ public class Register_Activity extends AppCompatActivity {
             return "Please use a valid email address that can receive email.";
         }
         if (lower.contains("password")) {
-            // Show Supabase's actual rule when the project requires a stronger
-            // password than the app's baseline. Never change the entered password.
+            // Show the server's password rule without changing the entered password.
             if (serverMessage != null && !serverMessage.trim().isEmpty()
                     && serverMessage.length() <= 400) return serverMessage;
             return "Supabase rejected this password. Try a longer, unique password "

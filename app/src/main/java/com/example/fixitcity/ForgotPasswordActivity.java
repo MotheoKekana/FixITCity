@@ -30,27 +30,22 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private String accessToken = "";
     private CountDownTimer countDownTimer;
 
-    // Layout Containers
     private View stepEmail, stepCode, stepPassword, stepSuccess;
     private View step1Bar, step2Bar, step3Bar;
     private TextView tvTitle, tvSubtitle, tvRedirect;
 
-    // Step 1
     private TextInputLayout tilEmail;
     private TextInputEditText etEmail;
     private MaterialButton btnSendCode;
 
-    // Step 2
     private TextInputLayout tilCode;
     private TextInputEditText etCode;
     private MaterialButton btnVerifyCode;
 
-    // Step 3
     private TextInputLayout tilNewPassword, tilConfirmPassword;
     private TextInputEditText etNewPassword, etConfirmPassword;
     private MaterialButton btnResetPassword;
 
-    // Step 4 & Navigation
     private MaterialButton btnGoToSignIn, btnBackToSignIn;
 
     @Override
@@ -64,7 +59,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Handle system back button
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -82,13 +76,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
-        // Containers
         stepEmail = findViewById(R.id.stepEmail);
         stepCode = findViewById(R.id.stepCode);
         stepPassword = findViewById(R.id.stepPassword);
         stepSuccess = findViewById(R.id.stepSuccess);
 
-        // Progress & Headers
         step1Bar = findViewById(R.id.step1Bar);
         step2Bar = findViewById(R.id.step2Bar);
         step3Bar = findViewById(R.id.step3Bar);
@@ -96,24 +88,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         tvSubtitle = findViewById(R.id.tvSubtitle);
         tvRedirect = findViewById(R.id.tvRedirect);
 
-        // Step 1
         tilEmail = findViewById(R.id.tilEmail);
         etEmail = findViewById(R.id.etEmail);
         btnSendCode = findViewById(R.id.btnSendCode);
 
-        // Step 2
         tilCode = findViewById(R.id.tilCode);
         etCode = findViewById(R.id.etCode);
         btnVerifyCode = findViewById(R.id.btnVerifyCode);
 
-        // Step 3
         tilNewPassword = findViewById(R.id.tilNewPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnResetPassword = findViewById(R.id.btnResetPassword);
 
-        // Step 4 & Navigation
         btnGoToSignIn = findViewById(R.id.btnGoToSignIn);
         btnBackToSignIn = findViewById(R.id.btnBackToSignIn);
     }
@@ -126,7 +114,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         btnGoToSignIn.setOnClickListener(v -> finish());
         btnBackToSignIn.setOnClickListener(v -> finish());
 
-        // Clear errors on typing
         etEmail.addTextChangedListener(clearError(tilEmail));
         etCode.addTextChangedListener(clearError(tilCode));
         etNewPassword.addTextChangedListener(clearError(tilNewPassword));
@@ -136,13 +123,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private void showStep(int step) {
         currentStep = step;
 
-        // 1. Hide all steps
         stepEmail.setVisibility(View.GONE);
         stepCode.setVisibility(View.GONE);
         stepPassword.setVisibility(View.GONE);
         stepSuccess.setVisibility(View.GONE);
 
-        // 2. Show correct step & update texts
         switch (step) {
             case 1:
                 stepEmail.setVisibility(View.VISIBLE);
@@ -168,12 +153,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 break;
         }
 
-        // 3. Update Progress Bars
         step1Bar.setBackgroundResource(step >= 1 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
         step2Bar.setBackgroundResource(step >= 2 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
         step3Bar.setBackgroundResource(step >= 3 ? R.drawable.bg_step_active : R.drawable.bg_step_inactive);
 
-        // 4. Show back button on steps 1-3
         if (step < 4) {
             btnBackToSignIn.setVisibility(View.VISIBLE);
         }
@@ -195,7 +178,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }
     }
 
-    // ─── STEP 1: Send Code ───────────────────────────────────────────────
     private void sendResetCode() {
         String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
 
@@ -226,7 +208,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }).start();
     }
 
-    // ─── STEP 2: Verify Code ─────────────────────────────────────────────
     private void verifyCode() {
         String code = etCode.getText() != null ? etCode.getText().toString().trim() : "";
 
@@ -260,7 +241,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }).start();
     }
 
-    // ─── STEP 3: Reset Password ──────────────────────────────────────────
     private void resetPassword() {
         String newPass = etNewPassword.getText() != null ? etNewPassword.getText().toString() : "";
         String confirmPass = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString() : "";
@@ -293,7 +273,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }).start();
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────
     private void startSuccessCountdown() {
         if (countDownTimer != null) countDownTimer.cancel();
 
