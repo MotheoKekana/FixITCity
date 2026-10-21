@@ -141,19 +141,18 @@ namespace FixITCity_Dashboard.Pages
             }
         }
 
-        // ---------------------------------------------------------
         // Verify report
         // ---------------------------------------------------------
         public async Task<IActionResult> OnPostVerifyAsync(long id)
         {
-            return await UpdateReportStatusAsync(id, "Accepted");
+            // Pass a default reason so the 3-argument method is satisfied
+            return await UpdateReportStatusAsync(id, "Accepted", "Report verified and moved to the ranked queue.");
         }
 
         // ---------------------------------------------------------
         // Update status
         // ---------------------------------------------------------
-        public async Task<IActionResult> OnPostUpdateStatusAsync(
-            long id, string? statusUpdate)
+        public async Task<IActionResult> OnPostUpdateStatusAsync(long id, string? statusUpdate, string? reason)
         {
             if (string.IsNullOrWhiteSpace(statusUpdate))
             {
@@ -161,13 +160,24 @@ namespace FixITCity_Dashboard.Pages
                 return RedirectToPage(new { id });
             }
 
-            return await UpdateReportStatusAsync(id, statusUpdate.Trim());
-        }
+            // VALIDATION: If they are rejecting, they MUST provide a reason.
+            if (statusUpdate == "Rejected" && string.IsNullOrWhiteSpace(reason))
+            {
+                TempData["ErrorMessage"] = "You must provide a reason when rejecting a report.";
+                return RedirectToPage(new { id });
+            }
 
+            // Default reason if they are changing to something else
+            string finalReason = string.IsNullOrWhiteSpace(reason)
+                ? $"Status changed to {statusUpdate.Trim()}."
+                : reason.Trim();
+
+            return await UpdateReportStatusAsync(id, statusUpdate.Trim(), finalReason);
+        }
         // ---------------------------------------------------------
         // Send status update to API
         // ---------------------------------------------------------
-        private async Task<IActionResult> UpdateReportStatusAsync(long id, string status)
+        private async Task<IActionResult> UpdateReportStatusAsync(long id, string status, string reason)
         {
             var client = _httpClientFactory.CreateClient("Api");
 
@@ -176,8 +186,7 @@ namespace FixITCity_Dashboard.Pages
                 var request = new UpdateReportRequest
                 {
                     Status = status,
-                    // Same wording for every status change, so the log reads consistently
-                    Reason = $"Status changed to \"{status}\""
+                    Reason = reason // <--- Now uses the dynamic reason passed in
                 };
 
                 using var response = await client
@@ -209,7 +218,6 @@ namespace FixITCity_Dashboard.Pages
 
             return RedirectToPage(new { id });
         }
-
         // ---------------------------------------------------------
         // Audit log helpers
         // ---------------------------------------------------------
