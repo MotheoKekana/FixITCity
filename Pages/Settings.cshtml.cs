@@ -89,6 +89,7 @@ namespace FixITCity_Dashboard.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     HttpContext.Session.SetString("FullName", Input.FullName ?? "");
+                    HttpContext.Session.SetString("DisplayName", Input.FullName?.Trim() ?? "");
 
                     if (!string.IsNullOrWhiteSpace(Input.Email) &&
                         Input.Email != currentEmail)
