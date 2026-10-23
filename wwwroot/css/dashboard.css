@@ -744,3 +744,77 @@ html[data-theme="dark"] .refresh-button {
 html[data-theme="dark"] .refresh-button:hover {
     background: #334155;
 }
+/* =========================================
+   DARK MODE: Reports by Category panel
+   ========================================= */
+
+.dark-mode .panel,
+body.dark-mode .panel,
+html[data-theme="dark"] .panel,
+[data-theme="dark"] .panel {
+    color: #F1F5F9;
+}
+
+/* "Reports by category" heading */
+.dark-mode .panel-heading h2,
+body.dark-mode .panel-heading h2,
+html[data-theme="dark"] .panel-heading h2,
+[data-theme="dark"] .panel-heading h2 {
+    color: #F8FAFC !important;
+}
+
+/* "Report mix" label */
+.dark-mode .panel-kicker,
+body.dark-mode .panel-kicker,
+html[data-theme="dark"] .panel-kicker,
+[data-theme="dark"] .panel-kicker {
+    color: #CBD5E1 !important;
+}
+
+/* "41 total" label */
+.dark-mode .panel-meta,
+body.dark-mode .panel-meta,
+html[data-theme="dark"] .panel-meta,
+[data-theme="dark"] .panel-meta {
+    color: #CBD5E1 !important;
+}
+
+/* Category names: Electrical Outage, Burst Pipe, etc. */
+.dark-mode .category-copy span,
+body.dark-mode .category-copy span,
+html[data-theme="dark"] .category-copy span,
+[data-theme="dark"] .category-copy span {
+    color: #E2E8F0 !important;
+}
+
+/* Category counts: 9, 8, 7, etc. */
+.dark-mode .category-copy strong,
+body.dark-mode .category-copy strong,
+html[data-theme="dark"] .category-copy strong,
+[data-theme="dark"] .category-copy strong {
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+
+/* Improve progress-bar track visibility */
+.dark-mode .progress-track,
+body.dark-mode .progress-track,
+html[data-theme="dark"] .progress-track,
+[data-theme="dark"] .progress-track {
+    background-color: #374151 !important;
+}
+
+/* Empty-state text, when there are no categories */
+.dark-mode .empty-state,
+body.dark-mode .empty-state,
+html[data-theme="dark"] .empty-state,
+[data-theme="dark"] .empty-state {
+    color: #E2E8F0 !important;
+}
+
+    .dark-mode .empty-state p,
+    body.dark-mode .empty-state p,
+    html[data-theme="dark"] .empty-state p,
+    [data-theme="dark"] .empty-state p {
+        color: #CBD5E1 !important;
+    }
